@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graphura – Connect Channels</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Configuration file -->
+  <script src="config.js"></script>
 
   <style>
     /* ===== SIDEBAR ===== */
@@ -141,7 +143,7 @@
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/30 text-slate-800 min-h-screen">
+<body class="bg-white text-slate-800 min-h-screen">
 
 <!-- MOBILE SIDEBAR OVERLAY -->
 <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
@@ -149,9 +151,10 @@
 <!-- MOBILE SIDEBAR -->
 <aside id="mobileSidebar" class="mobile-sidebar">
   <!-- LOGO -->
-  <div class="px-6 py-6 border-b flex items-center gap-3">
-    <img src="assets/graphuralogo.png" class="h-10" />
-  </div>
+   <div class="px-4 py-4 border-b flex items-center justify-between">
+      <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
+      <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+    </div>
 
   <!-- NAV -->
   <nav class="px-4 py-6 space-y-1 flex-1">
@@ -166,6 +169,9 @@
     </a>
     <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">
       Help & Guide
+    </a>
+    <a href="f&q.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      FAQs
     </a>
   </nav>
 
@@ -197,10 +203,10 @@
 <div class="flex min-h-screen">
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-white/90 to-cyan-50/50 backdrop-blur-xl border-r border-cyan-200/30 flex flex-col justify-between">
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-cyan-200/30 flex flex-col justify-between">
 
     <!-- LOGO -->
-    <div class="px-6 py-6 border-b flex items-center gap-3">
+    <div class="px-6 py-6 border-b flex items-center justify-center">
       <img src="assets/graphuralogo.png" class="h-16" />
     </div>
 
@@ -218,6 +224,9 @@
       </a>
       <a href="help.html" class="sidebar-link">
         Help & Guide
+      </a>
+      <a href="f&q.html" class="sidebar-link">
+        FAQs
       </a>
 
     </nav>
@@ -272,25 +281,36 @@
   </aside>
 
 <!-- ================= MAIN CONTENT ================= -->
-<main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 relative overflow-hidden w-full">
-  <!-- Background gradient blobs -->
-  <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-300/15 to-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-300/10 to-cyan-300/10 rounded-full blur-3xl pointer-events-none"></div>
-
+<main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-slate-50 relative overflow-hidden w-full">
+   
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 width-full fixed top-0 left-0 right-0 z-20">
+      <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
   <!-- ===== PAGE HEADER ===== -->
-  <header class="flex items-start gap-3 sm:gap-4 mb-6 lg:mb-10">
+  <header class="flex items-start gap-3 sm:gap-4 mb-6 lg:mb-10 pt-16 lg:pt-0">
     <!-- MOBILE MENU BUTTON -->
-    <button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden mt-1" onclick="openMobileSidebar()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+   
     
     <div class="flex-1 min-w-0">
-      <h1 class="text-xl sm:text-2xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-blue-600 truncate">
-        Connect Channels
-      </h1>
-      <p class="text-xs sm:text-sm text-slate-600 mt-1 line-clamp-1">Connect your social media accounts to schedule and manage posts</p>
+      <div class="flex items-center gap-3">
+        <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="6" cy="12" r="3" stroke-width="2"/>
+          <circle cx="18" cy="6" r="3" stroke-width="2"/>
+          <circle cx="18" cy="18" r="3" stroke-width="2"/>
+            <path d="M8.7 10.5L15.3 7.5
+            M8.7 13.5L15.3 16.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+          Connect Channels
+        </h1>
+      </div>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">Connect your social media accounts to schedule and manage posts</p>
     </div>
   </header>
 
@@ -298,8 +318,8 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 relative">
 
     <!-- Facebook -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 border border-slate-200 hover:border-indigo-100" style="background: radial-gradient(circle at 100% 100%, rgba(59,130,246,0.15) 0%, rgba(99,102,241,0.05) 40%, rgba(255,255,255,0) 70%);">
-      <div class="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
+      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       
       <div class="p-4 lg:p-6 relative z-10">
         <div class="flex items-start justify-between mb-4 gap-2">
@@ -325,11 +345,9 @@
          transition-all duration-500
          hover:-translate-y-2 cursor-pointer
          bg-white
-         hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50
-         border border-slate-200 hover:border-green-100"
-  style="background: radial-gradient(circle at 100% 100%, rgba(34,197,94,0.15) 0%, rgba(16,185,129,0.05) 40%, rgba(255,255,255,0) 70%);">
+         border border-slate-200">
 
-  <div class="absolute inset-0 bg-gradient-to-br from-green-400/10 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
   <div class="p-4 lg:p-6 relative z-10">
     <div class="flex items-start justify-between mb-4 gap-2">
@@ -365,8 +383,8 @@
    
 
     <!-- Twitter/X -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white hover:bg-gradient-to-br hover:from-slate-100 hover:to-slate-50 border border-slate-200" style="background: radial-gradient(circle at 100% 100%, rgba(71,85,105,0.15) 0%, rgba(71,85,105,0.05) 40%, rgba(255,255,255,0) 70%);">
-      <div class="absolute inset-0 bg-gradient-to-br from-slate-400/10 to-slate-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
+      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       
       <div class="p-4 lg:p-6 relative z-10">
         <div class="flex items-start justify-between mb-4 gap-2">
@@ -388,8 +406,8 @@
     </div>
 
     <!-- YouTube -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white hover:bg-gradient-to-br hover:from-red-50 hover:to-orange-50 border border-slate-200 hover:border-red-100" style="background: radial-gradient(circle at 100% 100%, rgba(239,68,68,0.15) 0%, rgba(234,88,12,0.05) 40%, rgba(255,255,255,0) 70%);">
-      <div class="absolute inset-0 bg-gradient-to-br from-red-400/10 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
+      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       
       <div class="p-4 lg:p-6 relative z-10">
         <div class="flex items-start justify-between mb-4 gap-2">
@@ -410,8 +428,8 @@
       </div>
     </div>
      <!-- LinkedIn -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 border border-slate-200 hover:border-indigo-100" style="background: radial-gradient(circle at 100% 100%, rgba(59,130,246,0.15) 0%, rgba(99,102,241,0.05) 40%, rgba(255,255,255,0) 70%);">
-      <div class="absolute inset-0 bg-gradient-to-br from-indigo-400/10 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
+      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       
       <div class="p-4 lg:p-6 relative z-10">
         <div class="flex items-start justify-between mb-4 gap-2">
@@ -434,8 +452,8 @@
     </div>
 
     <!-- Pinterest -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white hover:bg-gradient-to-br hover:from-red-50 hover:to-rose-50 border border-slate-200 hover:border-red-100" style="background: radial-gradient(circle at 100% 100%, rgba(220,38,38,0.15) 0%, rgba(225,29,72,0.05) 40%, rgba(255,255,255,0) 70%);">
-      <div class="absolute inset-0 bg-gradient-to-br from-red-400/10 to-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
+      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       
       <div class="p-4 lg:p-6 relative z-10">
         <div class="flex items-start justify-between mb-4 gap-2">
@@ -517,14 +535,12 @@
     try {
       // Platform-specific OAuth endpoints
         const oauthEndpoints = {
-        'YOUTUBE': 'http://localhost:8082/oauth/youtube/connect',
-        'LINKEDIN': 'http://localhost:8082/oauth/linkedin/connect?userId=' 
-      + encodeURIComponent(localStorage.getItem("userEmail") || ''),
-
-        'TWITTER': 'http://localhost:8082/oauth/twitter/connect',
-        'PINTEREST': 'http://localhost:8082/oauth/pinterest/connect',
+        'YOUTUBE': API_ENDPOINTS.OAUTH.YOUTUBE,
+        'LINKEDIN': API_ENDPOINTS.OAUTH.LINKEDIN(localStorage.getItem("userEmail") || ''),
+        'TWITTER': API_ENDPOINTS.OAUTH.TWITTER,
+        'PINTEREST': API_ENDPOINTS.OAUTH.PINTEREST,
         'WHATSAPP': 'https://graph.facebook.com/v17.0',
-        'FACEBOOK': 'http://localhost:8082/oauth/whatsapp/connect'
+        'FACEBOOK': API_ENDPOINTS.OAUTH.WHATSAPP
         };
 
       // Check if this platform has a direct OAuth endpoint
@@ -534,7 +550,7 @@
       }
 
       // Fallback: Generic connection API endpoint
-      const response = await fetch(`http://localhost:8082/api/channels/connect/${channel.toLowerCase()}`, {
+      const response = await fetch(API_ENDPOINTS.CHANNELS.CONNECT(channel), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -581,7 +597,7 @@
     }
 
     try {
-      const response = await fetch('http://localhost:8082/api/channels/status', {
+      const response = await fetch(API_ENDPOINTS.CHANNELS.STATUS, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -633,6 +649,9 @@
       }
     }
   }
+
+
+
 
   // Mobile Sidebar Functions
   function openMobileSidebar() {

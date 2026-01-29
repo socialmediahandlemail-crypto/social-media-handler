@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js for professional data visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  <!-- Configuration file -->
+  <script src="config.js"></script>
 
   <style>
     /* ===== SIDEBAR ===== */
@@ -119,18 +121,18 @@
       border: 1px solid rgba(6, 182, 212, 0.1);
       border-radius: 1rem;
       padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.08);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
     }
 
     .chart-card:hover {
-      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       border-color: rgba(6, 182, 212, 0.2);
     }
 
     /* ===== STAT CARD ===== */
     .stat-card {
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+      background: #ffffff;
       border: 1px solid rgba(6, 182, 212, 0.15);
       border-radius: 1rem;
       padding: 1.25rem;
@@ -145,7 +147,7 @@
     .stat-number {
       font-size: 2rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      background: #06b6d4;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -163,13 +165,13 @@
 
     .loading-skeleton {
       animation: pulse-glow 1.5s ease-in-out infinite;
-      background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+      background: #f0f9ff;
       background-size: 200% 100%;
     }
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/30 text-slate-800 min-h-screen">
+<body class="bg-white text-slate-800 min-h-screen">
 
 <!-- MOBILE SIDEBAR OVERLAY -->
 <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
@@ -177,9 +179,10 @@
 <!-- MOBILE SIDEBAR -->
 <aside id="mobileSidebar" class="mobile-sidebar">
   <!-- LOGO -->
-  <div class="px-6 py-6 border-b flex items-center gap-3">
-    <img src="assets/graphuralogo.png" class="h-10" />
-  </div>
+   <div class="px-4 py-4 border-b flex items-center justify-between">
+      <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
+      <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+    </div>
 
   <!-- NAV -->
   <nav class="px-4 py-6 space-y-1 flex-1">
@@ -194,6 +197,9 @@
     </a>
     <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">
       Help & Guide
+    </a>
+    <a href="f&q.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      FAQs
     </a>
   </nav>
 
@@ -225,10 +231,10 @@
 <div class="flex min-h-screen">
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-white/90 to-cyan-50/50 backdrop-blur-xl border-r border-cyan-200/30 flex flex-col justify-between">
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-cyan-200/30 flex flex-col justify-between">
 
     <!-- LOGO -->
-    <div class="px-6 py-6 border-b flex items-center gap-3">
+    <div class="px-6 py-6 border-b flex items-center justify-center">
       <img src="assets/graphuralogo.png" class="h-16" />
     </div>
 
@@ -245,6 +251,9 @@
       </a>
       <a href="help.html" class="sidebar-link">
        Help & Guide
+      </a>
+      <a href="f&q.html" class="sidebar-link">
+        FAQs
       </a>
     </nav>
 
@@ -275,29 +284,31 @@
   </aside>
 
   <!-- ================= MAIN CONTENT ================= -->
-  <main class="lg:ml-64 flex-1 px-4 lg:px-10 py-6 lg:py-10 bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 relative overflow-y-auto overflow-x-hidden w-full">
-    <!-- Background gradient blobs -->
-    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-300/15 to-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-300/10 to-cyan-300/10 rounded-full blur-3xl pointer-events-none"></div>
-
+  <main class="lg:ml-64 flex-1 px-4 lg:px-10 py-6 lg:py-8 bg-slate-50 relative overflow-y-auto overflow-x-hidden w-full">
+   <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 fixed top-0 left-0 right-0 z-20">
+      <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
     <!-- ===== DASHBOARD HEADER ===== -->
-    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
-
+    <header class=" flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 py-14 lg:pt-0">
+       
       <!-- TOP ROW: MOBILE BUTTON & TITLE -->
       <div class="flex items-start gap-3 sm:gap-4">
-        <!-- MOBILE MENU BUTTON -->
-        <button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden flex-shrink-0" onclick="openMobileSidebar()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+       
 
         <!-- TITLE AND DESCRIPTION -->
         <div class="flex-1 min-w-0">
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-blue-600">
-            Analytics
-          </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+          <div class="flex items-center gap-3">
+            <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+              Analytics
+            </h1>
+          </div>
+          <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
             Track performance, posts, and platform insights.
           </p>
         </div>
@@ -374,7 +385,7 @@
         <div class="mb-4">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
             <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h11.5a.75.75 0 00.75-.75v-8.5a.75.75 0 00-.75-.75H4.25zm12-1.5a2.25 2.25 0 012.25 2.25v8.5A2.25 2.25 0 0115.75 17H4.25A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h11.5z" clip-rule="evenodd"></path></svg>
-            Posts by Platform
+            Pending Posts by Platform
           </h2>
           <p class="text-xs text-slate-500 mt-1">Distribution across channels</p>
         </div>
@@ -400,6 +411,7 @@
 <!-- ===== SCRIPTS ===== -->
 <script>
   // ===== AUTHENTICATION CHECK =====
+  
   window.onload = () => {
     const token = localStorage.getItem("authToken");
     if (!token) window.location.href = "home.html";
@@ -478,38 +490,50 @@
   // ===== CHART INSTANCES (global scope) =====
   let postsTimelineChart = null;
   let platformDistributionChart = null;
+  let cachedPosts = [];
 
   /**
    * Initialize analytics page with data and charts
    * Fetches posts from API and renders professional visualizations
    */
-  async function initializeAnalytics() {
-    try {
-      // Show loading state
-      showLoading(true);
+  let pendingInterval = null;
 
-      // Fetch posts from backend API
-      const posts = await fetchPosts();
+async function initializeAnalytics() {
+  try {
+    showLoading(true);
 
-      if (!posts || posts.length === 0) {
-        // Show 0 values when no posts available
-        updateStatisticsEmpty();
-        renderChartsEmpty();
-      } else {
-        // Process real data
-        updateStatistics(posts);
-        renderChartsWithData(posts);
-      }
+    const posts = await fetchPosts();
+    cachedPosts = posts || [];
 
-    } catch (error) {
-      console.error("Error initializing analytics:", error);
-      // Show 0 values on error
+    if (cachedPosts.length === 0) {
       updateStatisticsEmpty();
       renderChartsEmpty();
-    } finally {
-      showLoading(false);
+      return;
     }
+
+    updateStatistics(cachedPosts);
+
+    const activePosts = cachedPosts.filter(
+      p => new Date(p.scheduledTime) > new Date()
+    );
+
+    renderChartsWithData(activePosts);
+
+    if (pendingInterval) clearInterval(pendingInterval);
+
+    pendingInterval = setInterval(() => {
+      updateStatistics(cachedPosts);
+    }, 60000);
+
+  } catch (err) {
+    console.error(err);
+    updateStatisticsEmpty();
+    renderChartsEmpty();
+  } finally {
+    showLoading(false);
   }
+}
+
 
   /**
    * Fetch posts from backend API
@@ -517,7 +541,7 @@
    */
   async function fetchPosts() {
     try {
-      const response = await fetch('http://localhost:8082/api/posts/all', {
+      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('authToken')
         }
@@ -539,17 +563,32 @@
    * @param {Array} posts - Array of post objects
    */
   function updateStatistics(posts) {
-    // Total scheduled posts
-    document.getElementById('totalPostsCount').textContent = posts.length;
+  const now = new Date();
 
-    // Count unique platforms
-    const uniquePlatforms = new Set(posts.map(p => p.platform));
-    document.getElementById('activePlatformsCount').textContent = uniquePlatforms.size;
+  document.getElementById('totalPostsCount').textContent = posts.length;
 
-    // Count pending posts
-    const pendingPosts = posts.filter(p => p.status === 'PENDING').length;
-    document.getElementById('pendingPostsCount').textContent = pendingPosts;
-  }
+  // Get platforms with future scheduled posts only (active platforms)
+  const activePosts = posts.filter(post => {
+    if (!post.scheduledTime) return false;
+    const scheduledDate = new Date(post.scheduledTime);
+    return scheduledDate > now;
+  });
+
+  const activePlatforms = new Set(activePosts.map(p => p.platform));
+  document.getElementById('activePlatformsCount').textContent = activePlatforms.size;
+
+  // Get pending posts (PENDING status with future scheduled time)
+  const pendingPosts = posts.filter(post => {
+    if (!post.scheduledTime) return false;
+
+    const scheduledDate = new Date(post.scheduledTime);
+    return post.status === 'PENDING' && scheduledDate > now;
+  });
+
+  document.getElementById('pendingPostsCount').textContent = pendingPosts.length;
+}
+
+
 
   /**
    * Render charts with real post data

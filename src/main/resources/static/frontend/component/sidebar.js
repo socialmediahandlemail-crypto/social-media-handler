@@ -76,8 +76,8 @@ function initSidebarLogic() {
   }
 }
 
-// API Base URL
-const API_BASE_URL = "http://localhost:8082";
+// Import config from config.js (ensure config.js is loaded before this script)
+// const API_BASE_URL and API_ENDPOINTS are now defined in config.js
 
 // Track ongoing connection attempts to prevent duplicate redirects
 const ONGOING_CONNECTIONS = new Set();
@@ -85,16 +85,16 @@ const ONGOING_CONNECTIONS = new Set();
 // Timeout for redirect (ms) - prevents hanging if OAuth flow is cancelled
 const REDIRECT_TIMEOUT = 5000;
 
-// Channel OAuth endpoints mapping
+// Channel OAuth endpoints mapping (now using API_ENDPOINTS from config.js)
 const OAUTH_ENDPOINTS = {
-  youtube: "/oauth/youtube/connect",
-  linkedin: "/oauth/linkedin/connect",
-  instagram: "/oauth/instagram/connect",
-  facebook: "/oauth/facebook/connect",
-  twitter: "/oauth/twitter/connect",
-  pinterest: "/oauth/pinterest/connect",
-  tiktok: "/oauth/tiktok/connect",
-  whatsapp: "/oauth/whatsapp/connect"
+  youtube: API_ENDPOINTS.OAUTH.YOUTUBE,
+  linkedin: (userEmail) => API_ENDPOINTS.OAUTH.LINKEDIN(userEmail),
+  instagram: API_ENDPOINTS.OAUTH.INSTAGRAM,
+  facebook: API_ENDPOINTS.OAUTH.FACEBOOK,
+  twitter: API_ENDPOINTS.OAUTH.TWITTER,
+  pinterest: API_ENDPOINTS.OAUTH.PINTEREST,
+  tiktok: API_ENDPOINTS.OAUTH.TIKTOK,
+  whatsapp: API_ENDPOINTS.OAUTH.WHATSAPP
 };
 
 async function connectChannel(channel) {
@@ -113,7 +113,13 @@ async function connectChannel(channel) {
   try {
     // Check if OAuth endpoint exists for this channel
     if (OAUTH_ENDPOINTS[channel]) {
-      const oauthUrl = `${API_BASE_URL}${OAUTH_ENDPOINTS[channel]}`;
+      let oauthUrl = OAUTH_ENDPOINTS[channel];
+      
+      // Handle dynamic LinkedIn URL
+      if (typeof oauthUrl === 'function') {
+        oauthUrl = oauthUrl(localStorage.getItem("userEmail") || "");
+      }
+      
       console.log("Redirecting to OAuth:", oauthUrl);
       
       // Show loading state
@@ -141,7 +147,7 @@ async function connectChannel(channel) {
     console.log("Using generic connect API for:", channel);
     showNotification(`Connecting to ${channel}...`, "info");
 
-    const response = await fetch(`${API_BASE_URL}/api/channels/connect`, {
+    const response = await fetch(API_ENDPOINTS.CHANNELS.CONNECT(channel), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

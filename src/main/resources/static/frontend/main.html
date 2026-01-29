@@ -5,8 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graphura – Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Configuration file -->
+  <script src="config.js"></script>
 
   <style>
+    .status-completed {
+  background: linear-gradient(to right, #dcfce7, #bbf7d0);
+  color: #166534;
+  border: 1px solid #86efac;
+  padding: 0.375rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .status-completed {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.625rem;
+  }
+}
+
+/* Responsive status badge base styles */
+.status-badge {
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
     /* ===== SIDEBAR ===== */
     .sidebar-link {
       display: flex;
@@ -87,7 +129,7 @@
       left: 4px;
       width: calc(50% - 2px);
       height: calc(100% - 8px);
-      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      background: #06b6d4;
       border-radius: 10px;
       transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 12px rgba(6, 182, 212, 0.28);
@@ -208,7 +250,7 @@
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/30 text-slate-800 min-h-screen">
+<body class="bg-white text-slate-800 min-h-screen">
 
 <!-- MOBILE SIDEBAR OVERLAY -->
 <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
@@ -216,9 +258,10 @@
 <!-- MOBILE SIDEBAR -->
 <aside id="mobileSidebar" class="mobile-sidebar">
   <!-- LOGO -->
-  <div class="px-6 py-6 border-b flex items-center gap-3">
-    <img src="assets/graphuralogo.png" class="h-10" />
-  </div>
+  <div class="px-4 py-4 border-b flex items-center justify-between">
+      <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
+      <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+    </div>
 
   <!-- NAV -->
   <nav class="px-4 py-6 space-y-1 flex-1">
@@ -233,6 +276,9 @@
     </a>
     <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">
       Help & Guide
+    </a>
+    <a href="f&q.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      FAQs
     </a>
   </nav>
 
@@ -264,10 +310,10 @@
 <div class="flex min-h-screen">
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-white/90 to-cyan-50/50 backdrop-blur-xl border-r border-cyan-200/30 flex flex-col justify-between">
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-cyan-200/30 flex flex-col justify-between">
 
     <!-- LOGO -->
-    <div class="px-6 py-6 border-b flex items-center gap-3">
+    <div class="px-6 py-6 border-b flex items-center justify-center">
       <img src="assets/graphuralogo.png" class="h-16" />
     </div>
 
@@ -285,6 +331,9 @@
       </a>
       <a href="help.html" class="sidebar-link">
         Help & Guide
+      </a>
+      <a href="f&q.html" class="sidebar-link">
+        FAQs
       </a>
 
     </nav>
@@ -340,29 +389,35 @@
 
   </aside>
 <!-- ================= MAIN CONTENT ================= -->
-<main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 relative overflow-y-auto overflow-x-hidden max-h-screen w-full">
-  <!-- Background gradient blobs -->
-  <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-300/15 to-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-300/10 to-cyan-300/10 rounded-full blur-3xl pointer-events-none"></div>
-
-  <!-- ===== DASHBOARD HEADER ===== -->
-  <header class="mb-6 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
-    <!-- TOP ROW: MOBILE BUTTON & TITLE -->
-    <div class="flex items-start gap-3 sm:gap-4">
-      <!-- MOBILE MENU BUTTON -->
-      <button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden flex-shrink-0" onclick="openMobileSidebar()">
+<main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-slate-50 relative overflow-y-auto overflow-x-hidden max-h-screen w-full">
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 fixed top-0 left-0 right-0 z-20">
+      <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
         <span></span>
         <span></span>
         <span></span>
       </button>
+    </div>
+  <!-- ===== DASHBOARD HEADER ===== -->
+  <header class="mb-6 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-16 lg:pt-0">
+
+    <!-- TOP ROW: MOBILE BUTTON & TITLE -->
+    <div class="flex items-start gap-3 sm:gap-4">
 
       <!-- TITLE AND DESCRIPTION -->
       <div class="flex-1 min-w-0">
-        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-blue-600">
-          Dashboard
-        </h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="2"/>
+          </svg>
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+            Dashboard
+          </h1>
+        </div>
+        <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
           Unified view of activity, performance, and insights.
         </p>
       </div>
@@ -373,7 +428,7 @@
       <!-- SCHEDULE POST BUTTON -->
       <button
         onclick="openModal()"
-        class="flex items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5">
+        class="flex items-center justify-center gap-1 sm:gap-2 bg-cyan-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
         </svg>
@@ -383,28 +438,43 @@
 
       <!-- VIEW TOGGLE BUTTONS -->
       <div class="view-btn-group">
-        <button id="listBtn" class="view-btn active">📋 List</button>
-        <button id="calendarBtn" class="view-btn">📅 Calendar</button>
-      </div>
-    </div>
+  <button id="listBtn" class="view-btn active">
+    <svg class="w-4 h-4 mr-2 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M8 6h13M8 12h13M8 18h13" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="4" cy="6" r="1" fill="currentColor"/>
+      <circle cx="4" cy="12" r="1" fill="currentColor"/>
+      <circle cx="4" cy="18" r="1" fill="currentColor"/>
+    </svg>
+    List
+  </button>
+
+  <button id="calendarBtn" class="view-btn">
+    <svg class="w-4 h-4 mr-2 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2"/>
+      <path d="M16 3v4M8 3v4M3 9h18" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Calendar
+  </button>
+</div>
+
   </header>
 
   <!-- ===== CONTENT CARD ===== -->
   <section class="relative z-10 bg-white/70 backdrop-blur-md
        rounded-2xl border
-       shadow-[0_4px_12px_rgba(6,182,212,0.28)]
+       shadow-sm
        p-8 flex flex-col">
 
   <!-- ===== TAB BUTTONS FOR UPCOMING/PAST (ONLY IN LIST VIEW) ===== -->
   <div id="postTabsContainer" class="flex gap-8 mb-8 border-b border-slate-200">
     <button id="upcomingTab" class="relative pb-4 font-semibold text-slate-600 transition-all duration-300 hover:text-slate-900" onclick="switchPostTab('upcoming')">
       Scheduled Posts
-      <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"></div>
+      <div class="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 rounded-full"></div>
     </button>
     
     <button id="pastTab" class="relative pb-4 font-semibold text-slate-400 transition-all duration-300 hover:text-slate-600" onclick="switchPostTab('past')">
       Completed Posts
-      <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-300"></div>
+      <div class="absolute bottom-0 left-0 w-0 h-1 bg-cyan-500 rounded-full transition-all duration-300"></div>
     </button>
   </div>
 
@@ -435,7 +505,7 @@
       <div class="flex items-center justify-between mb-2">
 
         <!-- MONTH CONTROLS (REQUIRED BY calender.js) -->
-        <div class="flex items-center bg-gradient-to-r from-cyan-100/40 to-blue-100/40 rounded-lg p-0.5 border border-cyan-200/50">
+        <div class="flex items-center bg-white rounded-lg p-0.5 border border-cyan-200/50">
           <button
             id="prevMonth"
             type="button"
@@ -445,7 +515,7 @@
 
           <h2
             id="calendarTitle"
-            class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 px-3 min-w-[140px] text-center">
+            class="text-sm font-bold text-cyan-600 px-3 min-w-[140px] text-center">
           </h2>
 
           <button
@@ -459,7 +529,7 @@
       </div>
 
       <!-- WEEK HEADER -->
-      <div class="grid grid-cols-7 text-center text-xs font-bold bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-700 uppercase mb-1 rounded-lg py-0.5 border border-cyan-200/50">
+      <div class="grid grid-cols-7 text-center text-xs font-bold bg-white text-cyan-700 uppercase mb-1 rounded-lg py-0.5 border border-cyan-200/50">
         <span class="py-0.5">Sun</span><span class="py-0.5">Mon</span><span class="py-0.5">Tue</span>
         <span class="py-0.5">Wed</span><span class="py-0.5">Thu</span><span class="py-0.5">Fri</span><span class="py-0.5">Sat</span>
       </div>
@@ -467,7 +537,7 @@
       <!-- CALENDAR GRID (REQUIRED ID) -->
       <div
         id="calendarGrid"
-        class="grid grid-cols-7 gap-0.5 bg-gradient-to-br from-cyan-100/20 to-blue-100/20 p-0.5 border border-cyan-200/40 rounded-lg overflow-hidden">
+        class="grid grid-cols-7 gap-0.5 bg-white p-0.5 border border-cyan-200/40 rounded-lg overflow-hidden">
       </div>
 
     </section>
@@ -480,10 +550,10 @@
 <div id="postDetailsModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-xl overflow-hidden border border-slate-200 shadow-xl">
         <!-- Modal Header -->
-        <div class="p-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-cyan-50/30">
+        <div class="p-6 border-b border-slate-200 bg-white">
             <div class="flex justify-between items-start gap-4">
               <div class="flex-1">
-                <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600" id="detailModalTitle">Post Details</h3>
+                <h3 class="text-2xl font-bold text-cyan-600" id="detailModalTitle">Post Details</h3>
                 <p class="text-sm text-slate-500 mt-2" id="detailModalPlatform">Platform</p>
               </div>
               <button onclick="closePostDetailsModal()" class="w-8 h-8 rounded-lg hover:bg-slate-200 transition flex items-center justify-center text-slate-400 hover:text-slate-600 flex-shrink-0">
@@ -496,16 +566,16 @@
         <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
             <!-- Status Badge -->
             <div class="flex items-center justify-between">
-              <div id="detailStatusBadge" class="px-4 py-2 rounded-lg text-sm font-bold">
+              <div id="detailStatusBadge" class="status-badge px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg font-bold max-w-[200px] sm:max-w-[250px]">
                 Status
               </div>
-              <div id="detailPlatformIcon" class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"></div>
+              <div id="detailPlatformIcon" class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl flex-shrink-0"></div>
             </div>
 
             <!-- Media Preview in Modal -->
             <div id="detailMediaContainer" class="hidden">
-              <h4 class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">🖼️ Uploaded Media Preview</h4>
-              <div class="rounded-xl overflow-hidden h-64 bg-gradient-to-br from-slate-200 to-slate-300 border-2 border-slate-300 shadow-lg">
+              <h4 class="text-sm font-bold text-cyan-600 mb-3">🖼️ Uploaded Media Preview</h4>
+              <div class="rounded-xl overflow-hidden h-64 bg-slate-100 border-2 border-slate-300 shadow-lg">
                 <img id="detailMediaImage" src="" alt="media" class="w-full h-full object-cover hidden">
                 <video id="detailMediaVideo" controls class="w-full h-full object-cover hidden"></video>
               </div>
@@ -513,35 +583,64 @@
 
             <!-- Full Message Content -->
             <div>
-              <h4 class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-2">📝 Message Content</h4>
-              <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <p class="text-slate-700 leading-relaxed text-sm" id="detailContent">Message content will appear here</p>
-              </div>
-            </div>
+              <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+            <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2"/>
+           <path d="M9 9h6M9 13h6" stroke-width="2" stroke-linecap="round"/>
+           </svg>
+           Message Content
+          </h4>
+
+             <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+           <p class="text-slate-700 leading-relaxed text-sm" id="detailContent">
+              Message content will appear here
+             </p>
+             </div>
+             </div>
+
 
             <!-- Schedule Information -->
             <div class="grid grid-cols-2 gap-4">
-              <div>
-                <h4 class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-2">⏰ Scheduled Date</h4>
-                <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                  <p class="text-slate-700 font-medium text-sm" id="detailScheduledDate">--</p>
-                </div>
-              </div>
-              <div>
-                <h4 class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-2">🕐 Scheduled Time</h4>
-                <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                  <p class="text-slate-700 font-medium text-sm" id="detailScheduledTime">--</p>
-                </div>
-              </div>
-            </div>
+  <div>
+    <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+      <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2"/>
+        <path d="M16 3v4M8 3v4M3 9h18" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Scheduled Date
+    </h4>
+    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+      <p class="text-slate-700 font-medium text-sm" id="detailScheduledDate">--</p>
+    </div>
+  </div>
 
-            <!-- Recipient Info -->
-            <div>
-              <h4 class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-2">📞 Recipient</h4>
-              <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                <p class="text-slate-700 font-medium text-sm" id="detailRecipient">--</p>
-              </div>
-            </div>
+  <div>
+    <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+      <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" stroke-width="2"/>
+        <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Scheduled Time
+    </h4>
+    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+      <p class="text-slate-700 font-medium text-sm" id="detailScheduledTime">--</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recipient Info -->
+<div>
+  <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" stroke-width="2"/>
+      <path d="M4 20a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Recipient
+  </h4>
+  <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+    <p class="text-slate-700 font-medium text-sm" id="detailRecipient">--</p>
+  </div>
+</div>
 
             <!-- Additional Info -->
             <div class="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
@@ -611,14 +710,36 @@
 
             </div>
             <div>
-                <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1">🖼️ Media (Optional)</label>
-                <input type="file" id="mediaFile" accept="image/*,video/*" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-100 file:text-cyan-700 hover:file:bg-cyan-200 text-sm">
-                <p class="text-xs text-slate-500 mt-1">Images or Videos</p>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1">⏰ Schedule Time</label>
-                <input type="datetime-local" id="scheduledTime" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 text-sm" required>
-            </div>
+  <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke-width="2"/>
+      <circle cx="9" cy="11" r="2" stroke-width="2"/>
+      <path d="M21 15l-5-5-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Media (Optional)
+  </label>
+
+  <input type="file" id="mediaFile" accept="image/*,video/*"
+    class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-100 file:text-cyan-700 hover:file:bg-cyan-200 text-sm">
+
+  <p class="text-xs text-slate-500 mt-1">Images or Videos</p>
+</div>
+
+<div>
+  <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2"/>
+      <path d="M16 3v4M8 3v4M3 9h18" stroke-width="2" stroke-linecap="round"/>
+      <path d="M12 13v3l2 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Schedule Time
+  </label>
+
+  <input type="datetime-local" id="scheduledTime"
+    class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 text-sm"
+    required>
+</div>
+
             <div class="flex gap-2 pt-2">
                 <button type="button" onclick="closeModal()" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-50 transition-colors text-sm">Cancel</button>
                 <button type="submit" class="flex-1 px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all active:scale-95 text-sm">Schedule Now</button>
@@ -632,6 +753,19 @@
 <script src="calender.js"></script>
 
 <script>
+function getComputedStatus(post) {
+  const now = new Date();
+  const scheduledDate = new Date(post.scheduledTime);
+
+  if (post.status === "FAILED") return "FAILED";
+  if (post.status === "SENT") return "SENT";
+
+  if (scheduledDate <= now) return "COMPLETED";
+
+  return "PENDING";
+}
+
+
   // Sidebar profile dropdown
   const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
   const sidebarProfileMenu = document.getElementById("sidebarProfileMenu");
@@ -702,7 +836,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
             formData.append('file', mediaFile);
             
             // ===== UPLOAD MEDIA TO BACKEND =====
-            const mediaResponse = await fetch('http://localhost:8082/api/media/upload', {
+            const mediaResponse = await fetch(API_ENDPOINTS.MEDIA.UPLOAD, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('authToken')
@@ -738,7 +872,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
     };
 
     try {
-        const response = await fetch('http://localhost:8082/api/posts/schedule', {
+        const response = await fetch(API_ENDPOINTS.POSTS.SCHEDULE, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -821,7 +955,7 @@ function switchPostTab(tabName) {
 async function loadPosts() {
     const contentArea = document.getElementById('contentArea');
     try {
-        const response = await fetch('http://localhost:8082/api/posts/all', {
+        const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         });
         allPosts = await response.json();
@@ -829,15 +963,29 @@ async function loadPosts() {
         if (allPosts.length === 0) {
             document.getElementById('upcomingViewContent').innerHTML = `
               <div class="flex flex-col items-center justify-center py-20 px-6 rounded-2xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 border border-cyan-200/30">
-                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center text-5xl mb-6 shadow-lg border border-cyan-200/50">
-                  📋
-                </div>
-                <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">No Posts Yet</h3>
-                <p class="text-slate-600 text-center max-w-sm font-medium mb-6">Start by creating your first post to see it displayed here</p>
-                <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
-                  ✨ Create First Post
-                </button>
-              </div>
+  
+  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center mb-6 shadow-lg border border-cyan-200/50">
+    <svg class="w-10 h-10 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2"/>
+      <path d="M9 4h6v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V4Z" stroke-width="2"/>
+      <path d="M9 12h6M9 16h4" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">
+    No Posts Yet
+  </h3>
+
+  <p class="text-slate-600 text-center max-w-sm font-medium mb-6">
+    Start by creating your first post to see it displayed here
+  </p>
+
+  <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
+    Create First Post
+  </button>
+
+</div>
+
             `;
             if(contentArea) contentArea.classList.remove('hidden');
             return;
@@ -863,15 +1011,28 @@ function renderUpcomingPosts() {
     if (upcomingPosts.length === 0) {
         listView.innerHTML = `
           <div class="flex flex-col items-center justify-center py-20 px-6 rounded-2xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 border border-cyan-200/30">
-            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center text-5xl mb-6 shadow-lg border border-cyan-200/50">
-              ⏳
-            </div>
-            <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">No Upcoming Posts</h3>
-            <p class="text-slate-600 text-center max-w-sm font-medium mb-6">All your scheduled posts are in the past. Create new ones!</p>
-            <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
-              ✨ Schedule New Post
-            </button>
-          </div>
+  
+  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center mb-6 shadow-lg border border-cyan-200/50">
+    <svg class="w-10 h-10 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" stroke-width="2"/>
+      <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">
+    No Upcoming Posts
+  </h3>
+
+  <p class="text-slate-600 text-center max-w-sm font-medium mb-6">
+    All your scheduled posts are in the past. Create new ones!
+  </p>
+
+  <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
+    Schedule New Post
+  </button>
+
+</div>
+
         `;
         return;
     }
@@ -889,12 +1050,25 @@ function renderPastPosts() {
     if (pastPosts.length === 0) {
         pastView.innerHTML = `
           <div class="flex flex-col items-center justify-center py-20 px-6 rounded-2xl bg-gradient-to-br from-green-50/50 to-emerald-50/30 border border-green-200/30">
-            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center text-5xl mb-6 shadow-lg border border-green-200/50">
-              📜
-            </div>
-            <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-600 mb-3">No Past Updates Yet</h3>
-            <p class="text-slate-600 text-center max-w-sm font-medium">Your completed scheduled posts will appear here once their scheduled time passes.</p>
-          </div>
+  
+  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center mb-6 shadow-lg border border-green-200/50">
+    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M3 3v5h5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="8" stroke-width="2"/>
+      <path d="M12 8v5l3 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-600 mb-3">
+    No Past Updates Yet
+  </h3>
+
+  <p class="text-slate-600 text-center max-w-sm font-medium">
+    Your completed scheduled posts will appear here once their scheduled time passes.
+  </p>
+
+</div>
+
         `;
         return;
     }
@@ -913,12 +1087,7 @@ function renderPostCards(posts, container) {
         const scheduledDate = new Date(post.scheduledTime);
         const isPast = scheduledDate <= now;
         
-        const statusStyle =
-            post.status === "SENT"
-                ? "bg-cyan-100 text-cyan-700"
-                : post.status === "FAILED"
-                ? "bg-red-100 text-red-700"
-                : isPast ? "bg-yellow-100 text-yellow-700" : "bg-blue-100 text-blue-700";
+        
 
         const platformIcon =
             post.platform === "FACEBOOK" ? "assets/facebook.png" :
@@ -936,7 +1105,17 @@ function renderPostCards(posts, container) {
             post.platform === "YOUTUBE" ? "red" :
             post.platform === "PINTEREST" ? "rose" : "cyan";
 
-        const displayStatus = isPast && post.status === "PENDING" ? "SCHEDULED" : post.status;
+        const computedStatus = getComputedStatus(post);
+
+         const statusStyle =
+         computedStatus === "COMPLETED"
+        ? "status-completed"
+        : computedStatus === "FAILED"
+        ? "bg-red-100 text-red-700"
+        : computedStatus === "SENT"
+        ? "bg-cyan-100 text-cyan-700"
+        : "bg-blue-100 text-blue-700";
+
 
         cardsHtml += `
     <div class="group relative rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-100 flex flex-col h-full bg-gradient-to-br from-white to-blue-50/40 hover:border-cyan-300/40">
@@ -948,10 +1127,11 @@ function renderPostCards(posts, container) {
             <img src="${platformIcon}" alt="${post.platform}" class="w-full h-full object-contain">
           </div>
           <div class="flex flex-col items-end gap-1 flex-shrink-0">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap ${statusStyle} shadow-sm border border-opacity-30">
-              ${displayStatus}
-            </span>
-            ${post.mediaUrl ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 whitespace-nowrap shadow-sm border border-purple-200/50">🖼️</span>' : ''}
+            <span class="px-2.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-xs sm:text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis max-w-xs ${statusStyle}">
+           ${computedStatus}
+          </span>
+
+            ${post.mediaUrl ? '<span class="px-2.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-xs sm:text-xs font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 whitespace-nowrap shadow-sm border border-purple-200/50">🖼️</span>' : ''}
           </div>
         </div>
 
@@ -975,19 +1155,38 @@ function renderPostCards(posts, container) {
 
         <!-- Details Section -->
         <div class="space-y-2 pt-3 border-t border-slate-200/50">
-          <div class="flex items-center gap-2 text-xs">
-            <span>⏰</span>
-            <div>
-              <p class="text-slate-700 font-semibold">${scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span>📞</span>
-            <div>
-              <p class="text-slate-700 font-semibold truncate">${post.recipient}</p>
-            </div>
-          </div>
-        </div>
+
+  <!-- Scheduled Date & Time -->
+  <div class="flex items-center gap-2 text-xs">
+    <svg class="w-4 h-4 text-cyan-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" stroke-width="2"/>
+      <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <p class="text-slate-700 font-semibold">
+        ${scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+      </p>
+      <p class="text-slate-500 text-xs">
+        ${scheduledDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+      </p>
+    </div>
+  </div>
+
+  <!-- Recipient -->
+  <div class="flex items-center gap-2 text-xs">
+    <svg class="w-4 h-4 text-cyan-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" stroke-width="2"/>
+      <path d="M4 20a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <p class="text-slate-700 font-semibold truncate">
+        ${post.recipient}
+      </p>
+    </div>
+  </div>
+
+</div>
+
 
         <!-- Action Button -->
         <button onclick="openPostDetailsModal(${JSON.stringify(post).replace(/"/g, '&quot;')})" class="w-full mt-4 py-2 px-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-lg font-semibold text-xs hover:shadow-lg hover:from-cyan-500 hover:to-blue-600 transition-all active:scale-95 flex-shrink-0 border border-cyan-300/40">
@@ -1010,7 +1209,19 @@ let currentPost = null;
 
 function openPostDetailsModal(post) {
     currentPost = post;
-    
+
+    // ===== COMPUTE STATUS BASED ON TIME =====
+    const now = new Date();
+    const scheduledDate = new Date(post.scheduledTime);
+
+    let computedStatus = post.status;
+
+    // 🔥 TIME-BASED STATUS OVERRIDE
+    if (post.status === "PENDING" && scheduledDate <= now) {
+        computedStatus = "COMPLETED";
+    }
+
+    // ===== PLATFORM ICONS =====
     const platformIcons = {
         "FACEBOOK": "assets/facebook.png",
         "WHATSAPP": "assets/whatsapp.png",
@@ -1021,34 +1232,46 @@ function openPostDetailsModal(post) {
         "DEFAULT": "assets/graphuralogo.png"
     };
 
+    // ===== STATUS STYLES =====
     const statusStyles = {
+        "PENDING": "bg-blue-100 text-blue-700",
+        "COMPLETED": "bg-green-100 text-green-700 border border-green-200",
         "SENT": "bg-cyan-100 text-cyan-700",
-        "FAILED": "bg-red-100 text-red-700",
-        "PENDING": "bg-blue-100 text-blue-700"
+        "FAILED": "bg-red-100 text-red-700"
     };
 
-    // Populate modal with post details
+    // ===== STATUS BADGE (FIXED) =====
+    const badge = document.getElementById('detailStatusBadge');
+    badge.textContent = computedStatus;
+    badge.className = `status-badge px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg font-bold max-w-[200px] sm:max-w-[250px] ${statusStyles[computedStatus] || statusStyles["PENDING"]}`;
+
+    // ===== MODAL HEADER =====
     document.getElementById('detailModalTitle').textContent = post.platform;
     document.getElementById('detailModalPlatform').textContent = `Scheduled on ${post.platform}`;
-    document.getElementById('detailStatusBadge').textContent = post.status;
-    document.getElementById('detailStatusBadge').className = `px-4 py-2 rounded-lg text-sm font-bold ${statusStyles[post.status] || statusStyles["PENDING"]}`;
-    
-    const iconElement = document.getElementById('detailPlatformIcon');
-    iconElement.innerHTML = `<img src="${platformIcons[post.platform] || platformIcons['DEFAULT']}" alt="${post.platform}" class="w-full h-full object-contain p-2">`;
 
-    // Display media if available - Check multiple field names
+    // ===== PLATFORM ICON =====
+    const iconElement = document.getElementById('detailPlatformIcon');
+    iconElement.innerHTML = `
+        <img src="${platformIcons[post.platform] || platformIcons.DEFAULT}"
+             alt="${post.platform}"
+             class="w-full h-full object-contain p-2">
+    `;
+
+    // ===== MEDIA HANDLING =====
     const detailMediaContainer = document.getElementById('detailMediaContainer');
     const detailMediaImage = document.getElementById('detailMediaImage');
     const detailMediaVideo = document.getElementById('detailMediaVideo');
-    
-    // Check for media in different field names (mediaUrl, media, mediaLink, etc)
-    const mediaUrl = post.mediaUrl || post.media || post.mediaLink || post.mediaPath || null;
-    
-    console.log("Post object:", post);
-    console.log("Media URL found:", mediaUrl);
-    
+
+    const mediaUrl =
+        post.mediaUrl ||
+        post.media ||
+        post.mediaLink ||
+        post.mediaPath ||
+        null;
+
     if (mediaUrl) {
         detailMediaContainer.classList.remove('hidden');
+
         if (mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
             detailMediaImage.src = mediaUrl;
             detailMediaImage.classList.remove('hidden');
@@ -1060,26 +1283,40 @@ function openPostDetailsModal(post) {
         }
     } else {
         detailMediaContainer.classList.add('hidden');
+        detailMediaImage.classList.add('hidden');
+        detailMediaVideo.classList.add('hidden');
     }
 
+    // ===== CONTENT =====
     document.getElementById('detailContent').textContent = post.content;
-    const scheduledDate = new Date(post.scheduledTime);
-    document.getElementById('detailScheduledDate').textContent = scheduledDate.toLocaleDateString();
-    document.getElementById('detailScheduledTime').textContent = scheduledDate.toLocaleTimeString();
-    document.getElementById('detailRecipient').textContent = post.recipient || 'Not specified';
-    document.getElementById('detailPostId').textContent = post.id || 'N/A';
-    document.getElementById('detailStatus').textContent = post.status;
 
-    // Show modal
-    document.getElementById('postDetailsModal').classList.remove('hidden');
+    document.getElementById('detailScheduledDate').textContent =
+        scheduledDate.toLocaleDateString();
+
+    document.getElementById('detailScheduledTime').textContent =
+        scheduledDate.toLocaleTimeString();
+
+    document.getElementById('detailRecipient').textContent =
+        post.recipient || 'Not specified';
+
+    document.getElementById('detailPostId').textContent =
+        post.id || 'N/A';
+
+    // 🔥 FIXED STATUS TEXT (IMPORTANT)
+    document.getElementById('detailStatus').textContent = computedStatus;
+
+    // ===== SHOW MODAL =====
+    const modal = document.getElementById('postDetailsModal');
+    modal.classList.remove('hidden');
 
     // Close modal when clicking outside
-    document.getElementById('postDetailsModal').addEventListener('click', (e) => {
+    modal.onclick = (e) => {
         if (e.target.id === 'postDetailsModal') {
             closePostDetailsModal();
         }
-    });
+    };
 }
+
 
 function closePostDetailsModal() {
     document.getElementById('postDetailsModal').classList.add('hidden');
@@ -1093,7 +1330,7 @@ async function deletePost(postId) {
     }
 
     try {
-        const response = await fetch(`http://localhost:8082/api/posts/${postId}`, {
+        const response = await fetch(API_ENDPOINTS.POSTS.GET_BY_ID(postId), {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
@@ -1123,7 +1360,7 @@ async function deletePostFromModal() {
     }
 
     try {
-        const response = await fetch(`http://localhost:8082/api/posts/${currentPost.id}`, {
+        const response = await fetch(API_ENDPOINTS.POSTS.UPDATE(currentPost.id), {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),

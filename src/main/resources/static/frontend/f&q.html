@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura – FAQs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ===== SIDEBAR ===== */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.25s ease;
+    }
+    .sidebar-link:hover {
+      background: rgba(6,182,212,0.08);
+      color: #0891b2;
+    }
+    .sidebar-active {
+      background: rgba(6,182,212,0.15);
+      color: #0891b2;
+      box-shadow: inset 0 0 0 1px rgba(6,182,212,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ===== MOBILE SIDEBAR ===== */
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      flex-direction: column;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .mobile-menu-btn:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .mobile-menu-btn span {
+      width: 18px;
+      height: 2px;
+      background: #0891b2;
+      display: block;
+      margin: 2.5px 0;
+      transition: all 0.25s ease;
+      border-radius: 1px;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 30;
+    }
+
+    .mobile-sidebar-overlay.open {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 256px;
+      background: white;
+      border-r: 1px solid rgba(6, 182, 212, 0.3);
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 40;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* FAQ ACCORDION */
+    .faq-item {
+      border: 1px solid rgba(6,182,212,0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+      transition: all 0.25s ease;
+    }
+    .faq-item:hover {
+      border-color: rgba(6,182,212,0.3);
+      box-shadow: 0 2px 8px rgba(6,182,212,0.1);
+    }
+    .faq-question {
+      cursor: pointer;
+      padding: 0.875rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #1e293b;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+    .faq-question:hover {
+      color: #0891b2;
+    }
+    .faq-question span {
+      font-size: 1.25rem;
+      color: #0891b2;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+    }
+    .faq-answer {
+      padding: 0 1rem 0.875rem;
+      display: none;
+      color: #475569;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      animation: slideDown 0.3s ease;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* FORM STYLING */
+    input:focus, textarea:focus {
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.1);
+      border-color: #0891b2;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      transition: all 0.3s ease;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(6,182,212,0.3);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- ===== MOBILE SIDEBAR OVERLAY ===== -->
+  <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- ===== MOBILE SIDEBAR ===== -->
+  <div class="mobile-sidebar" id="mobileSidebar">
+    <div class="px-4 py-4 border-b flex items-center justify-between">
+      <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
+      <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+    </div>
+
+    <nav class="px-3 py-4 space-y-1">
+      <a href="main.html" class="sidebar-link" onclick="closeMobileSidebar()">Dashboard</a>
+      <a href="connect.html" class="sidebar-link" onclick="closeMobileSidebar()">Channels</a>
+      <a href="analysis.html" class="sidebar-link" onclick="closeMobileSidebar()">Analytics</a>
+      <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">Help & Guide</a>
+      <a href="f&q.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">FAQs</a>
+    </nav>
+
+    <div class="p-3 border-t space-y-3 mt-auto">
+      <!-- Mobile Sidebar Profile Button -->
+      <button id="mobileSidebarProfileBtn"
+        class="w-full flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm hover:shadow transition">
+        <div class="w-9 h-9 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold flex-shrink-0">
+          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+        </div>
+        <div class="min-w-0 text-left">
+          <p id="mobileUserName" class="text-xs font-semibold text-slate-800 leading-tight">User</p>
+          <p id="mobileUserEmail" class="text-xs text-slate-500 leading-tight truncate">user@email.com</p>
+        </div>
+      </button>
+
+      <!-- Mobile Dropdown -->
+      <div id="mobileSidebarProfileMenu" class="hidden px-3 py-2 bg-slate-50 rounded-lg">
+        <button onclick="logout()" class="w-full px-3 py-2 text-left text-red-600 hover:bg-red-50 rounded text-sm font-medium transition">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DESKTOP SIDEBAR ===== -->
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-cyan-200/30 flex flex-col justify-between">
+
+    <div class="px-6 py-6 border-b flex items-center justify-center">
+      <img src="assets/graphuralogo.png" class="h-16" alt="Graphura Logo" />
+    </div>
+
+    <nav class="px-4 py-6 space-y-1 flex-1">
+      <a href="main.html" class="sidebar-link">Dashboard</a>
+      <a href="connect.html" class="sidebar-link">Channels</a>
+      <a href="analysis.html" class="sidebar-link">Analytics</a>
+      <a href="help.html" class="sidebar-link">Help & Guide</a>
+      <a href="f&q.html" class="sidebar-link sidebar-active">FAQs</a>
+    </nav>
+
+    <div class="p-4 relative">
+      <!-- Desktop Sidebar Profile Button -->
+      <button id="sidebarProfileBtn"
+        class="mt-auto w-full flex items-center gap-3 px-4 py-3 border-t border-slate-200 hover:bg-slate-50 transition">
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0">
+          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+        </div>
+
+        <!-- User Info -->
+        <div class="min-w-0 text-left">
+          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">User</p>
+          <p id="sidebarUserEmail" class="text-xs text-slate-500 leading-tight break-all">user@email.com</p>
+        </div>
+      </button>
+
+      <!-- DROPDOWN -->
+      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="lg:ml-64 flex-1 flex flex-col">
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 fixed top-0 left-0 right-0 z-20">
+      <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="flex-1 px-4 lg:px-10 py-6 overflow-y-auto">
+
+    <!-- HEADER -->
+    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-16 lg:pt-0">
+      <!-- TOP ROW: MOBILE BUTTON & TITLE -->
+      <div class="flex items-start gap-3 sm:gap-4">
+
+        <!-- TITLE AND DESCRIPTION -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3">
+            <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+              Frequently Asked Questions
+            </h1>
+          </div>
+          <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
+            Everything you need to know about using Graphura effectively.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== FAQ SECTION ===== -->
+    <section class="space-y-2 max-w-3xl mb-12">
+
+      <!-- FAQ ITEM -->
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">How does Graphura schedule posts?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Graphura allows you to select content, platform, and time. Once scheduled, the post is automatically published at the selected time using connected platform APIs. You can manage multiple posts across different platforms simultaneously from a single dashboard.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">Which social media platforms are supported?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Currently supported platforms include Facebook, Twitter/X, LinkedIn, YouTube, Pinterest, and WhatsApp. We're continuously adding new platforms to expand your reach.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">Can I edit or delete a scheduled post?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Yes. You can delete any scheduled post before its publishing time from the Dashboard. Once a post is published, you can only delete it from the social media platform directly.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">Why is my analytics data not showing?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Analytics appear once posts are published. Make sure posts are completed and the Analytics page is refreshed. Data typically updates within 15-30 minutes after publication. You may also need to authenticate with the respective platform's analytics service.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">Is my account data secure?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Yes. Graphura uses JWT authentication tokens and platform OAuth to ensure your data and connected accounts remain secure. All sensitive data is encrypted and stored securely. We never store your platform passwords.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">How can I connect my social media accounts?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Navigate to the "Channels" section and click on the platform you want to connect. You'll be redirected to the platform's login page where you can authorize Graphura to manage your posts. The process is secure and you maintain full control over permissions.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">What happens if my internet connection is lost during scheduling?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Graphura is designed to handle network interruptions gracefully. Your scheduled posts are saved to our servers before confirmation. If the connection is lost, you can simply retry the action. Rest assured your data won't be lost.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span class="flex-1">Can I schedule posts in advance?</span>
+          <span class="text-lg">+</span>
+        </div>
+        <div class="faq-answer">
+          Absolutely! You can schedule posts weeks or months in advance. This is perfect for planning content calendars and ensuring consistent posting even when you're busy. Use the Calendar view to get an overview of all scheduled posts.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===== ASK A QUESTION ===== -->
+    <section class="max-w-3xl bg-white border border-cyan-200/30 rounded-2xl p-6 lg:p-8">
+      <h2 class="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">Still have a question?</h2>
+      <p class="text-slate-600 mb-6">Ask us anything and our team will help you within 24 hours.</p>
+
+      <form class="space-y-4" id="contactForm">
+        <input 
+          type="text" 
+          id="contactName"
+          placeholder="Your Name"
+          required
+          class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+        />
+
+        <input 
+          type="email" 
+          id="contactEmail"
+          placeholder="Your Email"
+          required
+          class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+        />
+
+        <textarea 
+          id="contactMessage"
+          rows="4" 
+          placeholder="Write your question here..."
+          required
+          class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition resize-none"
+        ></textarea>
+
+        <div id="formMessage" class="hidden p-3 rounded-lg text-sm"></div>
+
+        <button 
+          type="submit"
+          class="submit-btn px-6 py-3 text-white rounded-lg font-semibold transition"
+        >
+          Submit Question
+        </button>
+      </form>
+    </section>
+
+    </div>
+  </main>
+</div>
+
+</div>
+
+<script>
+  // ===== AUTHENTICATION CHECK =====
+  window.addEventListener('load', () => {
+    const authToken = localStorage.getItem('authToken');
+    const currentPath = window.location.pathname;
+    
+    // Redirect to login if not authenticated
+    if (!authToken) {
+      window.location.href = 'home.html';
+      return;
+    }
+
+    // Display user info in sidebars
+    const userEmail = localStorage.getItem('userEmail') || 'user@email.com';
+    const userName = localStorage.getItem('userName') || 'User';
+    
+    // Update desktop sidebar
+    const sidebarUserName = document.getElementById('sidebarUserName');
+    const sidebarUserEmail = document.getElementById('sidebarUserEmail');
+    if (sidebarUserName) sidebarUserName.textContent = userName;
+    if (sidebarUserEmail) sidebarUserEmail.textContent = userEmail;
+    
+    // Update mobile sidebar
+    const mobileUserName = document.getElementById('mobileUserName');
+    const mobileUserEmail = document.getElementById('mobileUserEmail');
+    if (mobileUserName) mobileUserName.textContent = userName;
+    if (mobileUserEmail) mobileUserEmail.textContent = userEmail;
+
+    // Initialize profile dropdowns
+    initializeProfileDropdown();
+  });
+
+  // ===== PROFILE DROPDOWN INITIALIZATION =====
+  function initializeProfileDropdown() {
+    // Desktop sidebar profile button
+    const sidebarProfileBtn = document.getElementById('sidebarProfileBtn');
+    const sidebarProfileMenu = document.getElementById('sidebarProfileMenu');
+
+    if (sidebarProfileBtn && sidebarProfileMenu) {
+      let isOpen = false;
+
+      const toggleDropdown = (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        sidebarProfileMenu.classList.toggle('hidden', !isOpen);
+      };
+
+      const closeDropdown = () => {
+        isOpen = false;
+        sidebarProfileMenu.classList.add('hidden');
+      };
+
+      sidebarProfileBtn.addEventListener('click', toggleDropdown);
+      document.addEventListener('click', closeDropdown);
+    }
+
+    // Mobile sidebar profile button
+    const mobileSidebarProfileBtn = document.getElementById('mobileSidebarProfileBtn');
+    const mobileSidebarProfileMenu = document.getElementById('mobileSidebarProfileMenu');
+
+    if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
+      let isOpen = false;
+
+      const toggleDropdown = (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        mobileSidebarProfileMenu.classList.toggle('hidden', !isOpen);
+      };
+
+      const closeDropdown = () => {
+        isOpen = false;
+        mobileSidebarProfileMenu.classList.add('hidden');
+      };
+
+      mobileSidebarProfileBtn.addEventListener('click', toggleDropdown);
+      document.addEventListener('click', closeDropdown);
+    }
+  }
+
+  // ===== MOBILE SIDEBAR FUNCTIONS =====
+  function openMobileSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = 'auto';
+  }
+
+  // ===== FAQ TOGGLE =====
+  function toggleFAQ(element) {
+    const faqItem = element.closest('.faq-item');
+    faqItem.classList.toggle('open');
+  }
+
+  // Close FAQ when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.faq-item') && !e.target.closest('.faq-question')) {
+      document.querySelectorAll('.faq-item.open').forEach(item => {
+        item.classList.remove('open');
+      });
+    }
+  });
+
+  // ===== FORM SUBMISSION =====
+  document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const formMessage = document.getElementById('formMessage');
+    
+    const name = document.getElementById('contactName').value.trim();
+    const email = document.getElementById('contactEmail').value.trim();
+    const message = document.getElementById('contactMessage').value.trim();
+
+    // Validation
+    if (!name || !email || !message) {
+      showFormMessage('Please fill in all fields', 'error');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showFormMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    if (message.length < 10) {
+      showFormMessage('Question should be at least 10 characters long', 'error');
+      return;
+    }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+
+    try {
+      // Get auth token for backend request
+      const authToken = localStorage.getItem('authToken');
+      
+      const response = await fetch('/api/contact/faq', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          source: 'faq_page'
+        })
+      });
+
+      if (response.ok) {
+        showFormMessage('✓ Question submitted successfully! We\'ll respond within 24 hours.', 'success');
+        form.reset();
+        
+        // Reset button after 3 seconds
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          formMessage.classList.add('hidden');
+        }, 3000);
+      } else {
+        const errorData = await response.json();
+        showFormMessage(errorData.message || 'Error submitting question. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      showFormMessage('Network error. Please check your connection and try again.', 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+
+  function showFormMessage(message, type) {
+    const formMessage = document.getElementById('formMessage');
+    formMessage.textContent = message;
+    formMessage.classList.remove('hidden', 'bg-green-50', 'text-green-800', 'bg-red-50', 'text-red-800');
+    
+    if (type === 'success') {
+      formMessage.classList.add('bg-green-50', 'text-green-800');
+    } else if (type === 'error') {
+      formMessage.classList.add('bg-red-50', 'text-red-800');
+    }
+  }
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // ===== LOGOUT FUNCTION =====
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      window.location.href = 'home.html';
+    }
+  }
+</script>
+
+</body>
+</html>

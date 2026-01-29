@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Import config from config.js
+  // Note: config.js must be loaded before this script
 
   const listBtn = document.getElementById("listBtn");
   const calendarBtn = document.getElementById("calendarBtn");
@@ -21,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to fetch posts
   async function fetchAndRenderCalendar() {
     try {
-      const response = await fetch('http://localhost:8082/api/posts/all', {
+      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
       });
       allPosts = await response.json();
@@ -66,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch posts and render calendar
     try {
-      const response = await fetch('http://localhost:8082/api/posts/all', {
+      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
       });
       const posts = await response.json();
@@ -149,7 +151,7 @@ function renderCalendar(posts = []) {
   prevMonthBtn.onclick = async () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
     try {
-      const response = await fetch('http://localhost:8082/api/posts/all', {
+      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
       });
       const posts = await response.json();
@@ -163,7 +165,7 @@ function renderCalendar(posts = []) {
   nextMonthBtn.onclick = async () => {
     currentDate.setMonth(currentDate.getMonth() + 1);
     try {
-      const response = await fetch('http://localhost:8082/api/posts/all', {
+      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
       });
       const posts = await response.json();
