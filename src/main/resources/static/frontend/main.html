@@ -465,17 +465,36 @@
        shadow-sm
        p-8 flex flex-col">
 
-  <!-- ===== TAB BUTTONS FOR UPCOMING/PAST (ONLY IN LIST VIEW) ===== -->
-  <div id="postTabsContainer" class="flex gap-8 mb-8 border-b border-slate-200">
-    <button id="upcomingTab" class="relative pb-4 font-semibold text-slate-600 transition-all duration-300 hover:text-slate-900" onclick="switchPostTab('upcoming')">
-      Scheduled Posts
-      <div class="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 rounded-full"></div>
-    </button>
+  <!-- ===== PREMIUM SENIOR-LEVEL TAB DESIGN ===== -->
+  <div class="relative mb-8">
+    <div id="postTabsContainer" class="flex gap-16 relative px-0.5">
+      <!-- Animated Premium Underline with Shadow -->
+      <div id="tabUnderline" class="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-600 transition-all duration-600 ease-out rounded-full" style="width: 0; left: 0; box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);"></div>
+      
+      <!-- Scheduled Posts Tab -->
+      <button id="upcomingTab" class="relative py-5 px-0.5 font-semibold text-base transition-all duration-300 group" onclick="switchPostTab('upcoming')">
+        <span class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-800">
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="4" y="5" width="16" height="14" rx="2" stroke-width="1.5"/>
+            <path d="M4 10h16M9 1v8M15 1v8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Scheduled Posts</span>
+        </span>
+      </button>
+      
+      <!-- Completed Posts Tab -->
+      <button id="pastTab" class="relative py-5 px-0.5 font-semibold text-base transition-all duration-300 group" onclick="switchPostTab('past')">
+        <span class="flex items-center gap-2.5 text-slate-400 group-hover:text-slate-600">
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M9 3H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-4m-4 0a2 2 0 00-2 2v0a2 2 0 002 2h4a2 2 0 002-2v0a2 2 0 00-2-2m0 0V3a2 2 0 00-2-2h0a2 2 0 00-2 2v1m7 10l-3 3m0 0l-3-3m3 3v-6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Completed Posts</span>
+        </span>
+      </button>
+    </div>
     
-    <button id="pastTab" class="relative pb-4 font-semibold text-slate-400 transition-all duration-300 hover:text-slate-600" onclick="switchPostTab('past')">
-      Completed Posts
-      <div class="absolute bottom-0 left-0 w-0 h-1 bg-cyan-500 rounded-full transition-all duration-300"></div>
-    </button>
+    <!-- Subtle Border -->
+    <div class="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mt-0.5"></div>
   </div>
 
   <!-- ===== LIST VIEW (UPCOMING POSTS) ===== -->
@@ -903,54 +922,83 @@ let currentPostView = 'upcoming';
 
 // Switch between Upcoming and Past posts
 function switchPostTab(tabName) {
+    // Prevent toggle bug: don't do anything if same tab is clicked
+    if (currentPostView === tabName) {
+        return;
+    }
+    
     currentPostView = tabName;
     
     const upcomingBtn = document.getElementById('upcomingTab');
     const pastBtn = document.getElementById('pastTab');
+    const upcomingContent = document.getElementById('upcomingViewContent');
+    const pastContent = document.getElementById('pastViewContent');
+    const tabUnderline = document.getElementById('tabUnderline');
     
     if (tabName === 'upcoming') {
-        // Active: Upcoming, Inactive: Past
+        // Active: Upcoming
         upcomingBtn.classList.remove('text-slate-400');
         upcomingBtn.classList.add('text-slate-900');
-        upcomingBtn.innerHTML = `
-          Scheduled Posts
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"></div>
-        `;
         
+        // Inactive: Past
         pastBtn.classList.remove('text-slate-900');
         pastBtn.classList.add('text-slate-400');
-        pastBtn.innerHTML = `
-          Completed Posts
-          <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-300"></div>
-        `;
-    } else {
-        // Active: Past, Inactive: Upcoming
-        pastBtn.classList.remove('text-slate-400');
-        pastBtn.classList.add('text-slate-900');
-        pastBtn.innerHTML = `
-          Completed Posts
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"></div>
-        `;
         
-        upcomingBtn.classList.remove('text-slate-900');
-        upcomingBtn.classList.add('text-slate-400');
-        upcomingBtn.innerHTML = `
-          Scheduled Posts
-          <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-300"></div>
-        `;
-    }
-    
-    // Toggle content visibility
-    document.getElementById('upcomingViewContent').classList.toggle('hidden');
-    document.getElementById('pastViewContent').classList.toggle('hidden');
-    
-    // Render appropriate posts
-    if (tabName === 'upcoming') {
+        // Position underline under Scheduled Posts
+        const tabWidth = upcomingBtn.offsetWidth;
+        tabUnderline.style.left = upcomingBtn.offsetLeft + 'px';
+        tabUnderline.style.width = tabWidth + 'px';
+        
+        // Show upcoming, hide past
+        upcomingContent.classList.remove('hidden');
+        pastContent.classList.add('hidden');
         renderUpcomingPosts();
     } else {
+        // Active: Past
+        pastBtn.classList.remove('text-slate-400');
+        pastBtn.classList.add('text-slate-900');
+        
+        // Inactive: Upcoming
+        upcomingBtn.classList.remove('text-slate-900');
+        upcomingBtn.classList.add('text-slate-400');
+        
+        // Position underline under Completed Posts
+        const tabWidth = pastBtn.offsetWidth;
+        tabUnderline.style.left = pastBtn.offsetLeft + 'px';
+        tabUnderline.style.width = tabWidth + 'px';
+        
+        // Show past, hide upcoming
+        pastContent.classList.remove('hidden');
+        upcomingContent.classList.add('hidden');
         renderPastPosts();
     }
 }
+
+// Initialize tabs on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const upcomingBtn = document.getElementById('upcomingTab');
+    const tabUnderline = document.getElementById('tabUnderline');
+    
+    // Set initial underline position
+    if (upcomingBtn) {
+        const tabWidth = upcomingBtn.offsetWidth;
+        tabUnderline.style.left = upcomingBtn.offsetLeft + 'px';
+        tabUnderline.style.width = tabWidth + 'px';
+    }
+    
+    // Handle window resize to adjust underline
+    window.addEventListener('resize', function() {
+        const activeBtn = currentPostView === 'upcoming' 
+            ? document.getElementById('upcomingTab') 
+            : document.getElementById('pastTab');
+        
+        if (activeBtn && tabUnderline) {
+            const tabWidth = activeBtn.offsetWidth;
+            tabUnderline.style.left = activeBtn.offsetLeft + 'px';
+            tabUnderline.style.width = tabWidth + 'px';
+        }
+    });
+});
 
 async function loadPosts() {
     const contentArea = document.getElementById('contentArea');
