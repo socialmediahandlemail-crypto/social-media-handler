@@ -511,7 +511,7 @@ async function initializeAnalytics() {
       return;
     }
 
-    updateStatistics(cachedPosts);
+    await updateStatistics(cachedPosts);
 
     const activePosts = cachedPosts.filter(
       p => new Date(p.scheduledTime) > new Date()
@@ -521,8 +521,8 @@ async function initializeAnalytics() {
 
     if (pendingInterval) clearInterval(pendingInterval);
 
-    pendingInterval = setInterval(() => {
-      updateStatistics(cachedPosts);
+    pendingInterval = setInterval(async () => {
+      await updateStatistics(cachedPosts);
     }, 60000);
 
   } catch (err) {
@@ -562,31 +562,61 @@ async function initializeAnalytics() {
    * Update statistics cards with real data
    * @param {Array} posts - Array of post objects
    */
-  function updateStatistics(posts) {
-  const now = new Date();
+  async function updateStatistics(posts) {
+    const now = new Date();
 
-  document.getElementById('totalPostsCount').textContent = posts.length;
+    document.getElementById('totalPostsCount').textContent = posts.length;
 
-  // Get platforms with future scheduled posts only (active platforms)
-  const activePosts = posts.filter(post => {
-    if (!post.scheduledTime) return false;
-    const scheduledDate = new Date(post.scheduledTime);
-    return scheduledDate > now;
-  });
+    // Fetch connected platforms from API
+    await updateConnectedPlatforms();
 
-  const activePlatforms = new Set(activePosts.map(p => p.platform));
-  document.getElementById('activePlatformsCount').textContent = activePlatforms.size;
+    // Get pending posts (PENDING status with future scheduled time)
+    const pendingPosts = posts.filter(post => {
+      if (!post.scheduledTime) return false;
 
-  // Get pending posts (PENDING status with future scheduled time)
-  const pendingPosts = posts.filter(post => {
-    if (!post.scheduledTime) return false;
+      const scheduledDate = new Date(post.scheduledTime);
+      return post.status === 'PENDING' && scheduledDate > now;
+    });
 
-    const scheduledDate = new Date(post.scheduledTime);
-    return post.status === 'PENDING' && scheduledDate > now;
-  });
+    document.getElementById('pendingPostsCount').textContent = pendingPosts.length;
+  }
 
-  document.getElementById('pendingPostsCount').textContent = pendingPosts.length;
-}
+  /**
+   * Fetch and update connected platforms count from API
+   */
+  async function updateConnectedPlatforms() {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.warn("No auth token found");
+        return;
+      }
+
+      const response = await fetch(API_ENDPOINTS.CHANNELS.STATUS, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const channels = await response.json();
+        console.log("Connected platforms loaded:", channels);
+        
+        // Count connected platforms
+        const connectedCount = channels.filter(channel => 
+          channel.isConnected === true || channel.connected === true
+        ).length;
+        
+        document.getElementById('activePlatformsCount').textContent = connectedCount;
+      } else {
+        console.error("Failed to load connected platforms:", response.status);
+      }
+    } catch (error) {
+      console.error('Error loading connected platforms:', error);
+    }
+  }
 
 
 
