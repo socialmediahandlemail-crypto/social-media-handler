@@ -752,7 +752,14 @@
 <script src="main.js"></script>
 <script src="calender.js"></script>
 
+
 <script>
+
+  // Reload posts every 60 seconds to reflect backend changes (like auto-deletion)
+setInterval(() => {
+    console.log("🔄 Auto-refreshing post list...");
+    loadPosts(); 
+}, 600000); // 600000 ms = 10 minute
 function getComputedStatus(post) {
   const now = new Date();
   const scheduledDate = new Date(post.scheduledTime);
