@@ -3,14 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graphura – Analytics</title>
+  <title>Graphura – Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js for professional data visualization -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
   <!-- Configuration file -->
   <script src="config.js"></script>
 
   <style>
+    .status-completed {
+  background: linear-gradient(to right, #dcfce7, #bbf7d0);
+  color: #166534;
+  border: 1px solid #86efac;
+  padding: 0.375rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .status-completed {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.625rem;
+  }
+}
+
+/* Responsive status badge base styles */
+.status-badge {
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
     /* ===== SIDEBAR ===== */
     .sidebar-link {
       display: flex;
@@ -35,36 +73,100 @@
       backdrop-filter: blur(12px);
     }
 
+    .tab-btn {
+      padding-bottom: 10px;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    .tab-active {
+      border-bottom: 2px solid #2563eb;
+      color: #2563eb;
+    }
+
+    /* ===== VIEW TOGGLE BUTTONS ===== */
+    .view-btn-group {
+      position: relative;
+      display: inline-flex;
+      gap: 0;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 4px;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .view-btn {
+      position: relative;
+      z-index: 2;
+      padding: 8px 22px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    .view-btn.active {
+      color: white;
+    }
+
+    .view-btn:hover:not(.active) {
+      color: #475569;
+    }
+
+    /* Sliding Background */
+    .view-btn-group::before {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      background: #06b6d4;
+      border-radius: 10px;
+      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.28);
+
+    }
+
+    .view-btn-group.calendar-active::before {
+      left: calc(50% + 2px);
+    }
+
     /* ===== MOBILE SIDEBAR ===== */
     .mobile-menu-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      background: rgba(6, 182, 212, 0.12);
-      border: 1px solid rgba(6, 182, 212, 0.25);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.2);
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.3s ease;
       flex-direction: column;
       padding: 0;
-      flex-shrink: 0;
     }
 
     .mobile-menu-btn:hover {
       background: rgba(6, 182, 212, 0.2);
-      border-color: rgba(6, 182, 212, 0.4);
     }
 
     .mobile-menu-btn span {
-      width: 18px;
+      width: 20px;
       height: 2px;
       background: #0891b2;
       display: block;
-      margin: 2.5px 0;
-      transition: all 0.25s ease;
-      border-radius: 1px;
+      margin: 3px 0;
+      transition: all 0.3s ease;
     }
 
     .mobile-sidebar-overlay {
@@ -114,59 +216,36 @@
       }
     }
 
-    /* ===== CHART CONTAINER ===== */
-    .chart-card {
-      background: white/70;
-      backdrop-filter: blur(md);
-      border: 1px solid rgba(6, 182, 212, 0.1);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+    /* Make mobile button more visible */
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      flex-direction: column;
+      padding: 0;
+      flex-shrink: 0;
     }
 
-    .chart-card:hover {
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-color: rgba(6, 182, 212, 0.2);
+    .mobile-menu-btn:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: rgba(6, 182, 212, 0.4);
     }
 
-    /* ===== STAT CARD ===== */
-    .stat-card {
-      background: #ffffff;
-      border: 1px solid rgba(6, 182, 212, 0.15);
-      border-radius: 1rem;
-      padding: 1.25rem;
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      border-color: rgba(6, 182, 212, 0.3);
-      transform: translateY(-2px);
-    }
-
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 700;
-      background: #06b6d4;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* ===== LOADING ANIMATION ===== */
-    @keyframes pulse-glow {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.7;
-      }
-    }
-
-    .loading-skeleton {
-      animation: pulse-glow 1.5s ease-in-out infinite;
-      background: #f0f9ff;
-      background-size: 200% 100%;
+    .mobile-menu-btn span {
+      width: 18px;
+      height: 2px;
+      background: #0891b2;
+      display: block;
+      margin: 2.5px 0;
+      transition: all 0.25s ease;
+      border-radius: 1px;
     }
   </style>
 </head>
@@ -179,20 +258,20 @@
 <!-- MOBILE SIDEBAR -->
 <aside id="mobileSidebar" class="mobile-sidebar">
   <!-- LOGO -->
-   <div class="px-4 py-4 border-b flex items-center justify-between">
+  <div class="px-4 py-4 border-b flex items-center justify-between">
       <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
       <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
     </div>
 
   <!-- NAV -->
   <nav class="px-4 py-6 space-y-1 flex-1">
-    <a href="main.html" class="sidebar-link" onclick="closeMobileSidebar()">
+    <a href="main.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
       Dashboard
     </a>
     <a href="connect.html" class="sidebar-link" onclick="closeMobileSidebar()">
       Channels
     </a>
-    <a href="analysis.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
+    <a href="analysis.html" class="sidebar-link" onclick="closeMobileSidebar()">
       Analytics
     </a>
     <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">
@@ -219,6 +298,10 @@
     <!-- DROPDOWN -->
     <div id="mobileSidebarProfileMenu"
       class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="window.location.href='home.html'"
+        class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+        Go to Home
+      </button>
       <button onclick="logout()"
         class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
         Logout
@@ -240,52 +323,83 @@
 
     <!-- NAV -->
     <nav class="px-4 py-6 space-y-1 flex-1">
-      <a href="main.html" class="sidebar-link">
+
+      <a href="main.html" class="sidebar-link sidebar-active">
         Dashboard
       </a>
       <a href="connect.html" class="sidebar-link">
         Channels
       </a>
-      <a href="analysis.html" class="sidebar-link sidebar-active">
+      <a href="analysis.html" class="sidebar-link">
         Analytics
       </a>
       <a href="help.html" class="sidebar-link">
-       Help & Guide
+        Help & Guide
       </a>
       <a href="f&q.html" class="sidebar-link">
         FAQs
       </a>
+
     </nav>
 
     <!-- USER PROFILE -->
     <div class="p-4 relative">
-      <button id="sidebarProfileBtn"
-        class="mt-auto w-full flex items-center gap-3 px-4 py-3 border-t border-slate-200 hover:bg-slate-50 transition">
 
-        <!-- Avatar -->
-        <div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0">
-          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
-        </div>
+      <!-- Sidebar Profile (place LAST in sidebar) -->
+<button id="sidebarProfileBtn"
+  class="mt-auto w-full flex items-center gap-3
+         px-4 py-3
+         border-t border-slate-200
+         hover:bg-slate-50
+         transition">
 
-        <!-- User Info -->
-        <div class="min-w-0 text-left">
-          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">User</p>
-          <p id="sidebarUserEmail" class="text-xs text-slate-500 leading-tight break-all">user@email.com</p>
-        </div>
-      </button>
+  <!-- Avatar -->
+  <div class="w-10 h-10 rounded-full
+              bg-cyan-100
+              flex items-center justify-center
+              shrink-0">
+    <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+  </div>
+
+  <!-- User Info -->
+  <div class="min-w-0 text-left">
+    <p id="sidebarUserName"
+       class="text-sm font-semibold text-slate-800 leading-tight">
+      User
+    </p>
+
+    <!-- Email: readable, not truncated harshly -->
+    <p id="sidebarUserEmail"
+       class="text-xs text-slate-500 leading-tight break-all">
+      user@email.com
+    </p>
+  </div>
+
+</button>
+
 
       <!-- DROPDOWN -->
-      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
-        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+      <div id="sidebarProfileMenu"
+        class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+
+        <button onclick="window.location.href='home.html'"
+          class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+          Go to Home
+        </button>
+
+        <button onclick="logout()"
+          class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
           Logout
         </button>
-      </div>
-    </div>
-  </aside>
 
-  <!-- ================= MAIN CONTENT ================= -->
-  <main class="lg:ml-64 flex-1 px-4 lg:px-10 py-6 lg:py-8 bg-slate-50 relative overflow-y-auto overflow-x-hidden w-full">
-   <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 fixed top-0 left-0 right-0 z-20">
+      </div>
+
+    </div>
+
+  </aside>
+<!-- ================= MAIN CONTENT ================= -->
+<main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-slate-50 relative overflow-y-auto overflow-x-hidden max-h-screen w-full">
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 fixed top-0 left-0 right-0 z-20">
       <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
       <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
         <span></span>
@@ -293,125 +407,418 @@
         <span></span>
       </button>
     </div>
-    <!-- ===== DASHBOARD HEADER ===== -->
-    <header class=" flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 py-14 lg:pt-0">
-       
-      <!-- TOP ROW: MOBILE BUTTON & TITLE -->
-      <div class="flex items-start gap-3 sm:gap-4">
-       
+  <!-- ===== DASHBOARD HEADER ===== -->
+  <header class="mb-6 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-16 lg:pt-0">
 
-        <!-- TITLE AND DESCRIPTION -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-3">
-            <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
-              Analytics
-            </h1>
-          </div>
-          <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
-            Track performance, posts, and platform insights.
-          </p>
+    <!-- TOP ROW: MOBILE BUTTON & TITLE -->
+    <div class="flex items-start gap-3 sm:gap-4">
+
+      <!-- TITLE AND DESCRIPTION -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="2"/>
+          </svg>
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+            Dashboard
+          </h1>
         </div>
-      </div>
-    </header>
-
-    <!-- ===== STATS CARDS ===== -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 relative z-10">
-      <!-- Total Posts Card -->
-      <div class="stat-card">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 text-sm font-medium mb-2">Total Scheduled Posts</p>
-            <p id="totalPostsCount" class="stat-number">0</p>
-          </div>
-          <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg">
-            <svg class="w-7 h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Platforms Card -->
-      <div class="stat-card">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 text-sm font-medium mb-2">Active Platforms</p>
-            <p id="activePlatformsCount" class="stat-number">0</p>
-          </div>
-          <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
-            <svg class="w-7 h-7 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10.5 1.5H5.75A2.25 2.25 0 003.5 3.75v12.5A2.25 2.25 0 005.75 18.5h8.5a2.25 2.25 0 002.25-2.25V9M14 1.5l4.5 4.5M10 7h7.5"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pending Posts Card -->
-      <div class="stat-card">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-slate-600 text-sm font-medium mb-2">Pending Posts</p>
-            <p id="pendingPostsCount" class="stat-number">0</p>
-          </div>
-          <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-orange-100 to-amber-100 rounded-lg">
-            <svg class="w-7 h-7 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v3.5a1 1 0 002 0V6z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== CHARTS SECTION ===== -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
-
-      <!-- CHART 1: SCHEDULED POSTS OVER TIME -->
-      <div class="chart-card">
-        <div class="mb-4">
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v2H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v2H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-            Scheduled Posts Over Time
-          </h2>
-          <p class="text-xs text-slate-500 mt-1">Last 30 days activity</p>
-        </div>
-        <div class="relative h-80 w-full">
-          <canvas id="postsTimelineChart"></canvas>
-        </div>
-      </div>
-
-      <!-- CHART 2: POSTS BY PLATFORM -->
-      <div class="chart-card">
-        <div class="mb-4">
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h11.5a.75.75 0 00.75-.75v-8.5a.75.75 0 00-.75-.75H4.25zm12-1.5a2.25 2.25 0 012.25 2.25v8.5A2.25 2.25 0 0115.75 17H4.25A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h11.5z" clip-rule="evenodd"></path></svg>
-            Pending Posts by Platform
-          </h2>
-          <p class="text-xs text-slate-500 mt-1">Distribution across channels</p>
-        </div>
-        <div class="relative h-80 w-full">
-          <canvas id="platformDistributionChart"></canvas>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ===== LOADING STATE ===== -->
-    <div id="loadingState" class="hidden fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
-      <div class="bg-white rounded-2xl p-8 shadow-xl">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-cyan-200 border-t-cyan-600 mx-auto mb-4"></div>
-        <p class="text-slate-600 font-medium text-center">Loading analytics...</p>
+        <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
+          Unified view of activity, performance, and insights.
+        </p>
       </div>
     </div>
 
-  </main>
+    <!-- BOTTOM ROW: BUTTONS (RIGHT SIDE ON LARGE SCREENS) -->
+    <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+      <!-- SCHEDULE POST BUTTON -->
+      <button
+        onclick="openModal()"
+        class="flex items-center justify-center gap-1 sm:gap-2 bg-cyan-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="hidden sm:inline">Schedule Post</span>
+        <span class="sm:hidden">Schedule</span>
+      </button>
 
+      <!-- VIEW TOGGLE BUTTONS -->
+      <div class="view-btn-group">
+  <button id="listBtn" class="view-btn active">
+    <svg class="w-4 h-4 mr-2 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M8 6h13M8 12h13M8 18h13" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="4" cy="6" r="1" fill="currentColor"/>
+      <circle cx="4" cy="12" r="1" fill="currentColor"/>
+      <circle cx="4" cy="18" r="1" fill="currentColor"/>
+    </svg>
+    List
+  </button>
+
+  <button id="calendarBtn" class="view-btn">
+    <svg class="w-4 h-4 mr-2 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2"/>
+      <path d="M16 3v4M8 3v4M3 9h18" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Calendar
+  </button>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
+  </header>
+
+  <!-- ===== CONTENT CARD ===== -->
+  <section class="relative z-10 bg-white/70 backdrop-blur-md
+       rounded-2xl border
+       shadow-sm
+       p-8 flex flex-col">
+
+  <!-- ===== PREMIUM SENIOR-LEVEL TAB DESIGN ===== -->
+  <div class="relative mb-8">
+    <div id="postTabsContainer" class="flex gap-16 relative px-0.5">
+      <!-- Animated Premium Underline with Shadow -->
+      <div id="tabUnderline" class="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-600 transition-all duration-600 ease-out rounded-full" style="width: 0; left: 0; box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);"></div>
+      
+      <!-- Scheduled Posts Tab -->
+      <button id="upcomingTab" class="relative py-5 px-0.5 font-semibold text-base transition-all duration-300 group" onclick="switchPostTab('upcoming')">
+        <span class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-800">
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="4" y="5" width="16" height="14" rx="2" stroke-width="1.5"/>
+            <path d="M4 10h16M9 1v8M15 1v8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Scheduled Posts</span>
+        </span>
+      </button>
+      
+      <!-- Completed Posts Tab -->
+      <button id="pastTab" class="relative py-5 px-0.5 font-semibold text-base transition-all duration-300 group" onclick="switchPostTab('past')">
+        <span class="flex items-center gap-2.5 text-slate-400 group-hover:text-slate-600">
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M9 3H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-4m-4 0a2 2 0 00-2 2v0a2 2 0 002 2h4a2 2 0 002-2v0a2 2 0 00-2-2m0 0V3a2 2 0 00-2-2h0a2 2 0 00-2 2v1m7 10l-3 3m0 0l-3-3m3 3v-6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Completed Posts</span>
+        </span>
+      </button>
+    </div>
+    
+    <!-- Subtle Border -->
+    <div class="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mt-0.5"></div>
+  </div>
+
+  <!-- ===== LIST VIEW (UPCOMING POSTS) ===== -->
+  <section id="upcomingViewContent" class="flex-1">
+    <p class="text-gray-500 italic text-center py-16">
+      Your scheduled posts list will appear here.
+    </p>
+  </section>
+
+  <!-- ===== PAST UPDATES VIEW ===== -->
+  <section id="pastViewContent" class="hidden flex-1">
+    <p class="text-gray-500 italic text-center py-16">
+      Your past updates will appear here.
+    </p>
+  </section>
+
+  <!-- ===== OLD LIST VIEW (KEPT FOR CALENDAR VIEW) ===== -->
+  <section id="listViewContent" class="flex-1 hidden">
+    <p class="text-gray-500 italic text-center py-16">
+      Your scheduled posts list will appear here.
+    </p>
+  </section>
+
+    <!-- ===== CALENDAR VIEW ===== -->
+    <section id="calendarViewContent" class="hidden flex-1">
+
+      <div class="flex items-center justify-between mb-2">
+
+        <!-- MONTH CONTROLS (REQUIRED BY calender.js) -->
+        <div class="flex items-center bg-white rounded-lg p-0.5 border border-cyan-200/50">
+          <button
+            id="prevMonth"
+            type="button"
+            class="p-1 rounded-md hover:bg-cyan-200/50 transition-colors text-slate-600 hover:text-cyan-600 font-bold text-sm">
+            ←
+          </button>
+
+          <h2
+            id="calendarTitle"
+            class="text-sm font-bold text-cyan-600 px-3 min-w-[140px] text-center">
+          </h2>
+
+          <button
+            id="nextMonth"
+            type="button"
+            class="p-1 rounded-md hover:bg-cyan-200/50 transition-colors text-slate-600 hover:text-cyan-600 font-bold text-sm">
+            →
+          </button>
+        </div>
+
+      </div>
+
+      <!-- WEEK HEADER -->
+      <div class="grid grid-cols-7 text-center text-xs font-bold bg-white text-cyan-700 uppercase mb-1 rounded-lg py-0.5 border border-cyan-200/50">
+        <span class="py-0.5">Sun</span><span class="py-0.5">Mon</span><span class="py-0.5">Tue</span>
+        <span class="py-0.5">Wed</span><span class="py-0.5">Thu</span><span class="py-0.5">Fri</span><span class="py-0.5">Sat</span>
+      </div>
+
+      <!-- CALENDAR GRID (REQUIRED ID) -->
+      <div
+        id="calendarGrid"
+        class="grid grid-cols-7 gap-0.5 bg-white p-0.5 border border-cyan-200/40 rounded-lg overflow-hidden">
+      </div>
+
+    </section>
+
+  </section>
+
+</main>
+
+<!-- POST DETAILS MODAL -->
+<div id="postDetailsModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-xl overflow-hidden border border-slate-200 shadow-xl">
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-slate-200 bg-white">
+            <div class="flex justify-between items-start gap-4">
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold text-cyan-600" id="detailModalTitle">Post Details</h3>
+                <p class="text-sm text-slate-500 mt-2" id="detailModalPlatform">Platform</p>
+              </div>
+              <button onclick="closePostDetailsModal()" class="w-8 h-8 rounded-lg hover:bg-slate-200 transition flex items-center justify-center text-slate-400 hover:text-slate-600 flex-shrink-0">
+                <span class="text-xl font-bold">&times;</span>
+              </button>
+            </div>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+            <!-- Status Badge -->
+            <div class="flex items-center justify-between">
+              <div id="detailStatusBadge" class="status-badge px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg font-bold max-w-[200px] sm:max-w-[250px]">
+                Status
+              </div>
+              <div id="detailPlatformIcon" class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl flex-shrink-0"></div>
+            </div>
+
+            <!-- Media Preview in Modal -->
+            <div id="detailMediaContainer" class="hidden">
+              <h4 class="text-sm font-bold text-cyan-600 mb-3">🖼️ Uploaded Media Preview</h4>
+              <div class="rounded-xl overflow-hidden h-64 bg-slate-100 border-2 border-slate-300 shadow-lg">
+                <img id="detailMediaImage" src="" alt="media" class="w-full h-full object-cover hidden">
+                <video id="detailMediaVideo" controls class="w-full h-full object-cover hidden"></video>
+              </div>
+            </div>
+
+            <!-- Full Message Content -->
+            <div>
+              <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+            <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2"/>
+           <path d="M9 9h6M9 13h6" stroke-width="2" stroke-linecap="round"/>
+           </svg>
+           Message Content
+          </h4>
+
+             <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+           <p class="text-slate-700 leading-relaxed text-sm" id="detailContent">
+              Message content will appear here
+             </p>
+             </div>
+             </div>
+
+
+            <!-- Schedule Information -->
+            <div class="grid grid-cols-2 gap-4">
+  <div>
+    <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+      <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2"/>
+        <path d="M16 3v4M8 3v4M3 9h18" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Scheduled Date
+    </h4>
+    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+      <p class="text-slate-700 font-medium text-sm" id="detailScheduledDate">--</p>
+    </div>
+  </div>
+
+  <div>
+    <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+      <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" stroke-width="2"/>
+        <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Scheduled Time
+    </h4>
+    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+      <p class="text-slate-700 font-medium text-sm" id="detailScheduledTime">--</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recipient Info -->
+<div>
+  <h4 class="text-sm font-bold text-cyan-600 mb-2 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" stroke-width="2"/>
+      <path d="M4 20a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Recipient
+  </h4>
+  <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+    <p class="text-slate-700 font-medium text-sm" id="detailRecipient">--</p>
+  </div>
+</div>
+
+            <!-- Additional Info -->
+            <div class="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <p class="text-xs text-slate-500 font-semibold uppercase">Post ID</p>
+                  <p class="text-sm font-bold text-slate-700 mt-1" id="detailPostId">--</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 font-semibold uppercase">Status</p>
+                  <p class="text-sm font-bold text-slate-700 mt-1" id="detailStatus">--</p>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-4 border-t border-slate-200 bg-slate-50 flex gap-3">
+            <button onclick="closePostDetailsModal()" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 transition-colors text-sm">Close</button>
+            <button onclick="deletePostFromModal()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors text-sm">Delete Post</button>
+        </div>
+    </div>
+</div>
+
+<div id="postModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 border border-slate-200 max-h-[90vh] flex flex-col">
+        <div class="p-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-cyan-50/30">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600">Schedule New Post</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Plan your social media content</p>
+              </div>
+              <button onclick="closeModal()" class="w-8 h-8 rounded-lg hover:bg-slate-200 transition flex items-center justify-center text-slate-400 hover:text-slate-600 flex-shrink-0">
+                <span class="text-xl font-bold">&times;</span>
+              </button>
+            </div>
+        </div>
+        <form id="scheduleForm" class="p-4 space-y-3 overflow-y-auto flex-1">
+            <div>
+                <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1">📱 Platform</label>
+                <select id="platform" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 text-sm">
+                    <option value="FACEBOOK">Facebook</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="LINKEDIN">LinkedIn</option>
+                    <option value="TWITTER">Twitter</option>
+                    <option value="YOUTUBE">YouTube</option>
+                    <option value="PINTEREST">Pinterest</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1">📞 Recipient Number</label>
+                <input type="text" id="recipient" placeholder="e.g. 919876543210" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 placeholder-slate-400 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1">
+  💬 Message Content
+</label>
+
+<textarea id="content" rows="5"
+  class="w-full border border-slate-300 rounded-lg
+         p-3 bg-white
+         focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100
+         transition font-medium text-slate-700
+         placeholder-slate-400 resize-none text-sm"
+  placeholder="Type your message here..." required>
+</textarea>
+
+            </div>
+            <div>
+  <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke-width="2"/>
+      <circle cx="9" cy="11" r="2" stroke-width="2"/>
+      <path d="M21 15l-5-5-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Media (Optional)
+  </label>
+
+  <input type="file" id="mediaFile" accept="image/*,video/*"
+    class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-100 file:text-cyan-700 hover:file:bg-cyan-200 text-sm">
+
+  <p class="text-xs text-slate-500 mt-1">Images or Videos</p>
+</div>
+
+<div>
+  <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-1 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2"/>
+      <path d="M16 3v4M8 3v4M3 9h18" stroke-width="2" stroke-linecap="round"/>
+      <path d="M12 13v3l2 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Schedule Time
+  </label>
+
+  <input type="datetime-local" id="scheduledTime"
+    class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition font-medium text-slate-700 text-sm"
+    required>
+</div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="closeModal()" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-50 transition-colors text-sm">Cancel</button>
+                <button type="submit" class="flex-1 px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all active:scale-95 text-sm">Schedule Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="component/sidebar.js"></script>
+<script src="main.js"></script>
+<script src="calender.js"></script>
+
+
 <script>
-  // ===== AUTHENTICATION CHECK =====
-  
+
+  // Reload posts every 60 seconds to reflect backend changes (like auto-deletion)
+setInterval(() => {
+    console.log("🔄 Auto-refreshing post list...");
+    loadPosts(); 
+}, 600000); // 600000 ms = 10 minute
+function getComputedStatus(post) {
+  const now = new Date();
+  const scheduledDate = new Date(post.scheduledTime);
+
+  if (post.status === "FAILED") return "FAILED";
+  if (post.status === "SENT") return "SENT";
+
+  if (scheduledDate <= now) return "COMPLETED";
+
+  return "PENDING";
+}
+
+
+  // Sidebar profile dropdown
+  const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
+  const sidebarProfileMenu = document.getElementById("sidebarProfileMenu");
+
+  sidebarProfileBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    sidebarProfileMenu.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", () => {
+    sidebarProfileMenu.classList.add("hidden");
+  });
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "home.html";
+  }
+
   window.onload = () => {
     const token = localStorage.getItem("authToken");
     if (!token) window.location.href = "home.html";
@@ -426,656 +833,660 @@
     // Update mobile sidebar
     document.getElementById("mobileSidebarUserEmail").textContent = userEmail;
     document.getElementById("mobileSidebarUserName").textContent = userName;
-
-    // Initialize analytics
-    initializeAnalytics();
   };
+  
+// Modal control functions
+function openModal() {
+    document.getElementById('postModal').classList.remove('hidden');
+}
 
-  // ===== LOGOUT FUNCTION =====
-  function logout() {
-    localStorage.clear();
-    window.location.href = "home.html";
-  }
+function closeModal() {
+    document.getElementById('postModal').classList.add('hidden');
+    document.getElementById('scheduleForm').reset();
+}
 
-  // ===== MOBILE SIDEBAR FUNCTIONS =====
-  function openMobileSidebar() {
-    const mobileSidebar = document.getElementById('mobileSidebar');
-    const overlay = document.getElementById('mobileSidebarOverlay');
-    mobileSidebar.classList.add('open');
-    overlay.classList.add('open');
-  }
-
-  function closeMobileSidebar() {
-    const mobileSidebar = document.getElementById('mobileSidebar');
-    const overlay = document.getElementById('mobileSidebarOverlay');
-    mobileSidebar.classList.remove('open');
-    overlay.classList.remove('open');
-  }
-
-  // ===== PROFILE DROPDOWN =====
-  document.addEventListener('DOMContentLoaded', function() {
-    // Desktop sidebar profile menu
-    const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
-    const sidebarProfileMenu = document.getElementById("sidebarProfileMenu");
-
-    if (sidebarProfileBtn && sidebarProfileMenu) {
-      sidebarProfileBtn.addEventListener("click", e => {
-        e.stopPropagation();
-        sidebarProfileMenu.classList.toggle("hidden");
-      });
-
-      document.addEventListener("click", () => {
-        sidebarProfileMenu.classList.add("hidden");
-      });
+// Attach openModal to your "New Post" button
+document.querySelectorAll('button').forEach(btn => {
+    if(btn.innerText.includes('New Post') || btn.innerText.includes('Schedule Post')) {
+        btn.onclick = openModal;
     }
-
-    // Mobile sidebar profile menu
-    const mobileSidebarProfileBtn = document.getElementById("mobileSidebarProfileBtn");
-    const mobileSidebarProfileMenu = document.getElementById("mobileSidebarProfileMenu");
-
-    if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
-      mobileSidebarProfileBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        mobileSidebarProfileMenu.classList.toggle("hidden");
-      });
-
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest("#mobileSidebarProfileBtn")) {
-          mobileSidebarProfileMenu.classList.add("hidden");
-        }
-      });
-    }
-  });
-
-  // ===== CHART INSTANCES (global scope) =====
-  let postsTimelineChart = null;
-  let platformDistributionChart = null;
-  let cachedPosts = [];
-
-  /**
-   * Initialize analytics page with data and charts
-   * Fetches posts from API and renders professional visualizations
-   */
-  let pendingInterval = null;
-
-async function initializeAnalytics() {
-  try {
-    showLoading(true);
-
-    const posts = await fetchPosts();
-    cachedPosts = posts || [];
-
-    if (cachedPosts.length === 0) {
-      updateStatisticsEmpty();
-      renderChartsEmpty();
-      return;
-    }
-
-    await updateStatistics(cachedPosts);
-
-    // Filter posts from last 30 days for timeline chart
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+});
+// Form submission handler
+document.getElementById('scheduleForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    const timelinePosts = cachedPosts.filter(p => {
-      if (!p.scheduledTime) return false;
-      const postDate = new Date(p.scheduledTime);
-      return postDate >= thirtyDaysAgo;
+    const mediaFile = document.getElementById('mediaFile').files[0];
+    
+    // ===== BACKEND MEDIA UPLOAD CONNECTION POINT =====
+    // TODO: Implement media upload to backend
+    // 1. Create FormData object with file
+    // 2. Send POST request to: http://localhost:8082/api/media/upload
+    // 3. Get media ID/URL from response
+    // 4. Include mediaId/mediaUrl in postData below
+    
+    let mediaId = null;
+    if (mediaFile) {
+        try {
+            const formData = new FormData();
+            formData.append('file', mediaFile);
+            
+            // ===== UPLOAD MEDIA TO BACKEND =====
+            const mediaResponse = await fetch(API_ENDPOINTS.MEDIA.UPLOAD, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    // Note: Do NOT set Content-Type, browser will set it with correct boundary
+                },
+                body: formData
+            });
+            
+            if (mediaResponse.ok) {
+                const mediaData = await mediaResponse.json();
+                mediaId = mediaData.mediaId || mediaData.id || mediaData.url; // Get media ID
+                // Also store mediaUrl if backend returns it
+                window.uploadedMediaUrl = mediaData.url || mediaData.mediaUrl || mediaData.path || null;
+                console.log("Media uploaded successfully:", mediaId);
+                console.log("Media URL:", window.uploadedMediaUrl);
+            } else {
+                console.warn("Media upload failed, proceeding without media");
+            }
+        } catch (error) {
+            console.error("Error uploading media:", error);
+            console.warn("Proceeding with post without media");
+        }
+    }
+    
+    const postData = {
+        platform: document.getElementById('platform').value,
+        recipient: document.getElementById('recipient').value,
+        content: document.getElementById('content').value,
+        scheduledTime: document.getElementById('scheduledTime').value,
+        status: "PENDING",
+        mediaId: mediaId, // Include uploaded media ID if available
+        mediaUrl: window.uploadedMediaUrl || null // Include media URL if available
+    };
+
+    try {
+        const response = await fetch(API_ENDPOINTS.POSTS.SCHEDULE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+            },
+            body: JSON.stringify(postData)
+        });
+
+        if (response.ok) {
+            alert("✅ Post scheduled successfully!");
+            closeModal();
+            // Clear the temporary media URL
+            window.uploadedMediaUrl = null;
+            loadPosts(); // UI refresh karne ke liye
+        } else {
+            const errorData = await response.json();
+            alert("❌ Error: " + (errorData.message || "Failed to schedule post"));
+        }
+    } catch (error) {
+        console.error("Error sending data:", error);
+        alert("Server se connection fail ho gaya.");
+    }
+});
+
+// Store posts data globally
+let allPosts = [];
+let currentPostView = 'upcoming';
+
+// Switch between Upcoming and Past posts
+function switchPostTab(tabName) {
+    // Prevent toggle bug: don't do anything if same tab is clicked
+    if (currentPostView === tabName) {
+        return;
+    }
+    
+    currentPostView = tabName;
+    
+    const upcomingBtn = document.getElementById('upcomingTab');
+    const pastBtn = document.getElementById('pastTab');
+    const upcomingContent = document.getElementById('upcomingViewContent');
+    const pastContent = document.getElementById('pastViewContent');
+    const tabUnderline = document.getElementById('tabUnderline');
+    
+    if (tabName === 'upcoming') {
+        // Active: Upcoming
+        upcomingBtn.classList.remove('text-slate-400');
+        upcomingBtn.classList.add('text-slate-900');
+        
+        // Inactive: Past
+        pastBtn.classList.remove('text-slate-900');
+        pastBtn.classList.add('text-slate-400');
+        
+        // Position underline under Scheduled Posts
+        const tabWidth = upcomingBtn.offsetWidth;
+        tabUnderline.style.left = upcomingBtn.offsetLeft + 'px';
+        tabUnderline.style.width = tabWidth + 'px';
+        
+        // Show upcoming, hide past
+        upcomingContent.classList.remove('hidden');
+        pastContent.classList.add('hidden');
+        renderUpcomingPosts();
+    } else {
+        // Active: Past
+        pastBtn.classList.remove('text-slate-400');
+        pastBtn.classList.add('text-slate-900');
+        
+        // Inactive: Upcoming
+        upcomingBtn.classList.remove('text-slate-900');
+        upcomingBtn.classList.add('text-slate-400');
+        
+        // Position underline under Completed Posts
+        const tabWidth = pastBtn.offsetWidth;
+        tabUnderline.style.left = pastBtn.offsetLeft + 'px';
+        tabUnderline.style.width = tabWidth + 'px';
+        
+        // Show past, hide upcoming
+        pastContent.classList.remove('hidden');
+        upcomingContent.classList.add('hidden');
+        renderPastPosts();
+    }
+}
+
+// Initialize tabs on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const upcomingBtn = document.getElementById('upcomingTab');
+    const tabUnderline = document.getElementById('tabUnderline');
+    
+    // Set initial underline position
+    if (upcomingBtn) {
+        const tabWidth = upcomingBtn.offsetWidth;
+        tabUnderline.style.left = upcomingBtn.offsetLeft + 'px';
+        tabUnderline.style.width = tabWidth + 'px';
+    }
+    
+    // Handle window resize to adjust underline
+    window.addEventListener('resize', function() {
+        const activeBtn = currentPostView === 'upcoming' 
+            ? document.getElementById('upcomingTab') 
+            : document.getElementById('pastTab');
+        
+        if (activeBtn && tabUnderline) {
+            const tabWidth = activeBtn.offsetWidth;
+            tabUnderline.style.left = activeBtn.offsetLeft + 'px';
+            tabUnderline.style.width = tabWidth + 'px';
+        }
+    });
+});
+
+async function loadPosts() {
+    const contentArea = document.getElementById('contentArea');
+    try {
+        const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
+        });
+        allPosts = await response.json();
+
+        if (allPosts.length === 0) {
+            document.getElementById('upcomingViewContent').innerHTML = `
+              <div class="flex flex-col items-center justify-center py-20 px-6 rounded-2xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 border border-cyan-200/30">
+  
+  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center mb-6 shadow-lg border border-cyan-200/50">
+    <svg class="w-10 h-10 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2"/>
+      <path d="M9 4h6v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V4Z" stroke-width="2"/>
+      <path d="M9 12h6M9 16h4" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">
+    No Posts Yet
+  </h3>
+
+  <p class="text-slate-600 text-center max-w-sm font-medium mb-6">
+    Start by creating your first post to see it displayed here
+  </p>
+
+  <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
+    Create First Post
+  </button>
+
+</div>
+
+            `;
+            if(contentArea) contentArea.classList.remove('hidden');
+            return;
+        }
+        if(contentArea) contentArea.classList.add('hidden');
+        
+        // Render upcoming posts by default
+        renderUpcomingPosts();
+
+    } catch (error) {
+        console.error("Error loading posts:", error);
+        document.getElementById('upcomingViewContent').innerHTML = `<p class="text-red-500 italic text-center">Error loading posts.</p>`;
+    }
+}
+
+// Render upcoming posts
+function renderUpcomingPosts() {
+    const now = new Date();
+    const upcomingPosts = allPosts.filter(post => new Date(post.scheduledTime) > now);
+    
+    const listView = document.getElementById('upcomingViewContent');
+    
+    if (upcomingPosts.length === 0) {
+        listView.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-20 px-6 rounded-2xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 border border-cyan-200/30">
+  
+  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center mb-6 shadow-lg border border-cyan-200/50">
+    <svg class="w-10 h-10 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" stroke-width="2"/>
+      <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 mb-3">
+    No Upcoming Posts
+  </h3>
+
+  <p class="text-slate-600 text-center max-w-sm font-medium mb-6">
+    All your scheduled posts are in the past. Create new ones!
+  </p>
+
+  <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
+    Schedule New Post
+  </button>
+
+</div>
+
+        `;
+        return;
+    }
+    
+    renderPostCards(upcomingPosts, listView);
+}
+
+// Render past posts
+function renderPastPosts() {
+    const now = new Date();
+    const pastPosts = allPosts.filter(post => new Date(post.scheduledTime) <= now);
+    
+    const pastView = document.getElementById('pastViewContent');
+    
+    if (pastPosts.length === 0) {
+        pastView.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-20 px-6 rounded-2xl bg-gradient-to-br from-green-50/50 to-emerald-50/30 border border-green-200/30">
+  
+  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center mb-6 shadow-lg border border-green-200/50">
+    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M3 3v5h5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="8" stroke-width="2"/>
+      <path d="M12 8v5l3 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-600 mb-3">
+    No Past Updates Yet
+  </h3>
+
+  <p class="text-slate-600 text-center max-w-sm font-medium">
+    Your completed scheduled posts will appear here once their scheduled time passes.
+  </p>
+
+</div>
+
+        `;
+        return;
+    }
+    
+    renderPostCards(pastPosts, pastView);
+}
+
+// Common function to render post cards
+function renderPostCards(posts, container) {
+    let cardsHtml = `
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+`;
+    
+    posts.forEach(post => {
+        const now = new Date();
+        const scheduledDate = new Date(post.scheduledTime);
+        const isPast = scheduledDate <= now;
+        
+        
+
+        const platformIcon =
+            post.platform === "FACEBOOK" ? "assets/facebook.png" :
+            post.platform === "WHATSAPP" ? "assets/whatsapp.png" :
+            post.platform === "LINKEDIN" ? "assets/linkedin.png" :
+            post.platform === "TWITTER" ? "assets/twitter.png" :
+            post.platform === "YOUTUBE" ? "assets/youtube.png" :
+            post.platform === "PINTEREST" ? "assets/pintrest.png" : "assets/graphuralogo.png";
+
+        const accentColor =
+            post.platform === "FACEBOOK" ? "blue" :
+            post.platform === "WHATSAPP" ? "green" :
+            post.platform === "LINKEDIN" ? "blue" :
+            post.platform === "TWITTER" ? "slate" :
+            post.platform === "YOUTUBE" ? "red" :
+            post.platform === "PINTEREST" ? "rose" : "cyan";
+
+        const computedStatus = getComputedStatus(post);
+
+         const statusStyle =
+         computedStatus === "COMPLETED"
+        ? "status-completed"
+        : computedStatus === "FAILED"
+        ? "bg-red-100 text-red-700"
+        : computedStatus === "SENT"
+        ? "bg-cyan-100 text-cyan-700"
+        : "bg-blue-100 text-blue-700";
+
+
+        cardsHtml += `
+    <div class="group relative rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-100 flex flex-col h-full bg-gradient-to-br from-white to-blue-50/40 hover:border-cyan-300/40">
+      
+      <div class="p-3 relative z-10 flex flex-col flex-1">
+        <!-- Header with Icon and Status -->
+        <div class="flex items-start justify-between mb-3 gap-2">
+          <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-${accentColor}-100 to-${accentColor === 'cyan' ? 'blue' : accentColor === 'green' ? 'emerald' : accentColor === 'blue' ? 'indigo' : accentColor === 'slate' ? 'blue' : accentColor === 'red' ? 'orange' : 'pink'}-100 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 flex-shrink-0 border border-${accentColor}-200/50 shadow-sm overflow-hidden p-1">
+            <img src="${platformIcon}" alt="${post.platform}" class="w-full h-full object-contain">
+          </div>
+          <div class="flex flex-col items-end gap-1 flex-shrink-0">
+            <span class="px-2.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-xs sm:text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis max-w-xs ${statusStyle}">
+           ${computedStatus}
+          </span>
+
+            ${post.mediaUrl ? '<span class="px-2.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-xs sm:text-xs font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 whitespace-nowrap shadow-sm border border-purple-200/50">🖼️</span>' : ''}
+          </div>
+        </div>
+
+        <!-- Platform Title -->
+        <h3 class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 mb-1.5">${post.platform}</h3>
+
+        <!-- Media Preview -->
+        ${post.mediaUrl ? `
+          <div class="mb-3 rounded-lg overflow-hidden h-24 bg-gradient-to-br from-slate-100 to-slate-200 flex-shrink-0 border border-slate-200/60 shadow-sm">
+            ${post.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 
+              `<img src="${post.mediaUrl}" alt="media" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` :
+              `<video src="${post.mediaUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"></video>`
+            }
+          </div>
+        ` : ''}
+
+        <!-- Content Preview -->
+        <p class="text-slate-700 text-xs mb-2 leading-relaxed line-clamp-2 flex-grow font-medium">
+          ${post.content}
+        </p>
+
+        <!-- Details Section -->
+        <div class="space-y-2 pt-3 border-t border-slate-200/50">
+
+  <!-- Scheduled Date & Time -->
+  <div class="flex items-center gap-2 text-xs">
+    <svg class="w-4 h-4 text-cyan-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" stroke-width="2"/>
+      <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <p class="text-slate-700 font-semibold">
+        ${scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+      </p>
+      <p class="text-slate-500 text-xs">
+        ${scheduledDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+      </p>
+    </div>
+  </div>
+
+  <!-- Recipient -->
+  <div class="flex items-center gap-2 text-xs">
+    <svg class="w-4 h-4 text-cyan-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" stroke-width="2"/>
+      <path d="M4 20a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <p class="text-slate-700 font-semibold truncate">
+        ${post.recipient}
+      </p>
+    </div>
+  </div>
+
+</div>
+
+
+        <!-- Action Button -->
+        <button onclick="openPostDetailsModal(${JSON.stringify(post).replace(/"/g, '&quot;')})" class="w-full mt-4 py-2 px-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-lg font-semibold text-xs hover:shadow-lg hover:from-cyan-500 hover:to-blue-600 transition-all active:scale-95 flex-shrink-0 border border-cyan-300/40">
+          View Details
+        </button>
+      </div>
+    </div>
+  `;
     });
 
-    // Get pending/future posts for platform distribution chart
-    const pendingPosts = cachedPosts.filter(
-      p => new Date(p.scheduledTime) > new Date()
-    );
+    cardsHtml += `</div>`;
+    container.innerHTML = cardsHtml;
+}
 
-    renderChartsWithData(timelinePosts, pendingPosts);
+// Page load par posts load karein
+window.addEventListener('DOMContentLoaded', loadPosts);
 
-    if (pendingInterval) clearInterval(pendingInterval);
+// ===== POST DETAILS MODAL FUNCTIONS =====
+let currentPost = null;
 
-    pendingInterval = setInterval(async () => {
-      await updateStatistics(cachedPosts);
-    }, 60000);
+function openPostDetailsModal(post) {
+    currentPost = post;
 
-  } catch (err) {
-    console.error(err);
-    updateStatisticsEmpty();
-    renderChartsEmpty();
-  } finally {
-    showLoading(false);
-  }
+    // ===== COMPUTE STATUS BASED ON TIME =====
+    const now = new Date();
+    const scheduledDate = new Date(post.scheduledTime);
+
+    let computedStatus = post.status;
+
+    // 🔥 TIME-BASED STATUS OVERRIDE
+    if (post.status === "PENDING" && scheduledDate <= now) {
+        computedStatus = "COMPLETED";
+    }
+
+    // ===== PLATFORM ICONS =====
+    const platformIcons = {
+        "FACEBOOK": "assets/facebook.png",
+        "WHATSAPP": "assets/whatsapp.png",
+        "LINKEDIN": "assets/linkedin.png",
+        "TWITTER": "assets/twitter.png",
+        "YOUTUBE": "assets/youtube.png",
+        "PINTEREST": "assets/pintrest.png",
+        "DEFAULT": "assets/graphuralogo.png"
+    };
+
+    // ===== STATUS STYLES =====
+    const statusStyles = {
+        "PENDING": "bg-blue-100 text-blue-700",
+        "COMPLETED": "bg-green-100 text-green-700 border border-green-200",
+        "SENT": "bg-cyan-100 text-cyan-700",
+        "FAILED": "bg-red-100 text-red-700"
+    };
+
+    // ===== STATUS BADGE (FIXED) =====
+    const badge = document.getElementById('detailStatusBadge');
+    badge.textContent = computedStatus;
+    badge.className = `status-badge px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg font-bold max-w-[200px] sm:max-w-[250px] ${statusStyles[computedStatus] || statusStyles["PENDING"]}`;
+
+    // ===== MODAL HEADER =====
+    document.getElementById('detailModalTitle').textContent = post.platform;
+    document.getElementById('detailModalPlatform').textContent = `Scheduled on ${post.platform}`;
+
+    // ===== PLATFORM ICON =====
+    const iconElement = document.getElementById('detailPlatformIcon');
+    iconElement.innerHTML = `
+        <img src="${platformIcons[post.platform] || platformIcons.DEFAULT}"
+             alt="${post.platform}"
+             class="w-full h-full object-contain p-2">
+    `;
+
+    // ===== MEDIA HANDLING =====
+    const detailMediaContainer = document.getElementById('detailMediaContainer');
+    const detailMediaImage = document.getElementById('detailMediaImage');
+    const detailMediaVideo = document.getElementById('detailMediaVideo');
+
+    const mediaUrl =
+        post.mediaUrl ||
+        post.media ||
+        post.mediaLink ||
+        post.mediaPath ||
+        null;
+
+    if (mediaUrl) {
+        detailMediaContainer.classList.remove('hidden');
+
+        if (mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            detailMediaImage.src = mediaUrl;
+            detailMediaImage.classList.remove('hidden');
+            detailMediaVideo.classList.add('hidden');
+        } else if (mediaUrl.match(/\.(mp4|webm|ogg|mov|avi)$/i)) {
+            detailMediaVideo.src = mediaUrl;
+            detailMediaVideo.classList.remove('hidden');
+            detailMediaImage.classList.add('hidden');
+        }
+    } else {
+        detailMediaContainer.classList.add('hidden');
+        detailMediaImage.classList.add('hidden');
+        detailMediaVideo.classList.add('hidden');
+    }
+
+    // ===== CONTENT =====
+    document.getElementById('detailContent').textContent = post.content;
+
+    document.getElementById('detailScheduledDate').textContent =
+        scheduledDate.toLocaleDateString();
+
+    document.getElementById('detailScheduledTime').textContent =
+        scheduledDate.toLocaleTimeString();
+
+    document.getElementById('detailRecipient').textContent =
+        post.recipient || 'Not specified';
+
+    document.getElementById('detailPostId').textContent =
+        post.id || 'N/A';
+
+    // 🔥 FIXED STATUS TEXT (IMPORTANT)
+    document.getElementById('detailStatus').textContent = computedStatus;
+
+    // ===== SHOW MODAL =====
+    const modal = document.getElementById('postDetailsModal');
+    modal.classList.remove('hidden');
+
+    // Close modal when clicking outside
+    modal.onclick = (e) => {
+        if (e.target.id === 'postDetailsModal') {
+            closePostDetailsModal();
+        }
+    };
 }
 
 
-  /**
-   * Fetch posts from backend API
-   * @returns {Promise<Array>} Array of post objects
-   */
-  async function fetchPosts() {
-    try {
-      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-        }
-      });
+function closePostDetailsModal() {
+    document.getElementById('postDetailsModal').classList.add('hidden');
+    currentPost = null;
+}
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.warn("Could not fetch posts from API, using mock data:", error);
-      return null;
-    }
-  }
-
-  /**
-   * Update statistics cards with real data
-   * @param {Array} posts - Array of post objects
-   */
-  async function updateStatistics(posts) {
-    const now = new Date();
-
-    document.getElementById('totalPostsCount').textContent = posts.length;
-
-    // Fetch connected platforms from API
-    await updateConnectedPlatforms();
-
-    // Get pending posts (PENDING status with future scheduled time)
-    const pendingPosts = posts.filter(post => {
-      if (!post.scheduledTime) return false;
-
-      const scheduledDate = new Date(post.scheduledTime);
-      return post.status === 'PENDING' && scheduledDate > now;
-    });
-
-    document.getElementById('pendingPostsCount').textContent = pendingPosts.length;
-  }
-
-  /**
-   * Fetch and update connected platforms count from API
-   */
-  async function updateConnectedPlatforms() {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        console.warn("No auth token found");
+// Delete post from card
+async function deletePost(postId) {
+    if (!confirm('Are you sure you want to delete this scheduled post?')) {
         return;
-      }
+    }
 
-      const response = await fetch(API_ENDPOINTS.CHANNELS.STATUS, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+    try {
+        const response = await fetch(API_ENDPOINTS.POSTS.GET_BY_ID(postId), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            alert('✅ Post deleted successfully!');
+            loadPosts(); // Refresh the list
+        } else {
+            const errorData = await response.json();
+            alert('❌ Error: ' + (errorData.message || 'Failed to delete post'));
         }
-      });
-
-      if (response.ok) {
-        const channels = await response.json();
-        console.log("Connected platforms loaded:", channels);
-        
-        // Count connected platforms
-        const connectedCount = channels.filter(channel => 
-          channel.isConnected === true || channel.connected === true
-        ).length;
-        
-        document.getElementById('activePlatformsCount').textContent = connectedCount;
-      } else {
-        console.error("Failed to load connected platforms:", response.status);
-      }
     } catch (error) {
-      console.error('Error loading connected platforms:', error);
+        console.error('Error deleting post:', error);
+        alert('❌ Error deleting post. Please try again.');
     }
-  }
+}
 
-
-
-  /**
-   * Render charts with real post data
-   * Aggregates data by date and platform
-   * @param {Array} timelinePosts - Array of post objects for timeline (last 30 days)
-   * @param {Array} pendingPosts - Array of pending post objects for platform distribution
-   */
-  function renderChartsWithData(timelinePosts, pendingPosts) {
-    // Data aggregation for timeline chart
-    const timelineData = aggregatePostsByDate(timelinePosts);
-    renderTimelineChart(timelineData);
-
-    // Data aggregation for platform distribution chart (pending posts only)
-    const platformData = aggregatePostsByPlatform(pendingPosts);
-    renderPlatformChart(platformData);
-  }
-
-  /**
-   * Aggregate posts by date for timeline visualization
-   * @param {Array} posts - Array of post objects
-   * @returns {Object} Aggregated data with labels and counts
-   */
-  function aggregatePostsByDate(posts) {
-    const dateMap = {};
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-    // Initialize all dates in range
-    for (let d = new Date(thirtyDaysAgo); d <= today; d = new Date(d.getTime() + 24 * 60 * 60 * 1000)) {
-      const dateStr = d.toISOString().split('T')[0];
-      dateMap[dateStr] = 0;
+// Delete post from modal
+async function deletePostFromModal() {
+    if (!currentPost) return;
+    
+    if (!confirm('Are you sure you want to delete this scheduled post?')) {
+        return;
     }
 
-    // Count posts per date
-    posts.forEach(post => {
-      const dateStr = new Date(post.scheduledTime).toISOString().split('T')[0];
-      if (dateMap.hasOwnProperty(dateStr)) {
-        dateMap[dateStr]++;
-      }
-    });
-
-    const labels = Object.keys(dateMap).sort();
-    const data = labels.map(label => dateMap[label]);
-
-    return { labels, data };
-  }
-
-  /**
-   * Aggregate posts by platform
-   * @param {Array} posts - Array of post objects
-   * @returns {Object} Aggregated data with platform names and counts
-   */
-  function aggregatePostsByPlatform(posts) {
-    const platformMap = {};
-
-    posts.forEach(post => {
-      const platform = post.platform || 'Unknown';
-      platformMap[platform] = (platformMap[platform] || 0) + 1;
-    });
-
-    const labels = Object.keys(platformMap);
-    const data = Object.values(platformMap);
-
-    return { labels, data };
-  }
-
-  /**
-   * Render timeline chart showing posts over last 30 days
-   * Uses Chart.js for professional visualization
-   * @param {Object} timelineData - Data with labels and values
-   */
-  function renderTimelineChart(timelineData) {
-    const ctx = document.getElementById('postsTimelineChart').getContext('2d');
-
-    // Destroy previous chart instance if exists
-    if (postsTimelineChart) {
-      postsTimelineChart.destroy();
-    }
-
-    // Create gradient fill
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
-    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.01)');
-
-    postsTimelineChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: timelineData.labels.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-        datasets: [{
-          label: 'Scheduled Posts',
-          data: timelineData.data,
-          borderColor: '#06b6d4',
-          backgroundColor: gradient,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          pointRadius: 5,
-          pointBackgroundColor: '#06b6d4',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointHoverRadius: 7,
-          pointHoverBackgroundColor: '#0891b2',
-          segment: {
-            borderDash: (ctx) => ctx.p1DataIndex === undefined ? [] : undefined
-          }
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              font: { size: 12, weight: '600' },
-              color: '#475569',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
+    try {
+        const response = await fetch(API_ENDPOINTS.POSTS.UPDATE(currentPost.id), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                'Content-Type': 'application/json'
             }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-            padding: 12,
-            titleColor: '#f1f5f9',
-            bodyColor: '#e2e8f0',
-            borderColor: 'rgba(6, 182, 212, 0.3)',
-            borderWidth: 1,
-            titleFont: { size: 13, weight: 'bold' },
-            bodyFont: { size: 12 },
-            cornerRadius: 8,
-            displayColors: true,
-            callbacks: {
-              label: function(context) {
-                return `Posts: ${context.parsed.y}`;
-              }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            border: { dash: [5, 5], color: 'rgba(6, 182, 212, 0.1)' },
-            grid: { color: 'rgba(6, 182, 212, 0.08)' },
-            ticks: {
-              font: { size: 12 },
-              color: '#64748b',
-              callback: function(value) {
-                return Math.floor(value);
-              }
-            }
-          },
-          x: {
-            border: { display: false },
-            grid: { display: false },
-            ticks: {
-              font: { size: 12 },
-              color: '#64748b'
-            }
-          }
+        });
+
+        if (response.ok) {
+            alert('✅ Post deleted successfully!');
+            closePostDetailsModal();
+            loadPosts(); // Refresh the list
+        } else {
+            const errorData = await response.json();
+            alert('❌ Error: ' + (errorData.message || 'Failed to delete post'));
         }
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('❌ Error deleting post. Please try again.');
+    }
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePostDetailsModal();
+    }
+});
+
+// Mobile Sidebar Functions
+function openMobileSidebar() {
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  const overlay = document.getElementById('mobileSidebarOverlay');
+  mobileSidebar.classList.add('open');
+  overlay.classList.add('open');
+}
+
+function closeMobileSidebar() {
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  const overlay = document.getElementById('mobileSidebarOverlay');
+  mobileSidebar.classList.remove('open');
+  overlay.classList.remove('open');
+}
+
+// Mobile Sidebar Profile Menu
+document.addEventListener('DOMContentLoaded', function() {
+  const mobileSidebarProfileBtn = document.getElementById('mobileSidebarProfileBtn');
+  const mobileSidebarProfileMenu = document.getElementById('mobileSidebarProfileMenu');
+
+  if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
+    mobileSidebarProfileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileSidebarProfileMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!mobileSidebarProfileBtn.contains(e.target) && !mobileSidebarProfileMenu.contains(e.target)) {
+        mobileSidebarProfileMenu.classList.add('hidden');
       }
     });
   }
+});
 
-  /**
-   * Render platform distribution chart
-   * Uses doughnut chart for visual appeal
-   * @param {Object} platformData - Data with platform names and counts
-   */
-  function renderPlatformChart(platformData) {
-    const ctx = document.getElementById('platformDistributionChart').getContext('2d');
-
-    // Destroy previous chart instance if exists
-    if (platformDistributionChart) {
-      platformDistributionChart.destroy();
-    }
-
-    // Color palette for different platforms
-    const platformColors = {
-      'FACEBOOK': '#1877F2',
-      'TWITTER': '#1DA1F2',
-      'LINKEDIN': '#0A66C2',
-      'INSTAGRAM': '#E4405F',
-      'YOUTUBE': '#FF0000',
-      'PINTEREST': '#E60023',
-      'WHATSAPP': '#25D366',
-      'TIKTOK': '#000000'
-    };
-
-    const colors = platformData.labels.map(platform => 
-      platformColors[platform] || '#' + Math.floor(Math.random()*16777215).toString(16)
-    );
-
-    platformDistributionChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: platformData.labels,
-        datasets: [{
-          data: platformData.data,
-          backgroundColor: colors,
-          borderColor: '#ffffff',
-          borderWidth: 3,
-          hoverOffset: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              font: { size: 12, weight: '600' },
-              color: '#475569',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-            padding: 12,
-            titleColor: '#f1f5f9',
-            bodyColor: '#e2e8f0',
-            borderColor: 'rgba(6, 182, 212, 0.3)',
-            borderWidth: 1,
-            titleFont: { size: 13, weight: 'bold' },
-            bodyFont: { size: 12 },
-            cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                return `${context.label}: ${context.parsed} (${percentage}%)`;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  /**
-   * Update statistics cards with empty/zero values
-   */
-  function updateStatisticsEmpty() {
-    document.getElementById('totalPostsCount').textContent = '0';
-    document.getElementById('activePlatformsCount').textContent = '0';
-    document.getElementById('pendingPostsCount').textContent = '0';
-  }
-
-  /**
-   * Render empty charts with no data
-   */
-  function renderChartsEmpty() {
-    renderTimelineChartEmpty();
-    renderPlatformChartEmpty();
-  }
-
-  /**
-   * Render timeline chart with no data
-   */
-  function renderTimelineChartEmpty() {
-    const ctx = document.getElementById('postsTimelineChart').getContext('2d');
-
-    // Destroy previous chart instance if exists
-    if (postsTimelineChart) {
-      postsTimelineChart.destroy();
-    }
-
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
-    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.01)');
-
-    postsTimelineChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Scheduled Posts',
-          data: [],
-          borderColor: '#06b6d4',
-          backgroundColor: gradient,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          pointRadius: 5,
-          pointBackgroundColor: '#06b6d4',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointHoverRadius: 7,
-          pointHoverBackgroundColor: '#0891b2'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              font: { size: 12, weight: '600' },
-              color: '#475569',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-            padding: 12,
-            titleColor: '#f1f5f9',
-            bodyColor: '#e2e8f0',
-            borderColor: 'rgba(6, 182, 212, 0.3)',
-            borderWidth: 1,
-            titleFont: { size: 13, weight: 'bold' },
-            bodyFont: { size: 12 },
-            cornerRadius: 8,
-            displayColors: true,
-            callbacks: {
-              label: function(context) {
-                return `Posts: ${context.parsed.y}`;
-              }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            border: { dash: [5, 5], color: 'rgba(6, 182, 212, 0.1)' },
-            grid: { color: 'rgba(6, 182, 212, 0.08)' },
-            ticks: {
-              font: { size: 12 },
-              color: '#64748b',
-              callback: function(value) {
-                return Math.floor(value);
-              }
-            }
-          },
-          x: {
-            border: { display: false },
-            grid: { display: false },
-            ticks: {
-              font: { size: 12 },
-              color: '#64748b'
-            }
-          }
-        }
-      }
-    });
-  }
-
-  /**
-   * Render platform distribution chart with no data
-   */
-  function renderPlatformChartEmpty() {
-    const ctx = document.getElementById('platformDistributionChart').getContext('2d');
-
-    // Destroy previous chart instance if exists
-    if (platformDistributionChart) {
-      platformDistributionChart.destroy();
-    }
-
-    platformDistributionChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: [],
-          borderColor: '#ffffff',
-          borderWidth: 3,
-          hoverOffset: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              font: { size: 12, weight: '600' },
-              color: '#475569',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-            padding: 12,
-            titleColor: '#f1f5f9',
-            bodyColor: '#e2e8f0',
-            borderColor: 'rgba(6, 182, 212, 0.3)',
-            borderWidth: 1,
-            titleFont: { size: 13, weight: 'bold' },
-            bodyFont: { size: 12 },
-            cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                return `${context.label}: ${context.parsed} (${percentage}%)`;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  /**
-   * Render analytics with mock/sample data
-   * Useful for demonstration and testing
-   */
-  function renderAnalyticsWithMockData() {
-    // Mock data structure
-    const mockPosts = [
-      { scheduledTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), platform: 'TWITTER', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), platform: 'LINKEDIN', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), platform: 'YOUTUBE', status: 'PENDING' },
-      { scheduledTime: new Date(), platform: 'PINTEREST', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), platform: 'WHATSAPP', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), platform: 'TWITTER', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), platform: 'LINKEDIN', status: 'PENDING' }
-    ];
-
-    updateStatistics(mockPosts);
-    renderChartsWithData(mockPosts);
-  }
-
-  /**
-   * Toggle loading state
-   * @param {Boolean} show - Whether to show loading state
-   */
-  function showLoading(show) {
-    const loadingState = document.getElementById('loadingState');
-    if (show) {
-      loadingState.classList.remove('hidden');
-    } else {
-      loadingState.classList.add('hidden');
-    }
-  }
 </script>
 
 </body>
