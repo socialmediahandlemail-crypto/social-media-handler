@@ -16,4 +16,7 @@ public interface WhatsAppScheduledPostRepository extends MongoRepository<WhatsAp
 
 
     void deleteByIdAndUserId(String id, String userId);
+
+    // ✅ NEW: Delete all posts older than a certain time
+    void deleteByScheduledTimeBefore(LocalDateTime time);
 }
