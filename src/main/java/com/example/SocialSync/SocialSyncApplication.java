@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SocialSyncApplication {
 
 	public static void main(String[] args) {
+		 System.out.println("DEBUG: MongoDB URI is " + System.getenv("MONGODB_URI"));
 		SpringApplication.run(SocialSyncApplication.class, args);
 	}
 

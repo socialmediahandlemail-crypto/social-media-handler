@@ -1,31 +1,30 @@
 package com.example.SocialSync.service;
 
-import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Autowired
+    private JavaMailSender mailSender;
 
-    /**
-     * Generic email sender
-     */
-    @Async
     public void sendEmail(String to, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
+            message.setFrom("your-app-email@gmail.com"); // Must match application.properties
+
             mailSender.send(message);
-        } catch (Exception ex) {
-            // IMPORTANT: Email failure must NOT break core flow
-            System.err.println("Email sending failed: " + ex.getMessage());
+        } catch (Exception e) {
+            System.err.println("Failed to send email to " + to + ": " + e.getMessage());
+            // You might want to throw exception or log it, but don't break the controller response
         }
     }
 }

@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Configuration file -->
+  <script src="config.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
@@ -50,10 +52,25 @@
       animation: slideIn 0.6s ease-out;
     }
     
+    .content-enter {
+      animation: slideInFromLeft 0.6s ease-out;
+    }
+    
     @keyframes slideIn {
       from {
         opacity: 0;
         transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
       }
       to {
         opacity: 1;
@@ -238,21 +255,32 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
         
         <!-- LEFT SIDE - BRANDING -->
-        <div class="hidden lg:flex flex-col justify-center space-y-6">
+        <!-- LOGIN CONTENT (INITIALLY VISIBLE) -->
+        <div id="loginContent" class="form-slide hidden lg:flex flex-col justify-center space-y-8">
           <div>
-            <h1 class="text-4xl lg:text-5xl font-extrabold mb-4">
-              <span class="text-slate-900">Manage Your</span><br>
-              <span class="gradient-text">Social Media</span><br>
-              <span class="text-slate-900">From One Dashboard</span>
+            <h1 class="text-5xl font-extrabold mb-4 leading-tight">
+              <span class="text-slate-900">Welcome</span><br>
+              <span class="inline-block"><span class="gradient-text">Back to Graphura</span></span>
             </h1>
-            <p class="text-base text-slate-600 max-w-md leading-relaxed">
-              A Unified Platform to Manage, Schedule, and Grow Your Social Media
+            <p class="text-lg text-slate-600 max-w-md leading-relaxed font-medium">
+              Seamlessly manage all your social media accounts, schedule posts in advance, and track your performance—all from one powerful dashboard.
             </p>
           </div>
           
           
-          <div class="space-y-3">
-           
+        </div>
+
+        <!-- SIGNUP CONTENT (INITIALLY HIDDEN) -->
+        <div id="signupContent" class="form-slide hidden lg:flex flex-col justify-center space-y-8" style="display: none;">
+          <div>
+            <h1 class="text-5xl font-extrabold mb-4 leading-tight">
+              <span class="text-slate-900">Manage Your</span><br>
+              <span class="gradient-text">Social Media</span><br>
+              <span class="text-slate-900">From One Dashboard</span>
+            </h1>
+            <p class="text-lg text-slate-600 max-w-md leading-relaxed font-medium">
+              A Unified Platform to Manage, Schedule, and Grow Your Social Media
+            </p>
           </div>
         </div>
         
@@ -309,7 +337,7 @@
             
             <div class="text-center pt-4 border-t border-slate-200/60">
               <p class="text-sm text-slate-700">Already have an account? 
-                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text hover:opacity-80 transition">Sign In</button>
+                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text hover:opacity-80 transition">Log In</button>
               </p>
             </div>
           </div>
@@ -321,7 +349,7 @@
                 <div class="inline-block mb-4 p-3 bg-gradient-to-br from-cyan-100/80 to-blue-100/80 rounded-2xl">
                   <i class="fas fa-sign-in-alt text-cyan-600 text-2xl"></i>
                 </div>
-                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Welcome Back</h2>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Log In</h2>
                 <p class="text-sm text-slate-600 tracking-wide">Sign in to your Graphura account</p>
               </div>
               
@@ -347,7 +375,7 @@
                 <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right"></i>
-                    Sign In
+                    Log In
                   </span>
                 </button>
               </form>
@@ -375,11 +403,27 @@
     function toggleForm() {
       const signupForm = document.getElementById('signupForm');
       const signinForm = document.getElementById('signinForm');
+      const signupContent = document.getElementById('signupContent');
+      const loginContent = document.getElementById('loginContent');
       
+      // Toggle forms
       signupForm.classList.toggle('hidden');
       signinForm.classList.toggle('hidden');
+      
+      // Toggle left content - proper display management
+      if (loginContent.style.display === 'none') {
+        loginContent.style.display = 'flex';
+        signupContent.style.display = 'none';
+      } else {
+        loginContent.style.display = 'none';
+        signupContent.style.display = 'flex';
+      }
+      
+      // Add animations - forms from right, content from left
       signupForm.classList.add('form-enter');
       signinForm.classList.add('form-enter');
+      signupContent.classList.add('content-enter');
+      loginContent.classList.add('content-enter');
     }
 
     // Handle form switching based on URL parameter or button click
@@ -416,7 +460,7 @@
       }
       
       try {
-        const res = await fetch('http://localhost:8082/auth/login', {
+        const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -475,7 +519,7 @@
       }
       
       try {
-        const res = await fetch('http://localhost:8082/auth/signup', {
+        const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, email, password })
