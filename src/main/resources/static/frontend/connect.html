@@ -191,6 +191,10 @@
     <!-- DROPDOWN -->
     <div id="mobileSidebarProfileMenu"
       class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="window.location.href='home.html'"
+        class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+        Go to Home
+      </button>
       <button onclick="logout()"
         class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
         Logout
@@ -268,6 +272,11 @@
       <!-- DROPDOWN -->
       <div id="sidebarProfileMenu"
         class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+
+        <button onclick="window.location.href='home.html'"
+          class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+          Go to Home
+        </button>
 
         <button onclick="logout()"
           class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
@@ -520,135 +529,131 @@
     loadChannelStatus();
   };
 
-  // Channel connection function with OAuth support
-  async function connectChannel(channel) {
-    const token = localStorage.getItem("authToken");
-    
-    if (!token) {
-      alert("Please login first");
-      window.location.href = "login.html";
-      return;
-    }
-
-    console.log("Connecting to:", channel);
-
-    try {
-      // Platform-specific OAuth endpoints
-        const oauthEndpoints = {
-        'YOUTUBE': API_ENDPOINTS.OAUTH.YOUTUBE,
-        'LINKEDIN': API_ENDPOINTS.OAUTH.LINKEDIN(localStorage.getItem("userEmail") || ''),
-        'TWITTER': API_ENDPOINTS.OAUTH.TWITTER,
-        'PINTEREST': API_ENDPOINTS.OAUTH.PINTEREST,
-        'WHATSAPP': 'https://graph.facebook.com/v17.0',
-        'FACEBOOK': API_ENDPOINTS.OAUTH.WHATSAPP
-        };
-
-      // Check if this platform has a direct OAuth endpoint
-      if (oauthEndpoints[channel]) {
-        window.location.href = oauthEndpoints[channel];
-        return;
-      }
-
-      // Fallback: Generic connection API endpoint
-      const response = await fetch(API_ENDPOINTS.CHANNELS.CONNECT(channel), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        console.log(`${channel} connection response:`, data);
-        
-        // If OAuth URL is returned, redirect to it
-        if (data.oauthUrl) {
-          console.log(`Redirecting to OAuth URL:`, data.oauthUrl);
-          window.location.href = data.oauthUrl;
-          return;
-        }
-
-        // Update status
-        updateChannelStatus(channel, true);
-        alert(`${channel} connected successfully!`);
-        
-        // Reload channel status
-        loadChannelStatus();
-      } else {
-        const error = await response.json();
-        console.error(`Connection error for ${channel}:`, error);
-        alert(`Failed to connect ${channel}: ${error.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error(`Error connecting ${channel}:`, error);
-      alert(`Error connecting ${channel}. Please check your connection and try again.`);
-    }
-  }
-
-  // Load channel connection status
+  //updated loadChannelStatus.........
   async function loadChannelStatus() {
     const token = localStorage.getItem("authToken");
-    
     if (!token) {
-      console.log("No auth token found, skipping status load");
-      return;
+        console.warn("No auth token, skipping status load");
+        return;
     }
 
     try {
-      const response = await fetch(API_ENDPOINTS.CHANNELS.STATUS, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const channels = await response.json();
-        console.log("Channel status loaded:", channels);
-        
-        // Update status for each channel
-        channels.forEach(channel => {
-          updateChannelStatus(channel.platform || channel.name, channel.isConnected || channel.connected);
+        // Fetch from the correct endpoint
+        const response = await fetch(API_ENDPOINTS.SOCIAL.STATUS, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
-      } else {
-        console.error("Failed to load channel status:", response.status);
-      }
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Backend returns: { connections: { FACEBOOK: true, ... }, activeCount: 5 }
+            console.log("Social Status:", data);
+
+            // Update UI for each platform found in the map
+            Object.keys(data.connections).forEach(platform => {
+                const isConnected = data.connections[platform];
+                updateChannelUI(platform, isConnected);
+            });
+
+            // Optional: Update a total counter if you have one in HTML
+            // document.getElementById('total-active').innerText = data.activeCount;
+
+        } else {
+            console.error("Failed to fetch status");
+        }
     } catch (error) {
-      console.error('Error loading channel status:', error);
+        console.error('Error loading channel status:', error);
     }
   }
 
-  // Update channel status UI
-  function updateChannelStatus(channel, isConnected) {
-    const statusElement = document.getElementById(`${channel.toLowerCase()}-status`);
-    const buttonElement = document.getElementById(`${channel.toLowerCase()}-btn`);
+
+  //UI Updator......
+  function updateChannelUI(platform, isConnected) {
+    // Normalize platform name to lowercase for IDs (FACEBOOK -> facebook)
+    const lowerPlatform = platform.toLowerCase();
     
-    if (statusElement) {
-      if (isConnected) {
-        statusElement.textContent = 'Connected';
-        statusElement.classList.remove('bg-slate-100', 'text-slate-600');
-        statusElement.classList.add('bg-green-100', 'text-green-700');
-      } else {
-        statusElement.textContent = 'Disconnected';
-        statusElement.classList.remove('bg-green-100', 'text-green-700');
-        statusElement.classList.add('bg-slate-100', 'text-slate-600');
-      }
-    }
+    // Get Elements
+    const statusLabel = document.getElementById(`${lowerPlatform}-status`);
+    const actionBtn = document.getElementById(`${lowerPlatform}-btn`);
 
-    // Hide/Show Connect button based on connection status
-    if (buttonElement) {
-      if (isConnected) {
-        buttonElement.classList.add('hidden');
-        buttonElement.disabled = true;
-      } else {
-        buttonElement.classList.remove('hidden');
-        buttonElement.disabled = false;
-      }
+    // Safety check: if element doesn't exist in HTML, skip it
+    if (!statusLabel || !actionBtn) return;
+
+    if (isConnected) {
+        // ✅ CONNECTED STATE
+        statusLabel.textContent = "Connected";
+        statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap";
+        
+        actionBtn.textContent = "Disconnect";
+        // Change button to Red/Danger style
+        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 text-white rounded-lg font-semibold text-xs lg:text-sm bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/40 transition-all active:scale-95";
+        
+        // Bind click to Disconnect function
+        actionBtn.onclick = () => disconnectChannel(platform);
+
+    } else {
+        // ❌ DISCONNECTED STATE
+        statusLabel.textContent = "Disconnected";
+        // Reset specific badge colors based on platform (Generic approach here for simplicity, or revert to original classes)
+        statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-500 whitespace-nowrap";
+
+        actionBtn.textContent = "Connect Now";
+        // Reset button to original Blue/Platform style
+        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 text-white rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/40 transition-all active:scale-95";
+        
+        // Bind click to Connect function
+        actionBtn.onclick = () => connectChannel(platform);
     }
   }
+
+  // 3. Connect Function (Triggered by button)
+  async function connectChannel(platform) {
+    const token = localStorage.getItem("authToken");
+    
+    try {
+        // 1. Ask Backend for the Google/Facebook Login URL
+        const response = await fetch(`http://localhost:8082/api/channels/auth-url?platform=${platform}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            // 2. Redirect the user to that URL
+            window.location.href = data.url; 
+        } else {
+            alert("Could not initialize connection.");
+        }
+    } catch (error) {
+        console.error("Error starting oauth:", error);
+    }
+}
+  // 4. Disconnect Function (Triggered by button)
+  async function disconnectChannel(platform) {
+    if (!confirm(`Are you sure you want to disconnect ${platform}?`)) return;
+
+    const token = localStorage.getItem("authToken");
+
+    try {
+        const response = await fetch(`${API_ENDPOINTS.SOCIAL.DISCONNECT}?platform=${platform}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            loadChannelStatus(); // Refresh UI
+        } else {
+            alert("Failed to disconnect.");
+        }
+    } catch (error) {
+        console.error("Disconnect error:", error);
+    }
+  }
+  
 
 
 
@@ -685,6 +690,19 @@
         }
       });
     }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    
+    if (status === 'success') {
+        alert("✅ Connected successfully!");
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (status === 'error') {
+        alert("❌ Connection failed.");
+    }
+    
+    loadChannelStatus(); // Refresh grid
   });
 </script>
 

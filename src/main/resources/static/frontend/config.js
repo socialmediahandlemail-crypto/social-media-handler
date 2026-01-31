@@ -33,6 +33,13 @@ const API_ENDPOINTS = {
     CONNECT: (channel) => `${API_BASE_URL}/api/channels/connect/${channel.toLowerCase()}`,
     STATUS: `${API_BASE_URL}/api/channels/status`
   },
+
+  //Just for a testing purpose if works well we will bw using this one 
+  SOCIAL: {
+        STATUS: `${API_BASE_URL}/api/channels/status`,         // GET
+        CONNECT: `${API_BASE_URL}/api/channels/mock-connect`,   // POST (Mock for now)
+        DISCONNECT: `${API_BASE_URL}/api/channels/disconnect`   // POST
+  },
   
   // OAuth endpoints
   OAUTH: {

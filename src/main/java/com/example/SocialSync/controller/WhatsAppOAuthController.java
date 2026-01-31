@@ -1,8 +1,6 @@
 package com.example.SocialSync.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.SocialSync.service.WhatsAppAuthService;
