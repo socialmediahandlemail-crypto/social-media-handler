@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graphura – Connect Channels</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <!-- Configuration file -->
   <script src="config.js"></script>
 
@@ -22,14 +24,14 @@
     }
 
     .sidebar-link:hover {
-      background: rgba(6,182,212,0.08);
-      color: #0891b2;
+      background: rgba(249,115,22,0.08);
+      color: #f97316;
     }
 
     .sidebar-active {
-      background: rgba(6,182,212,0.15);
-      color: #0891b2;
-      box-shadow: inset 0 0 0 1px rgba(6,182,212,0.25);
+      background: rgba(249,115,22,0.15);
+      color: #f97316;
+      box-shadow: inset 0 0 0 1px rgba(249,115,22,0.25);
       backdrop-filter: blur(12px);
     }
 
@@ -41,8 +43,8 @@
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(6, 182, 212, 0.2);
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.18);
       cursor: pointer;
       transition: all 0.3s ease;
       flex-direction: column;
@@ -50,13 +52,13 @@
     }
 
     .mobile-menu-btn:hover {
-      background: rgba(6, 182, 212, 0.2);
+      background: rgba(249, 115, 22, 0.18);
     }
 
     .mobile-menu-btn span {
       width: 20px;
       height: 2px;
-      background: #0891b2;
+      background: #f97316;
       display: block;
       margin: 3px 0;
       transition: all 0.3s ease;
@@ -85,11 +87,11 @@
       height: 100vh;
       width: 256px;
       background: white;
-      border-r: 1px solid rgba(6, 182, 212, 0.3);
+      border-r: 1px solid rgba(249, 115, 22, 0.12);
       transform: translateX(-100%);
       transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 40;
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
       overflow-y: auto;
     }
 
@@ -109,7 +111,7 @@
       }
     }
 
-    /* Make mobile button more visible */
+    /* Make mobile button more visible (unified orange/pink) */
     .mobile-menu-btn {
       display: flex;
       align-items: center;
@@ -117,8 +119,8 @@
       width: 38px;
       height: 38px;
       border-radius: 8px;
-      background: rgba(6, 182, 212, 0.12);
-      border: 1px solid rgba(6, 182, 212, 0.25);
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.2);
       cursor: pointer;
       transition: all 0.25s ease;
       flex-direction: column;
@@ -127,19 +129,73 @@
     }
 
     .mobile-menu-btn:hover {
-      background: rgba(6, 182, 212, 0.2);
-      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(249, 115, 22, 0.18);
+      border-color: rgba(249, 115, 22, 0.34);
     }
 
     .mobile-menu-btn span {
       width: 18px;
       height: 2px;
-      background: #0891b2;
+      background: #f97316;
       display: block;
       margin: 2.5px 0;
       transition: all 0.25s ease;
       border-radius: 1px;
     }
+    
+    /* Top decorative accent */
+    .page-accent {
+      background: linear-gradient(90deg, rgba(249,115,22,0.06), rgba(99,102,241,0.03));
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+    .channel-card { transition: transform .32s, box-shadow .32s, border-color .32s; }
+    .channel-card:hover{ transform: translateY(-6px); box-shadow: 0 20px 40px rgba(2,6,23,0.12); }
+    .platform-icon-wrap{ width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center }
+    /* Button styles following current UI amber/orange scheme */
+    .connect-btn{
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+      color: #ffffff;
+      border: 1px solid rgba(249,115,22,0.16);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(249,115,22,0.14);
+      transition: transform .16s ease, box-shadow .16s ease, filter .12s ease;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding-left:0.9rem; padding-right:0.9rem;
+    }
+    .connect-btn::after{
+      content: "";
+      position: absolute;
+      left: -40%;
+      top: -50%;
+      width: 120%;
+      height: 220%;
+      background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 60%, rgba(255,255,255,0) 100%);
+      transform: rotate(20deg);
+      transition: all .6s cubic-bezier(.2,.9,.2,1);
+      opacity: .9;
+      pointer-events: none;
+    }
+    .connect-btn:hover{ transform: translateY(-4px); box-shadow: 0 20px 44px rgba(249,115,22,0.28); filter: saturate(1.05); }
+    .connect-btn:hover::after{ left: 120%; }
+    .connect-btn:active{ transform: translateY(-1px) scale(.997); }
+
+    /* Disconnect keeps a neutral surface but uses red text + subtle red accent, while remaining within UI tone */
+    .disconnect-btn{
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+      color: #b91c1c;
+      border: 1px solid rgba(185,28,28,0.08);
+      box-shadow: 0 8px 24px rgba(2,6,23,0.04);
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .disconnect-btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 36px rgba(2,6,23,0.08); border-color: rgba(249,115,22,0.14); }
+    .disconnect-btn:active{ transform: translateY(0) scale(.997); }
   </style>
 </head>
 
@@ -178,13 +234,13 @@
   <!-- USER PROFILE -->
   <div class="p-4 border-t relative">
     <button id="mobileSidebarProfileBtn"
-      class="w-full flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm hover:shadow transition">
-      <div class="w-9 h-9 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold">
+      class="w-full flex items-center gap-3 p-3 rounded-full bg-white/80 border border-orange-200/40 shadow-sm hover:shadow-md hover:bg-orange-50/60 hover:border-orange-300/60 transition">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-200 to-pink-200 flex items-center justify-center font-bold">
         <img src="assets/user_icon.png" class="w-5 h-5" />
       </div>
       <div class="truncate text-left">
-        <p id="mobileSidebarUserName" class="text-sm font-semibold">User</p>
-        <p id="mobileSidebarUserEmail" class="text-xs text-gray-500 truncate"></p>
+        <p id="mobileSidebarUserName" class="text-sm font-semibold text-slate-800">User</p>
+        <p id="mobileSidebarUserEmail" class="text-xs text-slate-600 truncate"></p>
       </div>
     </button>
 
@@ -207,7 +263,7 @@
 <div class="flex min-h-screen">
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-cyan-200/30 flex flex-col justify-between">
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-orange-200/30 flex flex-col justify-between">
 
     <!-- LOGO -->
     <div class="px-6 py-6 border-b flex items-center justify-center">
@@ -241,13 +297,15 @@
 <button id="sidebarProfileBtn"
   class="mt-auto w-full flex items-center gap-3
          px-4 py-3
-         border-t border-slate-200
-         hover:bg-slate-50
+         rounded-full
+         bg-white/80 border border-orange-200/40
+         hover:bg-orange-50/60 hover:border-orange-300/60
+         shadow-sm hover:shadow-md
          transition">
 
   <!-- Avatar -->
   <div class="w-10 h-10 rounded-full
-              bg-cyan-100
+              bg-gradient-to-br from-orange-200 to-pink-200
               flex items-center justify-center
               shrink-0">
     <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
@@ -262,7 +320,7 @@
 
     <!-- Email: readable, not truncated harshly -->
     <p id="sidebarUserEmail"
-       class="text-xs text-slate-500 leading-tight break-all">
+       class="text-xs text-slate-600 leading-tight break-all">
       user@email.com
     </p>
   </div>
@@ -290,7 +348,7 @@
   </aside>
 
 <!-- ================= MAIN CONTENT ================= -->
-<main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-slate-50 relative overflow-hidden w-full">
+<main class="lg:ml-64 flex-1 px-4 lg:px-12 py-6 lg:py-10 bg-slate-50 relative overflow-hidden w-full">
    
     <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 width-full fixed top-0 left-0 right-0 z-20">
       <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
@@ -307,7 +365,7 @@
     
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-3">
-        <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <circle cx="6" cy="12" r="3" stroke-width="2"/>
           <circle cx="18" cy="6" r="3" stroke-width="2"/>
           <circle cx="18" cy="18" r="3" stroke-width="2"/>
@@ -320,166 +378,128 @@
         </h1>
       </div>
       <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">Connect your social media accounts to schedule and manage posts</p>
+
+      <div class="mt-4 page-accent flex items-center justify-between gap-4">
+        <div>
+          <p class="text-sm text-slate-600">Total connected</p>
+          <p class="text-2xl font-extrabold text-slate-900"><span id="total-active">0</span> <span class="text-sm font-medium text-slate-500">/ 6</span></p>
+        </div>
+      </div>
     </div>
   </header>
 
   <!-- ===== CHANNELS GRID ===== -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 relative">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 relative">
 
     <!-- Facebook -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
-      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
-      <div class="p-4 lg:p-6 relative z-10">
-        <div class="flex items-start justify-between mb-4 gap-2">
-          <div class="w-12 lg:w-14 h-12 lg:h-14 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-125 transition-transform duration-300 overflow-hidden p-2 flex-shrink-0">
-            <img src="assets/facebook.png" alt="Facebook" class="w-full h-full object-contain">
-          </div>
-          <span id="facebook-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
-            Disconnected
-          </span>
+    <div class="channel-card relative rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-5 lg:p-6">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02));">
+          <img src="assets/facebook.png" alt="Facebook" class="w-8 h-8 object-contain">
         </div>
-
-        <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1">Facebook</h3>
-        
-        
-        <button id="facebook-btn" onclick="connectChannel('FACEBOOK')" class="w-full py-2 lg:py-2.5 px-3 lg:px-4 text-slate-700 rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/40 transition-all active:scale-95">
-          Connect Now
-        </button>
-      </div>
-    </div>
-    <div
-  class="group relative rounded-2xl overflow-hidden
-         shadow-lg hover:shadow-2xl
-         transition-all duration-500
-         hover:-translate-y-2 cursor-pointer
-         bg-white
-         border border-slate-200">
-
-  <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-  <div class="p-4 lg:p-6 relative z-10">
-    <div class="flex items-start justify-between mb-4 gap-2">
-
-      <div
-        class="w-12 lg:w-14 h-12 lg:h-14 rounded-xl
-               flex items-center justify-center
-               shadow-lg shadow-green-500/30
-               group-hover:scale-125
-               transition-transform duration-300
-               overflow-hidden p-2 flex-shrink-0">
-        <img src="assets/whatsapp.png" alt="WhatsApp" class="w-full h-full object-contain">
+        <span id="facebook-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
+          Disconnected
+        </span>
       </div>
 
-      <span
-        id="whatsapp-status"
-        class="px-2 lg:px-3 py-1 rounded-lg
-               text-[10px] lg:text-xs font-semibold
-               bg-green-100 text-green-700 whitespace-nowrap">
-        Disconnected
-      </span>
+      <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">Facebook</h3>
+
+      <button id="facebook-btn" onclick="connectChannel('FACEBOOK')" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm connect-btn text-white shadow-md group">
+        <span>Connect Now</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
+    <div class="channel-card relative rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-5 lg:p-6">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));">
+          <img src="assets/whatsapp.png" alt="WhatsApp" class="w-8 h-8 object-contain">
+        </div>
+        <span id="whatsapp-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap">Disconnected</span>
+      </div>
 
-    <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1">WhatsApp</h3>
-
-    <button id="whatsapp-btn" onclick="connectChannel('WHATSAPP')" class="w-full py-2 lg:py-2.5 px-3 lg:px-4 text-slate-700 rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/40 transition-all active:scale-95">
-      Connect Now
-    </button>
-  </div>
-</div>
+      <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">WhatsApp</h3>
+      <button id="whatsapp-btn" onclick="connectChannel('WHATSAPP')" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm connect-btn text-white shadow-md group">
+        <span>Connect Now</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
 
 
    
 
     <!-- Twitter/X -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
-      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
-      <div class="p-4 lg:p-6 relative z-10">
-        <div class="flex items-start justify-between mb-4 gap-2">
-          <div class="w-12 lg:w-14 h-12 lg:h-14 rounded-xl flex items-center justify-center shadow-lg shadow-slate-800/30 group-hover:scale-125 transition-transform duration-300 overflow-hidden p-2 flex-shrink-0">
-            <img src="assets/twitter.png" alt="Twitter" class="w-full h-full object-contain">
-          </div>
-          <span id="twitter-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-200 text-slate-700 whitespace-nowrap">
-            Disconnected
-          </span>
+    <div class="channel-card relative rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-5 lg:p-6">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(30,41,59,0.06), rgba(30,41,59,0.02));">
+          <img src="assets/twitter.png" alt="Twitter" class="w-8 h-8 object-contain">
         </div>
-
-        <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1">Twitter / X</h3>
-
-
-        <button id="twitter-btn" onclick="connectChannel('TWITTER')" class="w-full py-2 lg:py-2.5 px-3 lg:px-4 text-slate-700 rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-slate-800 to-slate-950 text-white shadow-lg shadow-slate-800/40 transition-all active:scale-95">
-          Connect Now
-        </button>
+        <span id="twitter-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-200 text-slate-700 whitespace-nowrap">Disconnected</span>
       </div>
+
+      <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">Twitter / X</h3>
+      <button id="twitter-btn" onclick="connectChannel('TWITTER')" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm connect-btn text-white shadow-md group">
+        <span>Connect Now</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
 
     <!-- YouTube -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
-      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
-      <div class="p-4 lg:p-6 relative z-10">
-        <div class="flex items-start justify-between mb-4 gap-2">
-          <div class="w-12 lg:w-14 h-12 lg:h-14 rounded-xl flex items-center justify-center shadow-lg shadow-red-400/30 group-hover:scale-125 transition-transform duration-300 overflow-hidden p-2 flex-shrink-0">
-            <img src="assets/youtube.png" alt="YouTube" class="w-full h-full object-contain">
-          </div>
-          <span id="youtube-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-red-100 text-red-700 whitespace-nowrap">
-            Disconnected
-          </span>
+    <div class="channel-card relative rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-5 lg:p-6">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));">
+          <img src="assets/youtube.png" alt="YouTube" class="w-8 h-8 object-contain">
         </div>
-
-        <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1">YouTube</h3>
-
-
-        <button id="youtube-btn" onclick="connectChannel('YOUTUBE')" class="w-full py-2 lg:py-2.5 px-3 lg:px-4 text-slate-700 rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg shadow-red-500/40 transition-all active:scale-95">
-          Connect Now
-        </button>
+        <span id="youtube-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-red-100 text-red-700 whitespace-nowrap">Disconnected</span>
       </div>
+
+      <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">YouTube</h3>
+      <button id="youtube-btn" onclick="connectChannel('YOUTUBE')" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm connect-btn text-white shadow-md group">
+        <span>Connect Now</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
-     <!-- LinkedIn -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
-      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
-      <div class="p-4 lg:p-6 relative z-10">
-        <div class="flex items-start justify-between mb-4 gap-2">
-          <div class="w-12 lg:w-14 h-12 lg:h-14 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 group-hover:scale-125 transition-transform duration-300 overflow-hidden p-2 flex-shrink-0">
-            <img src="assets/linkedin.png" alt="LinkedIn" class="w-full h-full object-contain">
-          </div>
-          <span id="linkedin-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-indigo-100 text-indigo-700 whitespace-nowrap">
-            Disconnected
-          </span>
+    <!-- LinkedIn -->
+    <div class="channel-card relative rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-5 lg:p-6">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(99,102,241,0.06), rgba(99,102,241,0.02));">
+          <img src="assets/linkedin.png" alt="LinkedIn" class="w-8 h-8 object-contain">
         </div>
-
-        <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1">LinkedIn</h3>
-
-
-
-        <button id="linkedin-btn" onclick="connectChannel('LINKEDIN')" class="w-full py-2 lg:py-2.5 px-3 lg:px-4 text-slate-700 rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/40 transition-all active:scale-95">
-          Connect Now
-        </button>
+        <span id="linkedin-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-indigo-100 text-indigo-700 whitespace-nowrap">Disconnected</span>
       </div>
+
+      <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">LinkedIn</h3>
+      <button id="linkedin-btn" onclick="connectChannel('LINKEDIN')" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm connect-btn text-white shadow-md group">
+        <span>Connect Now</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
 
     <!-- Pinterest -->
-    <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer bg-white border border-slate-200">
-      <div class="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
-      <div class="p-4 lg:p-6 relative z-10">
-        <div class="flex items-start justify-between mb-4 gap-2">
-          <div class="w-12 lg:w-14 h-12 lg:h-14 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/30 group-hover:scale-125 transition-transform duration-300 overflow-hidden p-2 flex-shrink-0">
-            <img src="assets/pintrest.png" alt="Pinterest" class="w-full h-full object-contain">
-          </div>
-          <span id="pinterest-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-red-100 text-red-700 whitespace-nowrap">
-            Disconnected
-          </span>
+    <div class="channel-card relative rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-5 lg:p-6">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));">
+          <img src="assets/pintrest.png" alt="Pinterest" class="w-8 h-8 object-contain">
         </div>
-
-        <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1">Pinterest</h3>
-
-        <button id="pinterest-btn" onclick="connectChannel('PINTEREST')" class="w-full py-2 lg:py-2.5 px-3 lg:px-4 text-slate-700 rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-red-600 to-rose-700 text-white shadow-lg shadow-red-600/40 transition-all active:scale-95">
-          Connect Now
-        </button>
+        <span id="pinterest-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-red-100 text-red-700 whitespace-nowrap">Disconnected</span>
       </div>
+
+      <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">Pinterest</h3>
+      <button id="pinterest-btn" onclick="connectChannel('PINTEREST')" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm connect-btn text-white shadow-md group">
+        <span>Connect Now</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
 
   </div>
@@ -548,19 +568,31 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
-            
-            // Backend returns: { connections: { FACEBOOK: true, ... }, activeCount: 5 }
-            console.log("Social Status:", data);
+          const data = await response.json();
 
-            // Update UI for each platform found in the map
+          // Backend expected shape: { connections: { FACEBOOK: true, ... }, activeCount: 5 }
+          console.log("Social Status:", data);
+
+          // Update UI for each platform found in the map
+          if (data.connections && typeof data.connections === 'object') {
             Object.keys(data.connections).forEach(platform => {
-                const isConnected = data.connections[platform];
-                updateChannelUI(platform, isConnected);
+              const isConnected = !!data.connections[platform];
+              updateChannelUI(platform, isConnected);
             });
+          }
 
-            // Optional: Update a total counter if you have one in HTML
-            // document.getElementById('total-active').innerText = data.activeCount;
+          // Compute connected count: prefer returned activeCount, otherwise count truthy entries in connections
+          let activeCount = typeof data.activeCount !== 'undefined' ? Number(data.activeCount) : null;
+          if (activeCount === null) {
+            if (data.connections && typeof data.connections === 'object') {
+              activeCount = Object.values(data.connections).filter(Boolean).length;
+            } else {
+              activeCount = 0;
+            }
+          }
+
+          const totalEl = document.getElementById('total-active');
+          if (totalEl) totalEl.innerText = activeCount;
 
         } else {
             console.error("Failed to fetch status");
@@ -588,9 +620,9 @@
         statusLabel.textContent = "Connected";
         statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap";
         
-        actionBtn.textContent = "Disconnect";
-        // Change button to Red/Danger style
-        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 text-white rounded-lg font-semibold text-xs lg:text-sm bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/40 transition-all active:scale-95";
+        actionBtn.innerHTML = `<span>Disconnect</span><svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>`;
+        // Use centralized disconnect button style (neutral surface + red accent)
+        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 rounded-xl font-semibold text-xs lg:text-sm disconnect-btn text-red-600 shadow-sm group";
         
         // Bind click to Disconnect function
         actionBtn.onclick = () => disconnectChannel(platform);
@@ -601,9 +633,9 @@
         // Reset specific badge colors based on platform (Generic approach here for simplicity, or revert to original classes)
         statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-500 whitespace-nowrap";
 
-        actionBtn.textContent = "Connect Now";
-        // Reset button to original Blue/Platform style
-        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 text-white rounded-lg font-semibold text-xs lg:text-sm bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/40 transition-all active:scale-95";
+        actionBtn.innerHTML = `<span>Connect Now</span><svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>`;
+        // Use centralized connect button style (amber/orange scheme)
+        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 rounded-xl font-semibold text-xs lg:text-sm connect-btn text-white shadow-sm group";
         
         // Bind click to Connect function
         actionBtn.onclick = () => connectChannel(platform);
