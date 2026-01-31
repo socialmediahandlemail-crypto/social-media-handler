@@ -7,9 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Configuration file -->
+  <script src="config.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
+    
+    .gradient-primary {
+      background: linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(241, 245, 249, 1) 100%);
+    }
     
     .glass {
       background: rgba(255, 255, 255, 0.85);
@@ -24,7 +30,7 @@
     }
     
     .gradient-text {
-      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -80,18 +86,18 @@
     .form-input {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      background: rgba(255, 255, 255, 0.98);
     }
 
     .form-input:hover {
-      border-color: #cbd5e1;
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.08);
+      border-color: rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.06);
     }
 
     .form-input:focus {
       background: #ffffff;
-      border-color: #06b6d4;
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1), 0 4px 20px rgba(6, 182, 212, 0.12);
+      border-color: rgba(249, 115, 22, 0.6);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1), 0 4px 20px rgba(249, 115, 22, 0.1);
     }
 
     /* Input Label Animation */
@@ -111,49 +117,31 @@
 
     /* Button Styling */
     .btn-gradient {
-      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #3b82f6 100%);
-      background-size: 200% 200%;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+      transition: all 0.3s ease;
+      color: white;
+      font-weight: 600;
     }
 
     .btn-gradient:hover {
-      background-position: 200% 0;
-      box-shadow: 0 12px 24px rgba(6, 182, 212, 0.3), 0 8px 16px rgba(59, 130, 246, 0.2);
       transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.3);
     }
 
     .btn-gradient:active {
       transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
-    }
-
-    .btn-gradient::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .btn-gradient:hover::before {
-      left: 100%;
     }
 
     /* Form Card Shadow & Border */
     .form-card {
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 0 1px rgba(6, 182, 212, 0.2), 0 10px 20px rgba(0, 0, 0, 0.12);
-      border: 1.5px solid rgba(6, 182, 212, 0.15);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(250, 251, 252, 0.95);
+      border: 1px solid rgba(226, 232, 240, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      transition: all 0.3s ease;
     }
 
     .form-card:hover {
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.22), 0 0 1px rgba(6, 182, 212, 0.3), 0 15px 30px rgba(0, 0, 0, 0.16);
-      border-color: rgba(6, 182, 212, 0.25);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
     }
 
     /* Error Message Animation */
@@ -207,46 +195,142 @@
     }
 
     .form-input:focus ~ .input-icon {
-      color: #06b6d4;
+      color: #f97316;
     }
 
     .form-input-with-icon {
       padding-left: 2.5rem;
     }
+
+    /* Creative Loader Styles */
+    .loader-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .loader-overlay.active {
+      display: flex;
+    }
+
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* Animated Gradient Spinner */
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(249, 115, 22, 0.15);
+      border-top: 4px solid #f97316;
+      border-right: 4px solid #ec4899;
+      border-radius: 50%;
+      animation: spin 1.5s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Pulse Dots */
+    .pulse-dots {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .pulse-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .pulse-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .loader-text {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.5px;
+    }
+
+    .loader-text span {
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 min-h-screen flex flex-col">
+<body class="gradient-primary text-slate-800 min-h-screen flex flex-col m-0 p-0">
+
+  <!-- CREATIVE LOADER -->
+  <div id="loaderOverlay" class="loader-overlay">
+    <div class="loader-container">
+      <div class="spinner"></div>
+      <div class="pulse-dots">
+        <div class="pulse-dot"></div>
+        <div class="pulse-dot"></div>
+        <div class="pulse-dot"></div>
+      </div>
+      <p class="loader-text">Processing your request<span>...</span></p>
+    </div>
+  </div>
 
   <!-- NAVBAR -->
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
-    <div class="max-w-7xl mx-auto px-6 py-2 flex justify-between items-center">
-      <a href="home.html" class="flex items-center gap-3 hover:opacity-80 transition">
-        <img src="assets/graphuralogo.png" class="h-14 w-auto" alt="Graphura Logo">
-      </a>
-      <div class="flex items-center gap-4">
-        <a href="home.html"
-   class="inline-flex items-center gap-2
-          px-4 py-2 rounded-xl
-          text-sm font-semibold
-          text-slate-600
-          bg-white/60
-          border border-slate-200/70
-          hover:bg-white/80
-          hover:text-slate-900
-          hover:border-slate-300
-          transition-all duration-200">
+  <nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-full px-8 py-4 shadow-lg hover:shadow-xl transition-shadow">
+      <div class="flex items-center justify-between">
+        
+        <!-- LOGO -->
+         <div class="flex items-center gap-3 flex-shrink-0">
+        <img src="assets/graphuralogo.png" class="h-12 w-auto" alt="Graphura Logo">
+      </div>
 
-  <i class="fas fa-arrow-left text-xs text-slate-400"></i>
-  Back to Home
-</a>
+        <!-- NAV LINKS - CENTER -->
+        <ul class="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600 flex-1 justify-center">
+          <li><a href="home.html#hero" class="hover:text-orange-500 transition">Home</a></li>
+          <li><a href="home.html#features" class="hover:text-orange-500 transition">Features</a></li>
+          <li><a href="home.html#analytics" class="hover:text-orange-500 transition">Analytics</a></li>
+        </ul>
 
+        <!-- AUTH AREA -->
+        <div class="flex items-center gap-3">
+          <a href="home.html"
+             class="px-6 py-2 rounded-full text-sm font-semibold text-white
+                    bg-gradient-to-br from-orange-400 to-pink-500 
+                    hover:shadow-lg transition">
+            Back to Home
+          </a>
+        </div>
       </div>
     </div>
   </nav>
 
   <!-- MAIN CONTENT -->
-  <main class="flex-1 flex items-center justify-center px-4 py-6 md:py-8">
+  <main class="flex-1 flex items-center justify-center px-4 py-6 md:py-8 mt-20">
     <div class="w-full max-w-6xl">
       
       <!-- CONTAINER -->
@@ -286,11 +370,11 @@
         <div class="w-full">
           
           <!-- SIGN UP FORM (INITIALLY HIDDEN) -->
-          <div id="signupForm" class="form-slide hidden form-card glass rounded-3xl p-6 md:p-10 h-[590px] flex flex-col justify-between">
+          <div id="signupForm" class="form-slide hidden form-card rounded-3xl p-6 md:p-10 h-[590px] flex flex-col justify-between">
             <div>
               <div class="mb-8 text-center">
-                <div class="inline-block mb-4 p-3 bg-gradient-to-br from-cyan-100/80 to-blue-100/80 rounded-2xl">
-                  <i class="fas fa-user-plus text-cyan-600 text-2xl"></i>
+                <div class="inline-block mb-4 p-3 bg-gradient-to-br from-orange-100/80 to-pink-100/80 rounded-2xl">
+                  <i class="fas fa-user-plus text-orange-600 text-2xl"></i>
                 </div>
                 <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Create Account</h2>
                 <p class="text-sm text-slate-600 tracking-wide">Start managing all your social media in one place</p>
@@ -298,7 +382,7 @@
               
               <form id="signupFormElement" class="space-y-4">
                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-user text-cyan-500 mr-2"></i>Username</label>
+                  <label class="form-label"><i class="fas fa-user text-orange-500 mr-2"></i>Username</label>
                   <div class="input-wrapper">
                     <input id="suName" type="text" placeholder="Choose your username"
                       class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
@@ -307,7 +391,7 @@
                 </div>
                 
                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-envelope text-cyan-500 mr-2"></i>Email Address</label>
+                  <label class="form-label"><i class="fas fa-envelope text-orange-500 mr-2"></i>Email Address</label>
                   <div class="input-wrapper">
                     <input id="suEmail" type="email" placeholder="you@example.com"
                       class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
@@ -316,31 +400,15 @@
                 </div>
                 
                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Password</label>
+                  <label class="form-label"><i class="fas fa-lock text-orange-500 mr-2"></i>Password</label>
                   <div class="input-wrapper">
                     <input id="suPassword" type="password" placeholder="Minimum 8 characters"
                       class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
                   </div>
                   <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                 </div>
-
-                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Admin</label>
-                  <div class="input-wrapper">
-                    <input id="admin" type="text" placeholder="Choose your username"
-                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
-                  </div>
-                  <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
-                </div>
-                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Secret Key</label>
-                  <div class="input-wrapper">
-                    <input id="secret" type="password" placeholder="Minimum 8 characters"
-                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
-                  </div>
-                  <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
-                </div>
-                <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg mt-4 relative group">
+                
+                <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right"></i>
                     Create Account
@@ -351,17 +419,17 @@
             
             <div class="text-center pt-4 border-t border-slate-200/60">
               <p class="text-sm text-slate-700">Already have an account? 
-                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text hover:opacity-80 transition">Log In</button>
+                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text hover:opacity-80 transition">Log In</button>
               </p>
             </div>
           </div>
           
           <!-- SIGN IN FORM (INITIALLY VISIBLE) -->
-          <div id="signinForm" class="form-slide form-card glass rounded-3xl p-6 md:p-10 h-[550px] flex flex-col justify-between">
+          <div id="signinForm" class="form-slide form-card rounded-3xl p-6 md:p-10 h-[550px] flex flex-col justify-between">
             <div>
               <div class="mb-8 text-center">
-                <div class="inline-block mb-4 p-3 bg-gradient-to-br from-cyan-100/80 to-blue-100/80 rounded-2xl">
-                  <i class="fas fa-sign-in-alt text-cyan-600 text-2xl"></i>
+                <div class="inline-block mb-4 p-3 bg-gradient-to-br from-orange-100/80 to-pink-100/80 rounded-2xl">
+                  <i class="fas fa-sign-in-alt text-orange-600 text-2xl"></i>
                 </div>
                 <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Log In</h2>
                 <p class="text-sm text-slate-600 tracking-wide">Sign in to your Graphura account</p>
@@ -369,7 +437,7 @@
               
               <form id="loginFormElement" class="space-y-4">
                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-envelope text-cyan-500 mr-2"></i>Email Address</label>
+                  <label class="form-label"><i class="fas fa-envelope text-orange-500 mr-2"></i>Email Address</label>
                   <div class="input-wrapper">
                     <input id="liEmail" type="email" placeholder="you@example.com"
                       class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
@@ -378,7 +446,7 @@
                 </div>
                 
                 <div class="form-group">
-                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Password</label>
+                  <label class="form-label"><i class="fas fa-lock text-orange-500 mr-2"></i>Password</label>
                   <div class="input-wrapper">
                     <input id="liPassword" type="password" placeholder="Enter your password"
                       class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
@@ -386,7 +454,7 @@
                   <p id="liPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                 </div>
                 
-                <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg mt-4 relative group">
+                <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right"></i>
                     Log In
@@ -397,7 +465,7 @@
             
             <div class="text-center pt-6 border-t border-slate-200/60">
               <p class="text-sm text-slate-700">Don't have an account? 
-                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text hover:opacity-80 transition">Sign Up</button>
+                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text hover:opacity-80 transition">Sign Up</button>
               </p>
             </div>
           </div>
@@ -409,8 +477,8 @@
 
   <!-- BACKGROUND EFFECTS -->
   <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-300/20 to-blue-300/10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-300/10 to-cyan-300/5 rounded-full blur-3xl"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-200/25 to-pink-200/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-orange-200/10 to-pink-200/5 rounded-full blur-3xl"></div>
   </div>
 
   <script>
@@ -456,6 +524,7 @@
       
       const email = document.getElementById('liEmail').value.trim();
       const password = document.getElementById('liPassword').value;
+      const loaderOverlay = document.getElementById('loaderOverlay');
       
       // Clear errors
       document.getElementById('liEmailError').classList.add('hidden');
@@ -474,13 +543,19 @@
       }
       
       try {
-        const res = await fetch('http://localhost:8082/auth/login', {
+        // Show loader
+        loaderOverlay.classList.add('active');
+        
+        const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         });
         
         const result = await res.json();
+        
+        // Hide loader
+        loaderOverlay.classList.remove('active');
         
         if (res.ok) {
           localStorage.setItem('authToken', result.token);
@@ -492,6 +567,8 @@
           document.getElementById('liEmailError').classList.remove('hidden');
         }
       } catch (err) {
+        // Hide loader on error
+        loaderOverlay.classList.remove('active');
         document.getElementById('liEmailError').textContent = 'Backend not reachable';
         document.getElementById('liEmailError').classList.remove('hidden');
       }
@@ -504,8 +581,7 @@
       const username = document.getElementById('suName').value.trim();
       const email = document.getElementById('suEmail').value.trim();
       const password = document.getElementById('suPassword').value;
-      const admin = document.getElementById('admin').value.trim(); 
-      const secret = document.getElementById('secret').value;
+      const loaderOverlay = document.getElementById('loaderOverlay');
       
       // Clear errors
       document.getElementById('suNameError').classList.add('hidden');
@@ -533,49 +609,37 @@
         document.getElementById('suPasswordError').classList.remove('hidden');
         return;
       }
-      document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
-
-      if (!username) { alert('Name is required'); return; }
-      if (!email) { alert('Email is required'); return; }
       
       try {
-        const res = await fetch('http://localhost:8082/auth/signup', {
+        // Show loader
+        loaderOverlay.classList.add('active');
+        
+        const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password, admin, secret })
+          body: JSON.stringify({ username, email, password })
         });
         
         const result = await res.json();
         
-        if (res.ok && result.success) {
-            alert('Account created! Please sign in.');
-            toggleForm();
-            document.getElementById('signupFormElement').reset();
-        } else {
-            alert(result.message || 'Signup failed');
-        }
-    } catch (err) {
-        console.error("Error:", err);
-        alert('Backend not reachable. Check if Server is running.');
-    }
-});
-
-
-    //     const result = await res.json();
+        // Hide loader
+        loaderOverlay.classList.remove('active');
         
-    //     if (res.ok && result.success) {
-    //       alert('Account created! Please sign in.');
-    //       toggleForm();
-    //       document.getElementById('loginFormElement').reset();
-    //     } else {
-    //       document.getElementById('suEmailError').textContent = result.message || 'Signup failed';
-    //       document.getElementById('suEmailError').classList.remove('hidden');
-    //     }
-    //   } catch (err) {
-    //     document.getElementById('suEmailError').textContent = 'Backend not reachable';
-    //      document.getElementById('suEmailError').classList.remove('hidden');
-    //   }
-    // });
+        if (res.ok && result.success) {
+          alert('Account created! Please sign in.');
+          toggleForm();
+          document.getElementById('loginFormElement').reset();
+        } else {
+          document.getElementById('suEmailError').textContent = result.message || 'Signup failed';
+          document.getElementById('suEmailError').classList.remove('hidden');
+        }
+      } catch (err) {
+        // Hide loader on error
+        loaderOverlay.classList.remove('active');
+        document.getElementById('suEmailError').textContent = 'Backend not reachable';
+        document.getElementById('suEmailError').classList.remove('hidden');
+      }
+    });
   </script>
 
 </body>
