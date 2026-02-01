@@ -26,6 +26,8 @@ private String email;
 private String password;
 private String role; // e.g., "ROLE_ADMIN" or "ROLE_USER"
 private boolean isAdmin;
+// 🔥 NEW: Stores the Permanent Key (Admin) or Random OTP (User)
+private String secretKey;
 private LocalDateTime createdAt;
 private String resetToken;
 private LocalDateTime resetTokenExpiry;
@@ -43,7 +45,7 @@ account.setUser(null);
 }
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
-return List.of(new SimpleGrantedAuthority(this.role != null ? this.role : "ROLE_USER"));}
+return List.of(new SimpleGrantedAuthority(this.role != null  ? this.role : "ROLE_USER"));}
 @Override
 public boolean isAccountNonExpired() {
 return true;

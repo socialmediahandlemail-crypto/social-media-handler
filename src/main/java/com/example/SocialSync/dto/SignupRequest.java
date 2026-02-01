@@ -12,6 +12,6 @@ public class SignupRequest {
     private String username;
     private String email;
     private String password;
-    private String admin;    
-    private String secret;
+    private String role;    
+    private String secretKey;
 }

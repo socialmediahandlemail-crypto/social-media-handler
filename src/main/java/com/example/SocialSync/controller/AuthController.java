@@ -38,8 +38,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        LoginResponse response = authService.loginUser(request);
-        return ResponseEntity.ok(response);
+        try {
+            LoginResponse response = authService.loginUser(request);
+            // If user login, response.getToken() will be null and requiresOtp=true
+            // If admin login, response.getToken() will be valid
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+    // 🔥 NEW: Verify User Secret Key (Step 2 for Users)
+    @PostMapping("/verify-key")
+    public ResponseEntity<?> verifyKey(@RequestBody LoginRequest request) {
+        try {
+            LoginResponse response = authService.verifyUserSecret(request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 
     // ===============================

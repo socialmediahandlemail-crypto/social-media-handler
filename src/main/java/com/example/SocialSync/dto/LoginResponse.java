@@ -13,4 +13,6 @@ public class LoginResponse{
     private String email;
     private String username;
     private String message;
+    // 🔥 NEW: Tells frontend if flow is complete or needs step 2
+    private boolean requiresOtp;
 }
