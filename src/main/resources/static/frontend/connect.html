@@ -196,6 +196,24 @@
     }
     .disconnect-btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 36px rgba(2,6,23,0.08); border-color: rgba(249,115,22,0.14); }
     .disconnect-btn:active{ transform: translateY(0) scale(.997); }
+    /* Connected button (creative green) */
+    .connected-btn{
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(90deg,#10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(6,95,70,0.12);
+      box-shadow: 0 12px 36px rgba(6,95,70,0.12);
+      transition: transform .16s ease, box-shadow .16s ease, filter .12s ease;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding-left:0.9rem; padding-right:0.9rem; border-radius:12px; font-weight:700;
+    }
+    .connected-btn::after{
+      content: "";
+      position:absolute; left:-30%; top:-30%; width:140%; height:160%; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 30%);
+      transform: rotate(14deg); transition: all .6s cubic-bezier(.2,.9,.2,1); pointer-events:none;
+    }
+    .connected-btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 44px rgba(6,95,70,0.14); filter: saturate(1.05); }
   </style>
 </head>
 
@@ -397,7 +415,7 @@
         <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02));">
           <img src="assets/facebook.png" alt="Facebook" class="w-8 h-8 object-contain">
         </div>
-        <span id="facebook-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
+        <span id="facebook-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">
           Disconnected
         </span>
       </div>
@@ -416,7 +434,7 @@
         <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));">
           <img src="assets/whatsapp.png" alt="WhatsApp" class="w-8 h-8 object-contain">
         </div>
-        <span id="whatsapp-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap">Disconnected</span>
+        <span id="whatsapp-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Disconnected</span>
       </div>
 
       <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">WhatsApp</h3>
@@ -437,7 +455,7 @@
         <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(30,41,59,0.06), rgba(30,41,59,0.02));">
           <img src="assets/twitter.png" alt="Twitter" class="w-8 h-8 object-contain">
         </div>
-        <span id="twitter-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-200 text-slate-700 whitespace-nowrap">Disconnected</span>
+        <span id="twitter-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Disconnected</span>
       </div>
 
       <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">Twitter / X</h3>
@@ -455,7 +473,7 @@
         <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));">
           <img src="assets/youtube.png" alt="YouTube" class="w-8 h-8 object-contain">
         </div>
-        <span id="youtube-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-red-100 text-red-700 whitespace-nowrap">Disconnected</span>
+        <span id="youtube-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Disconnected</span>
       </div>
 
       <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">YouTube</h3>
@@ -472,7 +490,7 @@
         <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(99,102,241,0.06), rgba(99,102,241,0.02));">
           <img src="assets/linkedin.png" alt="LinkedIn" class="w-8 h-8 object-contain">
         </div>
-        <span id="linkedin-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-indigo-100 text-indigo-700 whitespace-nowrap">Disconnected</span>
+        <span id="linkedin-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Disconnected</span>
       </div>
 
       <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">LinkedIn</h3>
@@ -490,7 +508,7 @@
         <div class="platform-icon-wrap shadow-sm" style="background:linear-gradient(180deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));">
           <img src="assets/pintrest.png" alt="Pinterest" class="w-8 h-8 object-contain">
         </div>
-        <span id="pinterest-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-red-100 text-red-700 whitespace-nowrap">Disconnected</span>
+        <span id="pinterest-status" class="px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Disconnected</span>
       </div>
 
       <h3 class="text-base lg:text-lg font-bold text-slate-900 mb-3">Pinterest</h3>
@@ -508,8 +526,12 @@
 
 </div>
 
+<!-- Notification root for toast-style messages -->
+<div id="notification-root" style="position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:none"></div>
+
 <script src="component/sidebar.js"></script>
 <script src="main.js"></script>
+<script src="confirm.js"></script>
 
 <script>
   // Sidebar profile dropdown
@@ -525,9 +547,17 @@
     sidebarProfileMenu.classList.add("hidden");
   });
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = "home.html";
+  async function logout() {
+    let ok;
+    if (typeof showConfirm === 'function') {
+      ok = await showConfirm('Are you sure you want to logout?');
+    } else {
+      ok = confirm('Are you sure you want to logout?');
+    }
+    if (ok) {
+      localStorage.clear();
+      window.location.href = "home.html";
+    }
   }
 
   window.onload = () => {
@@ -619,19 +649,39 @@
         // ✅ CONNECTED STATE
         statusLabel.textContent = "Connected";
         statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap";
-        
-        actionBtn.innerHTML = `<span>Disconnect</span><svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>`;
-        // Use centralized disconnect button style (neutral surface + red accent)
-        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 rounded-xl font-semibold text-xs lg:text-sm disconnect-btn text-red-600 shadow-sm group";
-        
-        // Bind click to Disconnect function
-        actionBtn.onclick = () => disconnectChannel(platform);
+
+        // Connected creative button (green) — clicking will prompt disconnect
+        actionBtn.innerHTML = `<span class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Connected</span>`;
+        actionBtn.className = "w-full py-2 lg:py-2.5 px-3 lg:px-4 rounded-xl connected-btn text-white shadow-sm group";
+
+        // Clicking still disconnects (confirmation + UI feedback)
+        actionBtn.onclick = async () => {
+          let ok;
+          if (typeof showConfirm === 'function') {
+            ok = await showConfirm(`Disconnect ${platform}?`);
+          } else {
+            ok = window.confirm(`Disconnect ${platform}?`);
+          }
+          if (!ok) return;
+          try {
+            actionBtn.disabled = true;
+            const prev = actionBtn.innerHTML;
+            actionBtn.innerHTML = `<span class="flex items-center gap-2">Working...</span>`;
+            const ok2 = await disconnectChannel(platform);
+            if (!ok2) {
+              showNotification('error', 'Failed to disconnect.');
+            }
+          } finally {
+            actionBtn.disabled = false;
+            // refresh will update UI from server state
+          }
+        };
 
     } else {
         // ❌ DISCONNECTED STATE
         statusLabel.textContent = "Disconnected";
         // Reset specific badge colors based on platform (Generic approach here for simplicity, or revert to original classes)
-        statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-500 whitespace-nowrap";
+        statusLabel.className = "px-2 lg:px-3 py-1 rounded-lg text-[10px] lg:text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap";
 
         actionBtn.innerHTML = `<span>Connect Now</span><svg class="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>`;
         // Use centralized connect button style (amber/orange scheme)
@@ -658,33 +708,36 @@
             // 2. Redirect the user to that URL
             window.location.href = data.url; 
         } else {
-            alert("Could not initialize connection.");
+          showNotification('error', 'Could not initialize connection.');
         }
     } catch (error) {
         console.error("Error starting oauth:", error);
     }
 }
   // 4. Disconnect Function (Triggered by button)
-  async function disconnectChannel(platform) {
-    if (!confirm(`Are you sure you want to disconnect ${platform}?`)) return;
-
+    async function disconnectChannel(platform) {
     const token = localStorage.getItem("authToken");
+    if (!token) return false;
 
     try {
-        const response = await fetch(`${API_ENDPOINTS.SOCIAL.DISCONNECT}?platform=${platform}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+      const response = await fetch(`${API_ENDPOINTS.SOCIAL.DISCONNECT}?platform=${platform}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-        if (response.ok) {
-            loadChannelStatus(); // Refresh UI
-        } else {
-            alert("Failed to disconnect.");
-        }
+      if (response.ok) {
+        // Refresh UI from server
+        await loadChannelStatus();
+        return true;
+      } else {
+        console.error('Disconnect failed', response.status);
+        return false;
+      }
     } catch (error) {
-        console.error("Disconnect error:", error);
+      console.error("Disconnect error:", error);
+      return false;
     }
-  }
+    }
   
 
 
@@ -727,15 +780,66 @@
     const status = urlParams.get('status');
     
     if (status === 'success') {
-        alert("✅ Connected successfully!");
-        // Clean URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+      showNotification('success', '✅ Connected successfully!');
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
     } else if (status === 'error') {
-        alert("❌ Connection failed.");
+      showNotification('error', '❌ Connection failed.');
     }
     
     loadChannelStatus(); // Refresh grid
   });
+</script>
+</body>
+</script>
+
+<script>
+  // Notification utility (copied from main.html)
+  function _injectNotificationStyles() {
+    if (document.getElementById('notif-styles')) return;
+    const css = `
+    #notification-root { display:flex; flex-direction:column; gap:10px; pointer-events:none }
+    .notif-card{min-width:280px;max-width:360px;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08);display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(2,6,23,0.04);font-family:Inter,system-ui,Arial}
+    .notif-card strong{display:block;font-weight:700;color:#0f172a}
+    .notif-success{background:linear-gradient(180deg,#ecfdf5,#f0fdf4);border-color:rgba(16,185,129,0.08);}
+    .notif-error{background:linear-gradient(180deg,#fff1f0,#fff7f5);border-color:rgba(239,68,68,0.06);}
+    .notif-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+    .notif-success .notif-icon{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
+    .notif-error .notif-icon{background:linear-gradient(90deg,#fb7185,#f97316);color:#fff}
+    .notif-body{flex:1;color:#0f172a;font-size:14px}
+    .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px}
+    .notif-enter{animation:notifIn .28s cubic-bezier(.2,.9,.2,1)}
+    .notif-leave{animation:notifOut .28s ease forwards}
+    @keyframes notifIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes notifOut{to{transform:translateY(-12px);opacity:0;height:0;margin:0;padding:0}}
+    `;
+    const s = document.createElement('style'); s.id = 'notif-styles'; s.innerHTML = css; document.head.appendChild(s);
+  }
+
+  function showNotification(type, message, timeout = 4500) {
+    _injectNotificationStyles();
+    const root = document.getElementById('notification-root');
+    if (!root) return alert(message);
+
+    const card = document.createElement('div');
+    card.className = 'notif-card notif-' + (type === 'error' ? 'error' : 'success') + ' notif-enter';
+
+    const icon = document.createElement('div'); icon.className = 'notif-icon';
+    icon.innerHTML = type === 'error' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.29 3.86L1.82 18.35A2 2 0 0 0 3.6 21h16.8a2 2 0 0 0 1.78-2.65L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="none" fill="currentColor"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    const body = document.createElement('div'); body.className = 'notif-body';
+    body.innerHTML = `<div>${message}</div>`;
+
+    const closeBtn = document.createElement('button'); closeBtn.className = 'notif-close'; closeBtn.innerHTML = '&#10005;';
+    closeBtn.onclick = () => { card.classList.add('notif-leave'); setTimeout(() => card.remove(), 300); };
+
+    card.appendChild(icon); card.appendChild(body); card.appendChild(closeBtn);
+    root.prepend(card);
+
+    const t = setTimeout(() => { if (card.parentElement) { card.classList.add('notif-leave'); setTimeout(() => card.remove(), 300); } }, timeout);
+
+    return { element: card, close: () => { clearTimeout(t); if (card.parentElement) { card.remove(); } } };
+  }
 </script>
 
 </body>
