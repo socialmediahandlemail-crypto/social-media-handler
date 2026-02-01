@@ -735,8 +735,14 @@
   }
 
   // ===== LOGOUT FUNCTION =====
-  function logout() {
-    if (confirm('Are you sure you want to logout?')) {
+  async function logout() {
+    let ok;
+    if (typeof showConfirm === 'function') {
+      ok = await showConfirm('Are you sure you want to logout?');
+    } else {
+      ok = confirm('Are you sure you want to logout?');
+    }
+    if (ok) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('userEmail');
       localStorage.removeItem('userName');
@@ -744,6 +750,9 @@
     }
   }
 </script>
+
+<!-- Include global confirm helper -->
+<script src="confirm.js"></script>
 
 </body>
 </html>
