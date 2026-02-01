@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Error — SocialSync Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    html,body{height:100%;margin:0;font-family:'Inter',system-ui,Segoe UI,Roboto,Arial;color:#0f172a}
+    body{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fbf7ff 0%, #fff9f5 100%)}
+    .container{width:min(980px,94%);display:flex;gap:28px;align-items:center;justify-content:space-between}
+    .panel{flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.85));border-radius:18px;padding:32px;box-shadow:0 10px 30px rgba(14,21,47,0.08);border:1px solid rgba(14,21,47,0.03)}
+    h1{font-size:32px;margin:0 0 8px;color:#0f172a}
+    .subtitle{color:#475569;margin:0 0 18px}
+    .code{display:inline-block;padding:6px 10px;background:linear-gradient(90deg,#fff1f0,#fff7ed);color:#b91c1c;border-radius:10px;font-weight:700}
+    .msg{background:#fff7f5;border-radius:12px;padding:14px;border:1px solid rgba(14,21,47,0.03);color:#334155;font-family:ui-monospace,monospace;font-size:14px}
+    .hero{width:320px;display:flex;flex-direction:column;align-items:center;gap:18px}
+    .dash-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border-radius:12px;background:linear-gradient(90deg,#f97316,#ec4899);color:white;font-weight:700;border:none;cursor:pointer;box-shadow:0 10px 30px rgba(249,115,22,0.12)}
+    .muted{color:#94a3b8;font-size:13px}
+    @media (max-width:880px){.container{flex-direction:column}.hero{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="code">Error</div>
+        <div>
+          <h1>We hit a snag</h1>
+          <p class="subtitle">The server redirected you here after encountering an error. You can go back to your dashboard and try again.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start">
+        <div>
+          <div class="muted">Details</div>
+          <div id="messageBox" class="msg" style="margin-top:8px;min-height:64px;white-space:pre-wrap">An unexpected server error occurred.</div>
+          <div style="margin-top:14px">
+            <button id="goDash" class="dash-btn">Go to Dashboard</button>
+          </div>
+        </div>
+
+        <div class="hero" aria-hidden>
+          <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" width="100%">
+            <defs>
+              <linearGradient id="gA" x1="0" x2="1"><stop offset="0" stop-color="#f97316"/><stop offset="1" stop-color="#ec4899"/></linearGradient>
+              <linearGradient id="gB" x1="0" x2="1"><stop offset="0" stop-color="#06b6d4"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+            </defs>
+            <rect x="6" y="10" rx="12" ry="12" width="188" height="110" fill="url(#gB)" opacity="0.08"/>
+            <path d="M12 120 Q60 40 120 100 T196 120" fill="none" stroke="url(#gA)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+            <circle cx="150" cy="40" r="18" fill="#fff" opacity="0.9"/>
+            <circle cx="150" cy="40" r="8" fill="#fb7185"/>
+          </svg>
+          <div style="text-align:center;color:#475569">Return to your dashboard to continue.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // read optional query param 'msg'
+    const params = new URLSearchParams(location.search);
+    const msg = params.get('msg') || params.get('error') || '';
+    const box = document.getElementById('messageBox');
+    if(msg) box.textContent = decodeURIComponent(msg);
+
+    document.getElementById('goDash').addEventListener('click', () => {
+      location.href = 'main.html';
+    });
+  </script>
+</body>
+</html>
