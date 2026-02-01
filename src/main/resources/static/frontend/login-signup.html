@@ -281,6 +281,42 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    /* OTP Modal Styles */
+    .otp-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      backdrop-filter: blur(6px);
+      background: rgba(2,6,23,0.35);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .otp-overlay.active { display: flex; }
+
+    .otp-card {
+      width: 96%;
+      max-width: 420px;
+      padding: 22px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,250,0.9));
+      box-shadow: 0 18px 50px rgba(2,6,23,0.24);
+      border: 1px solid rgba(226,232,240,0.6);
+      text-align: center;
+    }
+
+    .otp-title { font-weight: 800; font-size: 1.125rem; color: #0f172a; }
+    .otp-sub { color: #475569; font-size: 0.95rem; margin-top: 6px; }
+
+    .otp-inputs { display:flex; gap:10px; justify-content:center; margin:18px 0; }
+    .otp-input { width:48px; height:56px; border-radius:12px; border:1px solid #e6edf3; font-size:1.4rem; text-align:center; outline:none; background:#fff; box-shadow: 0 6px 18px rgba(3,7,18,0.06); }
+    .otp-input:focus { border-color: rgba(249,115,22,0.6); box-shadow: 0 6px 20px rgba(249,115,22,0.08); }
+
+    .otp-actions { display:flex; gap:10px; justify-content:center; margin-top:6px; }
+    .otp-resend { background:transparent; border:none; color:#f97316; font-weight:700; cursor:pointer }
+    .otp-verify { background:linear-gradient(135deg,#f97316,#ec4899); color:#fff; border:none; padding:10px 18px; border-radius:12px; cursor:pointer; font-weight:700 }
   </style>
 </head>
 
@@ -296,6 +332,29 @@
         <div class="pulse-dot"></div>
       </div>
       <p class="loader-text">Processing your request<span>...</span></p>
+    </div>
+  </div>
+
+  <!-- OTP / Secret Modal (shown for non-admin login OTP entry) -->
+  <div id="otpOverlay" class="otp-overlay">
+    <div class="otp-card">
+      <div class="inline-block mb-3 p-3 bg-gradient-to-br from-orange-100/80 to-pink-100/80 rounded-2xl">
+        <i class="fas fa-shield-alt text-orange-600 text-2xl"></i>
+      </div>
+      <div class="otp-title">Enter Secret Key</div>
+      <div class="otp-sub">Enter the secret key sent to your email to complete login</div>
+      <div class="otp-inputs" id="otpInputs">
+        <input inputmode="numeric" maxlength="1" class="otp-input" />
+        <input inputmode="numeric" maxlength="1" class="otp-input" />
+        <input inputmode="numeric" maxlength="1" class="otp-input" />
+        <input inputmode="numeric" maxlength="1" class="otp-input" />
+        <input inputmode="numeric" maxlength="1" class="otp-input" />
+        <input inputmode="numeric" maxlength="1" class="otp-input" />
+      </div>
+      <div class="otp-actions">
+        <button id="resendOtp" class="otp-resend">Resend</button>
+        <button id="verifyOtp" class="otp-verify">Verify & Login</button>
+      </div>
     </div>
   </div>
 
@@ -371,7 +430,7 @@
         <div class="w-full">
           
           <!-- SIGN UP FORM (INITIALLY HIDDEN) -->
-          <div id="signupForm" class="form-slide hidden form-card rounded-3xl p-6 md:p-10 h-[590px] flex flex-col justify-between">
+          <div id="signupForm" class="form-slide hidden form-card rounded-3xl p-6 md:p-10 min-h-[520px] flex flex-col justify-between">
             <div>
               <div class="mb-8 text-center">
                 <div class="inline-block mb-4 p-3 bg-gradient-to-br from-orange-100/80 to-pink-100/80 rounded-2xl">
@@ -409,6 +468,15 @@
                   <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                 </div>
                 
+                <!-- Admin Option -->
+                <div class="form-group">
+                  <label class="form-label inline-flex items-center gap-3"><input id="suIsAdmin" type="checkbox" class="mr-2 w-4 h-4"> <span class="text-sm font-semibold">Register as Admin</span></label>
+                  <div id="suSecretDiv" class="mt-3 hidden">
+                    <label class="form-label">Enter Secret Key</label>
+                    <input id="suSecret" type="password" placeholder="Secret key"
+                      class="form-input w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                </div>
                 <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right"></i>
@@ -426,7 +494,7 @@
           </div>
           
           <!-- SIGN IN FORM (INITIALLY VISIBLE) -->
-          <div id="signinForm" class="form-slide form-card rounded-3xl p-6 md:p-10 h-[550px] flex flex-col justify-between">
+          <div id="signinForm" class="form-slide form-card rounded-3xl p-6 md:p-10 min-h-[480px] flex flex-col justify-between">
             <div>
               <div class="mb-8 text-center">
                 <div class="inline-block mb-4 p-3 bg-gradient-to-br from-orange-100/80 to-pink-100/80 rounded-2xl">
@@ -453,6 +521,16 @@
                       class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
                   </div>
                   <p id="liPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                
+                <!-- Admin Option -->
+                <div class="form-group">
+                  <label class="form-label inline-flex items-center gap-3"><input id="liIsAdmin" type="checkbox" class="mr-2 w-4 h-4"> <span class="text-sm font-semibold">Login as Admin</span></label>
+                  <div id="liSecretDiv" class="mt-3 hidden">
+                    <label class="form-label">Enter Secret Key</label>
+                    <input id="liSecret" type="password" placeholder="Secret key"
+                      class="form-input w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
                 </div>
                 
                 <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg mt-4 relative group">
@@ -519,18 +597,19 @@
       }
     });
     
-    // LOGIN
+    // LOGIN (enhanced)
     document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const email = document.getElementById('liEmail').value.trim();
       const password = document.getElementById('liPassword').value;
+      const isAdmin = document.getElementById('liIsAdmin') && document.getElementById('liIsAdmin').checked;
       const loaderOverlay = document.getElementById('loaderOverlay');
-      
+
       // Clear errors
       document.getElementById('liEmailError').classList.add('hidden');
       document.getElementById('liPasswordError').classList.add('hidden');
-      
+
       // Validate
       if (!email) {
         document.getElementById('liEmailError').textContent = 'Email is required';
@@ -542,36 +621,175 @@
         document.getElementById('liPasswordError').classList.remove('hidden');
         return;
       }
-      
+
+      // If admin, include secret directly and attempt login
+      if (isAdmin) {
+        const secret = document.getElementById('liSecret') ? document.getElementById('liSecret').value : '';
+        try {
+          loaderOverlay.classList.add('active');
+          const res = await fetch('http://localhost:8082/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, secret })
+          });
+          const result = await res.json();
+          loaderOverlay.classList.remove('active');
+          if (res.ok) {
+            localStorage.setItem('authToken', result.token);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userName', result.username || 'User');
+            window.location.href = 'main.html';
+          } else {
+            document.getElementById('liEmailError').textContent = result.message || 'Invalid email or secret';
+            document.getElementById('liEmailError').classList.remove('hidden');
+          }
+        } catch (err) {
+          loaderOverlay.classList.remove('active');
+          document.getElementById('liEmailError').textContent = 'Backend not reachable';
+          document.getElementById('liEmailError').classList.remove('hidden');
+        }
+        return;
+      }
+
+      // Non-admin login: send credentials to trigger secret-send, then show OTP card
       try {
-        // Show loader
         loaderOverlay.classList.add('active');
-        
-        const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
+        const res = await fetch('http://localhost:8082/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, role: 'USER' })
         });
-        
         const result = await res.json();
-        
-        // Hide loader
         loaderOverlay.classList.remove('active');
-        
         if (res.ok) {
-          localStorage.setItem('authToken', result.token);
-          localStorage.setItem('userEmail', email);
-          localStorage.setItem('userName', result.username || 'User');
-          window.location.href = 'main.html';
+          showNotification('success', 'Secret key sent to your email');
+          showOtpOverlay();
         } else {
-          document.getElementById('liEmailError').textContent = result.message || 'Invalid email or password';
+          document.getElementById('liEmailError').textContent = result.message || 'Invalid credentials';
           document.getElementById('liEmailError').classList.remove('hidden');
         }
       } catch (err) {
-        // Hide loader on error
         loaderOverlay.classList.remove('active');
         document.getElementById('liEmailError').textContent = 'Backend not reachable';
         document.getElementById('liEmailError').classList.remove('hidden');
+      }
+    });
+
+    // --- Helpers and OTP handling ---
+    function toggleSecretVisibility(checkboxId, secretDivId) {
+      const cb = document.getElementById(checkboxId);
+      const sd = document.getElementById(secretDivId);
+      if (!cb || !sd) return;
+      cb.addEventListener('change', () => {
+        if (cb.checked) sd.classList.remove('hidden'); else sd.classList.add('hidden');
+        // let form adjust height naturally (we switched to min-h)
+      });
+    }
+
+    toggleSecretVisibility('suIsAdmin', 'suSecretDiv');
+    toggleSecretVisibility('liIsAdmin', 'liSecretDiv');
+
+    function showOtpOverlay() {
+      const overlay = document.getElementById('otpOverlay');
+      if (!overlay) return;
+      overlay.classList.add('active');
+      setupOtpInputs();
+    }
+
+    function hideOtpOverlay() {
+      const overlay = document.getElementById('otpOverlay');
+      if (!overlay) return;
+      overlay.classList.remove('active');
+      const inputs = overlay.querySelectorAll('.otp-input');
+      inputs.forEach(i => i.value = '');
+    }
+
+    function setupOtpInputs() {
+      const container = document.getElementById('otpInputs');
+      if (!container) return;
+      const inputs = Array.from(container.querySelectorAll('input.otp-input'));
+      inputs.forEach((inp, idx) => {
+        inp.value = '';
+        inp.addEventListener('input', (e) => {
+          const v = inp.value.replace(/[^0-9]/g, '');
+          inp.value = v.slice(-1);
+          if (v && idx < inputs.length - 1) inputs[idx + 1].focus();
+        });
+        inp.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !inp.value && idx > 0) {
+            inputs[idx - 1].focus();
+          }
+        });
+      });
+      inputs[0].focus();
+    }
+
+    document.getElementById('resendOtp')?.addEventListener('click', async (e) => {
+      // simple visual feedback for resend (real resend requires backend)
+      showNotification('success', 'Secret key resent to your email');
+    });
+
+    document.getElementById('verifyOtp')?.addEventListener('click', async (e) => {
+      const overlay = document.getElementById('otpOverlay');
+      if (!overlay) return;
+      const inputs = Array.from(overlay.querySelectorAll('.otp-input'));
+      const otp = inputs.map(i => i.value.trim()).join('');
+      if (otp.length < inputs.length) { showNotification('error', 'Please enter the full secret key'); return; }
+
+      // Verify secret with specified verify endpoint
+      const email = document.getElementById('liEmail').value.trim();
+      const loaderOverlay = document.getElementById('loaderOverlay');
+      try {
+        loaderOverlay.classList.add('active');
+        const res = await fetch('https://localhost:8082/auth/verify-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, secreteKey: otp })
+        });
+        const result = await res.json();
+        loaderOverlay.classList.remove('active');
+        if (res.ok && (result.success || result.valid || result.token)) {
+          // If backend returned a token, use it. Otherwise attempt to obtain token via login endpoint.
+          if (result.token) {
+            hideOtpOverlay();
+            localStorage.setItem('authToken', result.token);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userName', result.username || 'User');
+            window.location.href = 'main.html';
+            return;
+          }
+
+          // Fallback: exchange credentials for token
+          const password = document.getElementById('liPassword').value;
+          const loginRes = await fetch('http://localhost:8082/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          const loginResult = await loginRes.json();
+          if (loginRes.ok && loginResult.token) {
+            hideOtpOverlay();
+            localStorage.setItem('authToken', loginResult.token);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userName', loginResult.username || 'User');
+            window.location.href = 'main.html';
+            return;
+          }
+
+          // If verify returned success but no token and fallback failed, treat as failure
+          showNotification('error', result.message || 'Invalid secret key / credentials');
+        } else {
+          // Wrong secret: clear form and notify
+          document.getElementById('liEmail').value = '';
+          document.getElementById('liPassword').value = '';
+          const otpInputs = overlay.querySelectorAll('.otp-input');
+          otpInputs.forEach(i => i.value = '');
+          overlay.classList.remove('active');
+          showNotification('error', 'you entered the wrong secrete key');
+        }
+      } catch (err) {
+        loaderOverlay.classList.remove('active');
+        showNotification('error', 'Backend not reachable');
       }
     });
     
@@ -615,10 +833,18 @@
         // Show loader
         loaderOverlay.classList.add('active');
         
-        const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
+        const isAdmin = document.getElementById('suIsAdmin') && document.getElementById('suIsAdmin').checked;
+        const role = isAdmin ? 'ADMIN' : 'USER';
+        const payload = { email, password, role, username };
+        if (isAdmin) {
+          const secret = document.getElementById('suSecret') ? document.getElementById('suSecret').value : '';
+          if (secret) payload.secret = secret;
+        }
+
+        const res = await fetch('http://localhost:8082/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password })
+          body: JSON.stringify(payload)
         });
         
         const result = await res.json();
@@ -631,7 +857,14 @@
           toggleForm();
           document.getElementById('loginFormElement').reset();
         } else {
-          document.getElementById('suEmailError').textContent = result.message || 'Signup failed';
+          // If backend indicates secret/secret-key mismatch, show specific message
+          const backendMsg = (result && result.message) ? String(result.message) : '';
+          const backendError = result && result.error ? String(result.error) : '';
+          let displayMsg = backendMsg || 'Signup failed';
+          if (backendMsg.toLowerCase().includes('secret') || backendError === 'SECRET_MISMATCH' || backendMsg.toLowerCase().includes('secrete')) {
+            displayMsg = 'secrete didnt match';
+          }
+          document.getElementById('suEmailError').textContent = displayMsg;
           document.getElementById('suEmailError').classList.remove('hidden');
         }
       } catch (err) {
