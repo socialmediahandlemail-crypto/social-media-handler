@@ -512,13 +512,17 @@
     const userEmail = localStorage.getItem("userEmail") || "";
     const userName = localStorage.getItem("userName") || "User";
 
-    // Update desktop sidebar
-    document.getElementById("sidebarUserEmail").textContent = userEmail;
-    document.getElementById("sidebarUserName").textContent = userName;
+    // Update desktop sidebar (guarded)
+    const sidebarUserEmailEl = document.getElementById("sidebarUserEmail");
+    if (sidebarUserEmailEl) sidebarUserEmailEl.textContent = userEmail;
+    const sidebarUserNameEl = document.getElementById("sidebarUserName");
+    if (sidebarUserNameEl) sidebarUserNameEl.textContent = userName;
 
-    // Update mobile sidebar
-    document.getElementById("mobileSidebarUserEmail").textContent = userEmail;
-    document.getElementById("mobileSidebarUserName").textContent = userName;
+    // Update mobile sidebar (guarded)
+    const mobileSidebarUserEmailEl = document.getElementById("mobileSidebarUserEmail");
+    if (mobileSidebarUserEmailEl) mobileSidebarUserEmailEl.textContent = userEmail;
+    const mobileSidebarUserNameEl = document.getElementById("mobileSidebarUserName");
+    if (mobileSidebarUserNameEl) mobileSidebarUserNameEl.textContent = userName;
 
     // Initialize analytics
     initializeAnalytics();
@@ -533,7 +537,15 @@
       ok = confirm('Are you sure you want to logout?');
     }
     if (ok) {
-      localStorage.clear();
+      // Remove only auth-related keys to preserve cached UI data
+      try {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userName');
+        // Do not remove `activePlatformsCount` (cached UI value)
+      } catch (e) {
+        console.warn('Error clearing auth keys from localStorage', e);
+      }
       window.location.href = "home.html";
     }
   }
@@ -599,9 +611,20 @@
    */
   let pendingInterval = null;
 
+  // Clear interval when unloading to avoid background timers
+  window.addEventListener('beforeunload', () => {
+    if (pendingInterval) {
+      clearInterval(pendingInterval);
+      pendingInterval = null;
+    }
+  });
+
 async function initializeAnalytics() {
   try {
     showLoading(true);
+
+    // Apply cached connected platforms count immediately (fast UI update)
+    await updateConnectedPlatforms();
 
     const posts = await fetchPosts();
     cachedPosts = posts || [];
@@ -666,7 +689,7 @@ async function initializeAnalytics() {
       return await response.json();
     } catch (error) {
       console.warn("Could not fetch posts from API, using mock data:", error);
-      return null;
+      return [];
     }
   }
 
@@ -676,8 +699,9 @@ async function initializeAnalytics() {
    */
   async function updateStatistics(posts) {
     const now = new Date();
-
-    document.getElementById('totalPostsCount').textContent = posts.length;
+    posts = posts || [];
+    const totalEl = document.getElementById('totalPostsCount');
+    if (totalEl) totalEl.textContent = String(posts.length);
 
     // Fetch connected platforms from API
     await updateConnectedPlatforms();
@@ -698,65 +722,20 @@ async function initializeAnalytics() {
    */
   async function updateConnectedPlatforms() {
     try {
-      // Quick localStorage fallback for instant UI update
+      
       try {
         const cached = localStorage.getItem('activePlatformsCount');
-        if (cached !== null) {
-          const el = document.getElementById('activePlatformsCount');
-          if (el) el.textContent = String(Number(cached) || 0);
+        const el = document.getElementById('activePlatformsCount');
+        if (el) {
+          el.textContent = cached !== null ? String(Number(cached) || 0) : '0';
         }
       } catch (e) {
         console.warn('Could not read activePlatformsCount from localStorage', e);
-      }
-
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        // No auth token; we rely on localStorage value only
-        console.warn("No auth token found; skipping API refresh for channels status");
-        return;
-      }
-
-      const response = await fetch(API_ENDPOINTS.CHANNELS.STATUS, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        console.error("Failed to load connected platforms:", response.status);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Connected platforms loaded:", data);
-
-      // Normalize multiple possible response shapes
-      let connectedCount = 0;
-      if (data && typeof data === 'object') {
-        if (typeof data.activeCount !== 'undefined') {
-          connectedCount = Number(data.activeCount) || 0;
-        } else if (data.connections && typeof data.connections === 'object') {
-          connectedCount = Object.values(data.connections).filter(Boolean).length;
-        } else if (Array.isArray(data)) {
-          connectedCount = data.filter(item => item && (item.isConnected === true || item.connected === true || item.status === 'CONNECTED')).length;
-        } else {
-          connectedCount = Object.values(data).filter(item => item && (item.isConnected === true || item.connected === true || item.status === 'CONNECTED')).length;
-        }
-      }
-
-      const el = document.getElementById('activePlatformsCount');
-      if (el) el.textContent = String(connectedCount);
-
-      // Update cached value for other pages
-      try {
-        localStorage.setItem('activePlatformsCount', String(connectedCount));
-      } catch (e) {
-        console.warn('Failed to persist activePlatformsCount to localStorage', e);
+        const el = document.getElementById('activePlatformsCount');
+        if (el) el.textContent = '0';
       }
     } catch (error) {
-      console.error('Error loading connected platforms:', error);
+      console.error('Error reading activePlatformsCount from localStorage:', error);
     }
   }
 
@@ -833,12 +812,12 @@ async function initializeAnalytics() {
    * @param {Object} timelineData - Data with labels and values
    */
   function renderTimelineChart(timelineData) {
-    const ctx = document.getElementById('postsTimelineChart').getContext('2d');
+    const canvas = document.getElementById('postsTimelineChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
     // Destroy previous chart instance if exists
-    if (postsTimelineChart) {
-      postsTimelineChart.destroy();
-    }
+    if (postsTimelineChart) postsTimelineChart.destroy();
 
     // Create gradient fill
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -931,12 +910,12 @@ async function initializeAnalytics() {
    * @param {Object} platformData - Data with platform names and counts
    */
   function renderPlatformChart(platformData) {
-    const ctx = document.getElementById('platformDistributionChart').getContext('2d');
+    const canvas = document.getElementById('platformDistributionChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
     // Destroy previous chart instance if exists
-    if (platformDistributionChart) {
-      platformDistributionChart.destroy();
-    }
+    if (platformDistributionChart) platformDistributionChart.destroy();
 
     // Color palette for different platforms
     const platformColors = {
@@ -950,9 +929,18 @@ async function initializeAnalytics() {
       'TIKTOK': '#000000'
     };
 
-    const colors = platformData.labels.map(platform => 
-      platformColors[platform] || '#' + Math.floor(Math.random()*16777215).toString(16)
-    );
+    // Deterministic fallback color generator
+    function hashColor(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (h << 5) - h + str.charCodeAt(i);
+        h |= 0;
+      }
+      const hex = (h >>> 0).toString(16).slice(-6).padStart(6, '0');
+      return `#${hex}`;
+    }
+
+    const colors = platformData.labels.map(platform => platformColors[platform] || hashColor(platform));
 
     platformDistributionChart = new Chart(ctx, {
       type: 'doughnut',
@@ -992,10 +980,12 @@ async function initializeAnalytics() {
             cornerRadius: 8,
             callbacks: {
               label: function(context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                return `${context.label}: ${context.parsed} (${percentage}%)`;
-              }
+                  const dataArr = Array.isArray(context.dataset.data) ? context.dataset.data : [];
+                  const total = dataArr.reduce((a, b) => a + b, 0);
+                  const value = typeof context.parsed === 'number' ? context.parsed : Number(context.raw || 0);
+                  const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                  return `${context.label}: ${value} (${percentage}%)`;
+                }
             }
           }
         }
@@ -1007,9 +997,27 @@ async function initializeAnalytics() {
    * Update statistics cards with empty/zero values
    */
   function updateStatisticsEmpty() {
-    document.getElementById('totalPostsCount').textContent = '0';
-    document.getElementById('activePlatformsCount').textContent = '0';
-    document.getElementById('pendingPostsCount').textContent = '0';
+    const totalEl = document.getElementById('totalPostsCount');
+    if (totalEl) totalEl.textContent = '0';
+
+    try {
+      const cached = localStorage.getItem('activePlatformsCount');
+      const activeEl = document.getElementById('activePlatformsCount');
+      if (activeEl) {
+        if (cached !== null) {
+          console.log(cached);
+          activeEl.textContent = String(Number(cached) || 0);
+        } else {
+          activeEl.textContent = '0';
+        }
+      }
+    } catch (e) {
+      const activeEl = document.getElementById('activePlatformsCount');
+      if (activeEl) activeEl.textContent = '0';
+    }
+
+    const pendingEl = document.getElementById('pendingPostsCount');
+    if (pendingEl) pendingEl.textContent = '0';
   }
 
   /**
@@ -1024,12 +1032,12 @@ async function initializeAnalytics() {
    * Render timeline chart with no data
    */
   function renderTimelineChartEmpty() {
-    const ctx = document.getElementById('postsTimelineChart').getContext('2d');
+    const canvas = document.getElementById('postsTimelineChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
     // Destroy previous chart instance if exists
-    if (postsTimelineChart) {
-      postsTimelineChart.destroy();
-    }
+    if (postsTimelineChart) postsTimelineChart.destroy();
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
     gradient.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
@@ -1116,12 +1124,12 @@ async function initializeAnalytics() {
    * Render platform distribution chart with no data
    */
   function renderPlatformChartEmpty() {
-    const ctx = document.getElementById('platformDistributionChart').getContext('2d');
+    const canvas = document.getElementById('platformDistributionChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
     // Destroy previous chart instance if exists
-    if (platformDistributionChart) {
-      platformDistributionChart.destroy();
-    }
+    if (platformDistributionChart) platformDistributionChart.destroy();
 
     platformDistributionChart = new Chart(ctx, {
       type: 'doughnut',
@@ -1172,28 +1180,6 @@ async function initializeAnalytics() {
     });
   }
 
-  /**
-   * Render analytics with mock/sample data
-   * Useful for demonstration and testing
-   */
-  function renderAnalyticsWithMockData() {
-    // Mock data structure
-    const mockPosts = [
-      { scheduledTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), platform: 'TWITTER', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), platform: 'LINKEDIN', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), platform: 'YOUTUBE', status: 'PENDING' },
-      { scheduledTime: new Date(), platform: 'PINTEREST', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), platform: 'WHATSAPP', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), platform: 'TWITTER', status: 'PENDING' },
-      { scheduledTime: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), platform: 'LINKEDIN', status: 'PENDING' }
-    ];
-
-    updateStatistics(mockPosts);
-    renderChartsWithData(mockPosts);
-  }
 
   /**
    * Toggle loading state
