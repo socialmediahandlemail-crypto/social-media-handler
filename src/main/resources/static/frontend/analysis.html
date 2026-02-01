@@ -501,6 +501,7 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
+<script src="confirm.js"></script>
 <script>
   // ===== AUTHENTICATION CHECK =====
   
@@ -524,9 +525,17 @@
   };
 
   // ===== LOGOUT FUNCTION =====
-  function logout() {
-    localStorage.clear();
-    window.location.href = "home.html";
+  async function logout() {
+    let ok;
+    if (typeof showConfirm === 'function') {
+      ok = await showConfirm('Are you sure you want to logout?');
+    } else {
+      ok = confirm('Are you sure you want to logout?');
+    }
+    if (ok) {
+      localStorage.clear();
+      window.location.href = "home.html";
+    }
   }
 
   // ===== MOBILE SIDEBAR FUNCTIONS =====
@@ -706,12 +715,18 @@ async function initializeAnalytics() {
       if (response.ok) {
         const channels = await response.json();
         console.log("Connected platforms loaded:", channels);
-        
-        // Count connected platforms
-        const connectedCount = channels.filter(channel => 
-          channel.isConnected === true || channel.connected === true
-        ).length;
-        
+        // Count connected platforms. API may return an array or an object map.
+        let connectedCount = 0;
+        if (Array.isArray(channels)) {
+          connectedCount = channels.filter(channel =>
+            channel && (channel.isConnected === true || channel.connected === true || channel.status === 'CONNECTED')
+          ).length;
+        } else if (channels && typeof channels === 'object') {
+          connectedCount = Object.values(channels).filter(channel =>
+            channel && (channel.isConnected === true || channel.connected === true || channel.status === 'CONNECTED')
+          ).length;
+        }
+
         document.getElementById('activePlatformsCount').textContent = connectedCount;
       } else {
         console.error("Failed to load connected platforms:", response.status);
@@ -1172,3 +1187,4 @@ async function initializeAnalytics() {
 
 </body>
 </html>
+
