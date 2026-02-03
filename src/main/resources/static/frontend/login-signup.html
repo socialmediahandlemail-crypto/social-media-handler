@@ -430,6 +430,7 @@
           <div>
             <h1 class="text-5xl font-extrabold mb-4 leading-tight">
               <span class="text-slate-900">Welcome</span><br>
+              <span class="gradient-text">Back to Graphura</span><br>
             </h1>
           <!-- Notification root for toast-style messages -->
           <div id="notification-root" style="position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:none"></div>
@@ -678,6 +679,7 @@
             localStorage.setItem('authToken', result.token);
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', result.username || 'User');
+            localStorage.setItem('userRole', 'ADMIN');
             window.location.href = 'main.html';
           } else {
             document.getElementById('liEmailError').textContent = result.message || 'Invalid credentials or secret key';
@@ -799,6 +801,7 @@
             localStorage.setItem('authToken', result.token);
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', result.username || 'User');
+            localStorage.setItem('userRole', 'USER');
             window.location.href = 'main.html';
             return;
           }
@@ -816,6 +819,7 @@
             localStorage.setItem('authToken', loginResult.token);
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', loginResult.username || 'User');
+            localStorage.setItem('userRole', 'USER');
             window.location.href = 'main.html';
             return;
           }
