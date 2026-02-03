@@ -305,6 +305,7 @@
       box-shadow: 0 18px 50px rgba(2,6,23,0.24);
       border: 1px solid rgba(226,232,240,0.6);
       text-align: center;
+      position: relative;
     }
 
     .otp-title { font-weight: 800; font-size: 1.125rem; color: #0f172a; }
@@ -317,6 +318,29 @@
     .otp-actions { display:flex; gap:10px; justify-content:center; margin-top:6px; }
     .otp-resend { background:transparent; border:none; color:#f97316; font-weight:700; cursor:pointer }
     .otp-verify { background:linear-gradient(135deg,#f97316,#ec4899); color:#fff; border:none; padding:10px 18px; border-radius:12px; cursor:pointer; font-weight:700 }
+
+    .otp-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      border: 1px solid rgba(15,23,42,0.08);
+      background: rgba(255,255,255,0.9);
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .otp-close:hover {
+      color: #f97316;
+      border-color: rgba(249,115,22,0.4);
+      box-shadow: 0 6px 16px rgba(2,6,23,0.08);
+    }
   </style>
 </head>
 
@@ -341,6 +365,9 @@
   <!-- OTP / Secret Modal (shown for non-admin login OTP entry) -->
   <div id="otpOverlay" class="otp-overlay">
     <div class="otp-card">
+      <button type="button" class="otp-close" aria-label="Close" onclick="hideOtpOverlay()">
+        <i class="fas fa-times"></i>
+      </button>
       <div class="inline-block mb-3 p-3 bg-gradient-to-br from-orange-100/80 to-pink-100/80 rounded-2xl">
         <i class="fas fa-shield-alt text-orange-600 text-2xl"></i>
       </div>
