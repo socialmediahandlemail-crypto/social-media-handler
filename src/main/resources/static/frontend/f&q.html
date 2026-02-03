@@ -630,7 +630,29 @@
   // ===== FAQ TOGGLE =====
   function toggleFAQ(element) {
     const faqItem = element.closest('.faq-item');
-    faqItem.classList.toggle('open');
+    const isOpen = faqItem.classList.contains('open');
+
+    document.querySelectorAll('.faq-item.open').forEach(item => {
+      if (item !== faqItem) {
+        item.classList.remove('open');
+        setFaqIndicator(item, false);
+      }
+    });
+
+    if (isOpen) {
+      faqItem.classList.remove('open');
+      setFaqIndicator(faqItem, false);
+    } else {
+      faqItem.classList.add('open');
+      setFaqIndicator(faqItem, true);
+    }
+  }
+
+  function setFaqIndicator(item, open) {
+    const indicator = item.querySelector('.faq-question span:last-child');
+    if (indicator) {
+      indicator.textContent = open ? '-' : '+';
+    }
   }
 
   // Close FAQ when clicking outside
