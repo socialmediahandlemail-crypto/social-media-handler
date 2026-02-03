@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura – FAQ Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ===== SIDEBAR ===== */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.25s ease;
+    }
+    .sidebar-link:hover {
+      background: rgba(249,115,22,0.08);
+      color: #f97316;
+    }
+    .sidebar-active {
+      background: rgba(249,115,22,0.15);
+      color: #f97316;
+      box-shadow: inset 0 0 0 1px rgba(249,115,22,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ===== MOBILE SIDEBAR ===== */
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      flex-direction: column;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .mobile-menu-btn:hover {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .mobile-menu-btn span {
+      width: 18px;
+      height: 2px;
+      background: #f97316;
+      display: block;
+      margin: 2.5px 0;
+      transition: all 0.25s ease;
+      border-radius: 1px;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 30;
+    }
+
+    .mobile-sidebar-overlay.open {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 256px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 247, 237, 0.95) 100%);
+      border-r: 2px solid rgba(249, 115, 22, 0.3);
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 40;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* CARD STYLES */
+    .card-glass {
+      background: rgba(250, 251, 252, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    /* QUESTION CARD */
+    .question-card {
+      background: rgba(250, 251, 252, 0.95);
+      border: 1px solid rgba(226, 232, 240, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .question-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      border-color: rgba(249, 115, 22, 0.3);
+    }
+
+    .question-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #f97316, #ec4899);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .question-card.answered::before {
+      opacity: 1;
+    }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* STATUS BADGE */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: rgba(249, 115, 22, 0.15);
+      color: #ea580c;
+    }
+
+    .status-answered {
+      background: rgba(34, 197, 94, 0.15);
+      color: #16a34a;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MOBILE SIDEBAR -->
+<aside id="mobileSidebar" class="mobile-sidebar">
+  <!-- LOGO -->
+  <div class="px-4 py-4 border-b flex items-center justify-between">
+    <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
+    <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+  </div>
+
+  <!-- NAV -->
+  <nav class="px-4 py-6 space-y-1 flex-1">
+    <a href="admin-dashboard.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Dashboard
+    </a>
+    <a href="faq-management.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
+      FAQ Management
+    </a>
+  </nav>
+
+  <!-- USER PROFILE -->
+  <div class="p-4 border-t relative">
+    <button id="mobileSidebarProfileBtn"
+      class="w-full flex items-center gap-3 p-3 rounded-full bg-white/80 border border-orange-200/40 shadow-sm hover:shadow-md hover:bg-orange-50/60 hover:border-orange-300/60 transition">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-200 to-pink-200 flex items-center justify-center font-bold">
+        <img src="assets/user_icon.png" class="w-5 h-5" />
+      </div>
+      <div class="truncate text-left">
+        <p id="mobileSidebarUserName" class="text-sm font-semibold text-slate-800">Admin</p>
+        <p id="mobileSidebarUserEmail" class="text-xs text-slate-600 truncate"></p>
+      </div>
+    </button>
+
+    <!-- DROPDOWN -->
+    <div id="mobileSidebarProfileMenu"
+      class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="window.location.href='home.html'"
+        class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+        Go to Home
+      </button>
+      <button onclick="logout()"
+        class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+        Logout
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= APP LAYOUT ================= -->
+<div class="flex min-h-screen">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-orange-200/30 flex flex-col justify-between">
+
+    <!-- LOGO -->
+    <div class="px-6 py-6 border-b flex items-center justify-center">
+      <img src="assets/graphuralogo.png" class="h-16" />
+    </div>
+
+    <!-- NAV -->
+    <nav class="px-4 py-6 space-y-1 flex-1">
+      <a href="admin-dashboard.html" class="sidebar-link">
+        Dashboard
+      </a>
+      <a href="faq-management.html" class="sidebar-link sidebar-active">
+        FAQ Management
+      </a>
+    </nav>
+
+    <!-- USER PROFILE -->
+    <div class="p-4 relative">
+      <button id="sidebarProfileBtn"
+        class="mt-auto w-full flex items-center gap-3 px-4 py-3 rounded-full bg-white/80 border border-orange-200/40 hover:bg-orange-50/60 hover:border-orange-300/60 shadow-sm hover:shadow-md transition">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-200 to-pink-200 flex items-center justify-center shrink-0">
+          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+        </div>
+        <div class="min-w-0 text-left">
+          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">Admin</p>
+          <p id="sidebarUserEmail" class="text-xs text-slate-600 leading-tight break-all">admin@graphura.com</p>
+        </div>
+      </button>
+
+      <!-- DROPDOWN -->
+      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+        <button onclick="window.location.href='home.html'" class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+          Go to Home
+        </button>
+        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="lg:ml-64 flex-1 flex flex-col">
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-gradient-to-r from-white to-orange-50/30 border-b border-orange-200/30 fixed top-0 left-0 right-0 z-20 shadow-sm">
+      <img src="assets/graphuralogo.png" class="h-10 drop-shadow-sm" alt="Graphura Logo" />
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="flex-1 px-4 lg:px-10 py-6 overflow-y-auto">
+
+      <!-- HEADER -->
+      <header class="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-12 lg:pt-0">
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 flex items-center justify-center">
+                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+                FAQ Management
+              </h1>
+            </div>
+            <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
+              Review and respond to user questions from the FAQ section.
+            </p>
+          </div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="flex gap-3">
+          <div class="px-4 py-2 rounded-full bg-blue-50 border border-blue-200">
+            <p class="text-xs font-semibold text-blue-600"><span id="totalCount">8</span> Total</p>
+          </div>
+          <div class="px-4 py-2 rounded-full bg-orange-50 border border-orange-200">
+            <p class="text-xs font-semibold text-orange-600"><span id="pendingCount">5</span> Pending</p>
+          </div>
+          <div class="px-4 py-2 rounded-full bg-green-50 border border-green-200">
+            <p class="text-xs font-semibold text-green-600"><span id="answeredCount">3</span> Answered</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- FILTERS & SEARCH -->
+      <div class="mb-6 flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search by name, email, or question..." 
+            class="w-full px-4 py-3 rounded-xl border border-orange-200/40 focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+          />
+        </div>
+        <div class="flex gap-2">
+          <button onclick="filterQuestions('all')" class="filter-btn px-4 py-3 rounded-xl font-semibold text-sm border transition active bg-orange-100 border-orange-400 text-orange-700" data-filter="all">
+            All
+          </button>
+          <button onclick="filterQuestions('pending')" class="filter-btn px-4 py-3 rounded-xl font-semibold text-sm border transition bg-white border-slate-300 text-slate-700" data-filter="pending">
+            Pending
+          </button>
+          <button onclick="filterQuestions('answered')" class="filter-btn px-4 py-3 rounded-xl font-semibold text-sm border transition bg-white border-slate-300 text-slate-700" data-filter="answered">
+            Answered
+          </button>
+        </div>
+      </div>
+
+      <!-- QUESTIONS LIST -->
+      <div class="space-y-4" id="questionsList">
+        <!-- Questions will be populated by JavaScript -->
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div id="emptyState" class="hidden text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-slate-600 font-medium">No questions found</p>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== REPLY MODAL ===== -->
+<div id="replyModal" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <!-- MODAL HEADER -->
+    <div class="bg-gradient-to-r from-orange-50 to-pink-50 px-6 py-6 border-b border-orange-200/30 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900">Reply to Question</h2>
+        <p class="text-sm text-slate-600 mt-1">Help this user by providing a comprehensive answer</p>
+      </div>
+      <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+    </div>
+
+    <!-- MODAL BODY -->
+    <div class="p-6 space-y-6">
+
+      <!-- QUESTION DETAILS -->
+      <div class="card-glass rounded-xl p-4">
+        <p class="text-sm font-semibold text-slate-600 mb-2">USER INFORMATION</p>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Name:</span>
+            <span id="modalUserName" class="font-semibold text-slate-900"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Email:</span>
+            <span id="modalUserEmail" class="font-semibold text-blue-600"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Asked on:</span>
+            <span id="modalAskedDate" class="text-sm text-slate-600"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION TEXT -->
+      <div>
+        <p class="text-sm font-semibold text-slate-600 mb-2">QUESTION</p>
+        <div class="bg-blue-50 border border-blue-200/50 rounded-xl p-4">
+          <p id="modalQuestionText" class="text-slate-800 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <!-- EXISTING ANSWER (if any) -->
+      <div id="existingAnswerSection" class="hidden">
+        <p class="text-sm font-semibold text-slate-600 mb-2">YOUR ANSWER</p>
+        <div class="bg-green-50 border border-green-200/50 rounded-xl p-4">
+          <p id="existingAnswer" class="text-slate-800 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <!-- REPLY FORM -->
+      <div>
+        <p class="text-sm font-semibold text-slate-600 mb-2">YOUR RESPONSE</p>
+        <textarea 
+          id="replyText"
+          placeholder="Type your response here. Be clear, helpful, and professional..."
+          class="w-full px-4 py-3 rounded-xl border border-orange-200/40 focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+          rows="6"
+        ></textarea>
+        <p class="text-xs text-slate-500 mt-1" id="charCount">0 / 1000 characters</p>
+      </div>
+
+    </div>
+
+    <!-- MODAL FOOTER -->
+    <div class="bg-slate-50 px-6 py-4 border-t border-slate-200/50 flex gap-3 justify-end">
+      <button onclick="closeModal()" class="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition">
+        Cancel
+      </button>
+      <button onclick="submitReply()" class="px-6 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold hover:shadow-lg transition">
+        Send Response
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dummy data
+  let questions = [
+    {
+      id: 1,
+      userName: 'John Doe',
+      userEmail: 'john@example.com',
+      question: 'How does Graphura schedule posts?',
+      askedDate: '2024-01-15',
+      status: 'answered',
+      answer: 'Graphura allows you to select content, platform, and time. Once scheduled, the post is automatically published at the selected time using connected platform APIs.'
+    },
+    {
+      id: 2,
+      userName: 'Sarah Smith',
+      userEmail: 'sarah@example.com',
+      question: 'Which social media platforms are supported?',
+      askedDate: '2024-01-18',
+      status: 'pending',
+      answer: null
+    },
+    {
+      id: 3,
+      userName: 'Mike Johnson',
+      userEmail: 'mike@example.com',
+      question: 'Can I edit or delete a scheduled post?',
+      askedDate: '2024-01-20',
+      status: 'answered',
+      answer: 'Yes. You can delete any scheduled post before its publishing time from the Dashboard.'
+    },
+    {
+      id: 4,
+      userName: 'Emma Wilson',
+      userEmail: 'emma@example.com',
+      question: 'Why is my analytics data not showing?',
+      askedDate: '2024-01-22',
+      status: 'pending',
+      answer: null
+    },
+    {
+      id: 5,
+      userName: 'James Brown',
+      userEmail: 'james@example.com',
+      question: 'Is my account data secure?',
+      askedDate: '2024-01-24',
+      status: 'answered',
+      answer: 'Yes. Graphura uses JWT authentication tokens and platform OAuth to ensure your data remains secure.'
+    },
+    {
+      id: 6,
+      userName: 'Lisa Anderson',
+      userEmail: 'lisa@example.com',
+      question: 'How can I connect my social media accounts?',
+      askedDate: '2024-01-25',
+      status: 'pending',
+      answer: null
+    },
+    {
+      id: 7,
+      userName: 'David Chen',
+      userEmail: 'david@example.com',
+      question: 'What happens if my internet connection is lost during scheduling?',
+      askedDate: '2024-01-26',
+      status: 'pending',
+      answer: null
+    },
+    {
+      id: 8,
+      userName: 'Rachel Green',
+      userEmail: 'rachel@example.com',
+      question: 'Can I schedule posts in advance?',
+      askedDate: '2024-01-27',
+      status: 'answered',
+      answer: 'Absolutely! You can schedule posts weeks or months in advance for planning content calendars.'
+    }
+  ];
+
+  let currentFilter = 'all';
+  let currentModal = null;
+
+  // ===== AUTHENTICATION CHECK =====
+  window.addEventListener('load', () => {
+    const authToken = localStorage.getItem('authToken');
+    const userRole = localStorage.getItem('userRole');
+    
+    // Redirect to login if not authenticated
+    if (!authToken) {
+      window.location.href = 'home.html';
+      return;
+    }
+    
+    // Redirect to home if user doesn't have admin role
+    if (userRole !== 'ADMIN') {
+      alert('Access Denied: Admin privileges required');
+      window.location.href = 'home.html';
+      return;
+    }
+
+    const userEmail = localStorage.getItem('userEmail') || 'admin@graphura.com';
+    const userName = localStorage.getItem('userName') || 'Admin';
+    
+    document.getElementById('sidebarUserName').textContent = userName;
+    document.getElementById('sidebarUserEmail').textContent = userEmail;
+    document.getElementById('mobileSidebarUserName').textContent = userName;
+    document.getElementById('mobileSidebarUserEmail').textContent = userEmail;
+
+    initializeProfileDropdown();
+    renderQuestions();
+    updateStats();
+  });
+
+  // ===== RENDER QUESTIONS =====
+  function renderQuestions() {
+    const filtered = questions.filter(q => {
+      const matchesFilter = currentFilter === 'all' || q.status === currentFilter;
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const matchesSearch = 
+        q.userName.toLowerCase().includes(searchTerm) ||
+        q.userEmail.toLowerCase().includes(searchTerm) ||
+        q.question.toLowerCase().includes(searchTerm);
+      return matchesFilter && matchesSearch;
+    });
+
+    const questionsList = document.getElementById('questionsList');
+    const emptyState = document.getElementById('emptyState');
+
+    if (filtered.length === 0) {
+      questionsList.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+    questionsList.innerHTML = filtered.map(q => `
+      <div class="question-card rounded-xl p-6 ${q.status === 'answered' ? 'answered' : ''}" onclick="openModal(${q.id})">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-lg font-bold text-slate-900 truncate">${q.userName}</h3>
+              <span class="status-badge ${q.status === 'answered' ? 'status-answered' : 'status-pending'}">
+                ${q.status === 'answered' ? '✓ Answered' : '⏳ Pending'}
+              </span>
+            </div>
+            <p class="text-sm text-slate-600 mb-2">${q.userEmail}</p>
+            <p class="text-slate-700 font-medium line-clamp-2">${q.question}</p>
+            <p class="text-xs text-slate-500 mt-2">Asked on ${new Date(q.askedDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
+          </div>
+          <svg class="w-5 h-5 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ===== OPEN MODAL =====
+  function openModal(questionId) {
+    const question = questions.find(q => q.id === questionId);
+    if (!question) return;
+
+    currentModal = question;
+
+    document.getElementById('modalUserName').textContent = question.userName;
+    document.getElementById('modalUserEmail').textContent = question.userEmail;
+    document.getElementById('modalAskedDate').textContent = new Date(question.askedDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
+    document.getElementById('modalQuestionText').textContent = question.question;
+    document.getElementById('replyText').value = question.answer || '';
+
+    const existingAnswerSection = document.getElementById('existingAnswerSection');
+    if (question.answer) {
+      document.getElementById('existingAnswer').textContent = question.answer;
+      existingAnswerSection.classList.remove('hidden');
+    } else {
+      existingAnswerSection.classList.add('hidden');
+    }
+
+    updateCharCount();
+    document.getElementById('replyModal').classList.add('show');
+  }
+
+  // ===== CLOSE MODAL =====
+  function closeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('replyModal').classList.remove('show');
+    currentModal = null;
+  }
+
+  // ===== SUBMIT REPLY =====
+  function submitReply() {
+    const reply = document.getElementById('replyText').value.trim();
+    if (!reply) {
+      alert('Please enter a response');
+      return;
+    }
+
+    if (currentModal) {
+      currentModal.answer = reply;
+      currentModal.status = 'answered';
+      closeModal();
+      renderQuestions();
+      updateStats();
+    }
+  }
+
+  // ===== UPDATE CHARACTER COUNT =====
+  function updateCharCount() {
+    const replyText = document.getElementById('replyText');
+    const charCount = document.getElementById('charCount');
+    charCount.textContent = `${replyText.value.length} / 1000 characters`;
+  }
+
+  document.getElementById('replyText').addEventListener('input', updateCharCount);
+
+  // ===== FILTER QUESTIONS =====
+  function filterQuestions(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === filter);
+      if (btn.dataset.filter === filter) {
+        btn.classList.add('bg-orange-100', 'border-orange-400', 'text-orange-700');
+        btn.classList.remove('bg-white', 'border-slate-300', 'text-slate-700');
+      } else {
+        btn.classList.remove('bg-orange-100', 'border-orange-400', 'text-orange-700');
+        btn.classList.add('bg-white', 'border-slate-300', 'text-slate-700');
+      }
+    });
+    renderQuestions();
+  }
+
+  // ===== SEARCH =====
+  document.getElementById('searchInput').addEventListener('input', renderQuestions);
+
+  // ===== UPDATE STATS =====
+  function updateStats() {
+    const total = questions.length;
+    const answered = questions.filter(q => q.status === 'answered').length;
+    const pending = total - answered;
+
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('answeredCount').textContent = answered;
+    document.getElementById('pendingCount').textContent = pending;
+  }
+
+  // ===== PROFILE DROPDOWN =====
+  function initializeProfileDropdown() {
+    const sidebarProfileBtn = document.getElementById('sidebarProfileBtn');
+    const sidebarProfileMenu = document.getElementById('sidebarProfileMenu');
+
+    if (sidebarProfileBtn && sidebarProfileMenu) {
+      let isOpen = false;
+      const toggleDropdown = (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        sidebarProfileMenu.classList.toggle('hidden', !isOpen);
+      };
+      const closeDropdown = () => {
+        isOpen = false;
+        sidebarProfileMenu.classList.add('hidden');
+      };
+      sidebarProfileBtn.addEventListener('click', toggleDropdown);
+      document.addEventListener('click', closeDropdown);
+    }
+
+    const mobileSidebarProfileBtn = document.getElementById('mobileSidebarProfileBtn');
+    const mobileSidebarProfileMenu = document.getElementById('mobileSidebarProfileMenu');
+
+    if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
+      let isOpen = false;
+      const toggleDropdown = (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        mobileSidebarProfileMenu.classList.toggle('hidden', !isOpen);
+      };
+      const closeDropdown = () => {
+        isOpen = false;
+        mobileSidebarProfileMenu.classList.add('hidden');
+      };
+      mobileSidebarProfileBtn.addEventListener('click', toggleDropdown);
+      document.addEventListener('click', closeDropdown);
+    }
+  }
+
+  // ===== MOBILE SIDEBAR =====
+  function openMobileSidebar() {
+    document.getElementById('mobileSidebar').classList.add('open');
+    document.getElementById('mobileSidebarOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileSidebar() {
+    document.getElementById('mobileSidebar').classList.remove('open');
+    document.getElementById('mobileSidebarOverlay').classList.remove('open');
+    document.body.style.overflow = 'auto';
+  }
+
+  // ===== LOGOUT =====
+  async function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      window.location.href = 'home.html';
+    }
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+
+<!-- Include global confirm helper -->
+<script src="confirm.js"></script>
+
+</body>
+</html>
