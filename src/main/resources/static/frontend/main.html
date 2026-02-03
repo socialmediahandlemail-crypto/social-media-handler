@@ -731,7 +731,6 @@
                 <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-1">📱 Platform</label>
                 <select id="platform" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition font-medium text-slate-700 text-sm">
                     <option value="FACEBOOK">Facebook</option>
-                    <option value="WHATSAPP">WhatsApp</option>
                     <option value="LINKEDIN">LinkedIn</option>
                     <option value="TWITTER">Twitter</option>
                     <option value="YOUTUBE">YouTube</option>
@@ -1210,7 +1209,6 @@ function renderPostCards(posts, container) {
 
         const platformIcon =
             post.platform === "FACEBOOK" ? "assets/facebook.png" :
-            post.platform === "WHATSAPP" ? "assets/whatsapp.png" :
             post.platform === "LINKEDIN" ? "assets/linkedin.png" :
             post.platform === "TWITTER" ? "assets/twitter.png" :
             post.platform === "YOUTUBE" ? "assets/youtube.png" :
@@ -1218,7 +1216,6 @@ function renderPostCards(posts, container) {
 
           const accentColor =
             post.platform === "FACEBOOK" ? "blue" :
-            post.platform === "WHATSAPP" ? "green" :
             post.platform === "LINKEDIN" ? "blue" :
             post.platform === "TWITTER" ? "slate" :
             post.platform === "YOUTUBE" ? "red" :
@@ -1364,7 +1361,6 @@ function openPostDetailsModal(post) {
     // ===== PLATFORM ICONS =====
     const platformIcons = {
         "FACEBOOK": "assets/facebook.png",
-        "WHATSAPP": "assets/whatsapp.png",
         "LINKEDIN": "assets/linkedin.png",
         "TWITTER": "assets/twitter.png",
         "YOUTUBE": "assets/youtube.png",
