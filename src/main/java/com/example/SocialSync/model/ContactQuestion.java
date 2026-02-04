@@ -27,6 +27,11 @@ public class ContactQuestion {
     
     private LocalDateTime submittedAt;
 
+    // 🔥 NEW FIELDS for Admin Response
+    private String response;          // The answer typed by admin
+    private LocalDateTime respondedAt; // When it was answered
+    private String status;            // "PENDING" or "ANSWERED"
+
     @jakarta.persistence.PrePersist
     public void prePersist() {
         if (this.id == null) {
@@ -34,6 +39,9 @@ public class ContactQuestion {
         }
         if (this.submittedAt == null) {
             this.submittedAt = LocalDateTime.now();
+        }
+        if (this.status == null) {
+            this.status = "PENDING";
         }
     }
 }
