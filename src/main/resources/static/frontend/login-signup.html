@@ -680,7 +680,8 @@
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', result.username || 'User');
             localStorage.setItem('userRole', 'ADMIN');
-            window.location.href = 'main.html';
+            // Admin users go to admin dashboard
+            window.location.href = 'admin-dashboard.html';
           } else {
             document.getElementById('liEmailError').textContent = result.message || 'Invalid credentials or secret key';
             document.getElementById('liEmailError').classList.remove('hidden');
