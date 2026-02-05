@@ -130,6 +130,23 @@
 
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
+<script>
+  // Role guard: only ADMIN allowed here
+  (function(){
+    const authToken = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    if (!authToken) {
+      window.location.href = 'home.html';
+      return;
+    }
+    if (role !== 'ADMIN') {
+      alert('Access Denied: Admin privileges required');
+      window.location.href = 'main.html';
+      return;
+    }
+  })();
+</script>
+
 <!-- MOBILE SIDEBAR OVERLAY -->
 <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
