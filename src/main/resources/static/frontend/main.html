@@ -307,6 +307,22 @@
 
 <body class="bg-white text-slate-800 min-h-screen">
 
+<script>
+  // Redirect admin users away from user pages to admin dashboard
+  (function(){
+    const authToken = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    if (!authToken) {
+      window.location.href = 'home.html';
+      return;
+    }
+    if (role === 'ADMIN') {
+      window.location.href = 'admin-dashboard.html';
+      return;
+    }
+  })();
+</script>
+
 <!-- Notification root for toast cards -->
 <div id="notification-root" aria-live="polite" class="fixed top-6 right-6 z-50"></div>
 
