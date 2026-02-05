@@ -514,10 +514,10 @@
       return;
     }
     
-    // Redirect to home if user doesn't have admin role
+    // Redirect to user dashboard if user doesn't have admin role
     if (userRole !== 'ADMIN') {
       alert('Access Denied: Admin privileges required');
-      window.location.href = 'home.html';
+      window.location.href = 'main.html';
       return;
     }
 
