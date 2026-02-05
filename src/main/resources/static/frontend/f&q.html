@@ -221,6 +221,17 @@
 
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
+<script>
+  // If an admin navigates to user FAQ page, redirect to admin dashboard
+  (function(){
+    const role = localStorage.getItem('userRole');
+    if (role === 'ADMIN') {
+      window.location.href = 'admin-dashboard.html';
+      return;
+    }
+  })();
+</script>
+
 <!-- MOBILE SIDEBAR OVERLAY -->
 <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
