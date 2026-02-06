@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +32,7 @@ private String secretKey;
 private LocalDateTime createdAt;
 private String resetToken;
 private LocalDateTime resetTokenExpiry;
+private LocalDateTime lastActiveAt;
 @DBRef(lazy = true)
 @JsonManagedReference
 private List<YouTubeAccount> youtubeAccounts = new ArrayList<>();
