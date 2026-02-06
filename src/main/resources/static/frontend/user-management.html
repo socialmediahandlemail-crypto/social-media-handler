@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura – User Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ===== SIDEBAR ===== */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.25s ease;
+    }
+    .sidebar-link:hover {
+      background: rgba(249,115,22,0.08);
+      color: #f97316;
+    }
+    .sidebar-active {
+      background: rgba(249,115,22,0.15);
+      color: #f97316;
+      box-shadow: inset 0 0 0 1px rgba(249,115,22,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ===== MOBILE SIDEBAR ===== */
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      flex-direction: column;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .mobile-menu-btn:hover {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .mobile-menu-btn span {
+      width: 18px;
+      height: 2px;
+      background: #f97316;
+      display: block;
+      margin: 2.5px 0;
+      transition: all 0.25s ease;
+      border-radius: 1px;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 30;
+    }
+
+    .mobile-sidebar-overlay.open {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 256px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 247, 237, 0.95) 100%);
+      border-r: 2px solid rgba(249, 115, 22, 0.3);
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 40;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* CARD STYLES */
+    .card-glass {
+      background: rgba(250, 251, 252, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    /* USER CARD */
+    .user-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 250, 245, 0.95) 100%);
+      border: 1px solid rgba(226, 232, 240, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .user-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.3);
+    }
+
+    .user-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #f97316, #ec4899);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+      opacity: 0;
+    }
+
+    .user-card:hover::before {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow: hidden;
+      animation: slideUp 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-body {
+      overflow-y: overlay;
+      flex: 1;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(249, 115, 22, 0.3) transparent;
+    }
+
+    .modal-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+      background: rgba(249, 115, 22, 0.3);
+      border-radius: 3px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb:hover {
+      background: rgba(249, 115, 22, 0.5);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* AVATAR STYLES */
+    .avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+    }
+
+    .avatar-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .avatar-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .avatar-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .avatar-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .avatar-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .avatar-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+
+    /* STATUS BADGE */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #16a34a;
+    }
+
+    .status-inactive {
+      background: rgba(249, 115, 22, 0.15);
+      color: #ea580c;
+    }
+
+    /* DELETE CONFIRMATION MODAL */
+    .delete-modal {
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* STAT CARD */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 250, 245, 0.9) 100%);
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    /* SEARCH INPUT */
+    .search-input {
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+    }
+
+    /* LOADING SKELETON */
+    .skeleton {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* SCROLL BAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(249, 115, 22, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(249, 115, 22, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(249, 115, 22, 0.5);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<!-- ADMIN ROLE GUARD -->
+<script>
+  (function(){
+    const authToken = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    if (!authToken) {
+      window.location.href = 'home.html';
+      return;
+    }
+    if (role !== 'ADMIN') {
+      alert('Access Denied: Admin privileges required');
+      window.location.href = 'main.html';
+      return;
+    }
+  })();
+</script>
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MOBILE SIDEBAR -->
+<aside id="mobileSidebar" class="mobile-sidebar">
+  <!-- LOGO -->
+  <div class="px-4 py-4 border-b flex items-center justify-between">
+    <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
+    <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+  </div>
+
+  <!-- NAV -->
+  <nav class="px-4 py-6 space-y-1 flex-1">
+    <a href="admin-dashboard.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Dashboard
+    </a>
+    <a href="user-management.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
+      User Management
+    </a>
+    <a href="faq-management.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      FAQ Management
+    </a>
+  </nav>
+
+  <!-- USER PROFILE -->
+  <div class="p-4 border-t relative">
+    <button id="mobileSidebarProfileBtn"
+      class="w-full flex items-center gap-3 p-3 rounded-full bg-white/80 border border-orange-200/40 shadow-sm hover:shadow-md hover:bg-orange-50/60 hover:border-orange-300/60 transition">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-200 to-pink-200 flex items-center justify-center font-bold">
+        <img src="assets/user_icon.png" class="w-5 h-5" />
+      </div>
+      <div class="truncate text-left">
+        <p id="mobileSidebarUserName" class="text-sm font-semibold text-slate-800">Admin</p>
+        <p id="mobileSidebarUserEmail" class="text-xs text-slate-600 truncate"></p>
+      </div>
+    </button>
+
+    <!-- DROPDOWN -->
+    <div id="mobileSidebarProfileMenu"
+      class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="window.location.href='home.html'"
+        class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+        Go to Home
+      </button>
+      <button onclick="logout()"
+        class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+        Logout
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= APP LAYOUT ================= -->
+<div class="flex min-h-screen">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-orange-200/30 flex flex-col justify-between">
+
+    <!-- LOGO -->
+    <div class="px-6 py-6 border-b flex items-center justify-center">
+      <img src="assets/graphuralogo.png" class="h-16" />
+    </div>
+
+    <!-- NAV -->
+    <nav class="px-4 py-6 space-y-1 flex-1">
+      <a href="admin-dashboard.html" class="sidebar-link">
+        Dashboard
+      </a>
+      <a href="user-management.html" class="sidebar-link sidebar-active">
+        User Management
+      </a>
+      <a href="faq-management.html" class="sidebar-link">
+        FAQ Management
+      </a>
+    </nav>
+
+    <!-- USER PROFILE -->
+    <div class="p-4 relative">
+      <button id="sidebarProfileBtn"
+        class="mt-auto w-full flex items-center gap-3 px-4 py-3 rounded-full bg-white/80 border border-orange-200/40 hover:bg-orange-50/60 hover:border-orange-300/60 shadow-sm hover:shadow-md transition">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-200 to-pink-200 flex items-center justify-center shrink-0">
+          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+        </div>
+        <div class="min-w-0 text-left">
+          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">Admin</p>
+          <p id="sidebarUserEmail" class="text-xs text-slate-600 leading-tight break-all">admin@graphura.com</p>
+        </div>
+      </button>
+
+      <!-- DROPDOWN -->
+      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+        <button onclick="window.location.href='home.html'" class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+          Go to Home
+        </button>
+        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="lg:ml-64 flex-1 flex flex-col">
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-gradient-to-r from-white to-orange-50/30 border-b border-orange-200/30 fixed top-0 left-0 right-0 z-20 shadow-sm">
+      <img src="assets/graphuralogo.png" class="h-10 drop-shadow-sm" alt="Graphura Logo" />
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="flex-1 px-4 lg:px-10 py-6 overflow-y-auto">
+
+      <!-- HEADER -->
+      <header class="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-12 lg:pt-0">
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-orange-100 to-pink-100 rounded-xl">
+                <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12a4 4 0 100-8 4 4 0 000 8z"/>
+                  <path d="M16 14a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                  <circle cx="17" cy="18" r="2" fill="currentColor"/>
+                  <path d="M19.5 21h-5a1.5 1.5 0 00-1.5-1.5"/>
+                </svg>
+              </div>
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+                User Management
+              </h1>
+            </div>
+            <p class="text-sm sm:text-base text-slate-600 mt-2 font-medium">
+              Manage platform users, view their activity, and maintain account security.
+            </p>
+          </div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="flex flex-wrap gap-2 sm:gap-3">
+          <div class="stat-card">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Users</p>
+            <p class="text-2xl font-extrabold text-orange-600 mt-1"><span id="totalUsers">0</span></p>
+          </div>
+          <div class="stat-card">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Active</p>
+            <p class="text-2xl font-extrabold text-green-600 mt-1"><span id="activeUsers">0</span></p>
+          </div>
+          <div class="stat-card">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Inactive</p>
+            <p class="text-2xl font-extrabold text-amber-600 mt-1"><span id="inactiveUsers">0</span></p>
+          </div>
+        </div>
+      </header>
+
+      <!-- SEARCH BAR -->
+      <div class="mb-6">
+        <div class="relative">
+          <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search by name, email, or username..." 
+            class="search-input w-full pl-12 pr-4 py-3 rounded-xl border border-orange-200/40 focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+          />
+        </div>
+      </div>
+
+      <!-- USERS TABLE -->
+      <div class="card-glass rounded-2xl overflow-hidden border border-slate-200/50 shadow-lg">
+        <div class="bg-gradient-to-r from-orange-50 via-orange-50/50 to-pink-50 px-6 py-4 border-b border-slate-200/50">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-widest flex items-center gap-2">
+            <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            All Users
+          </h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-slate-50/50 border-b border-slate-200/50">
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">User</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Email</th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">
+                  <div class="flex items-center justify-center gap-1">
+                    <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 13H5v-2h14v2z"/>
+                    </svg>
+                    Posts
+                  </div>
+                </th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">
+                  <div class="flex items-center justify-center gap-1">
+                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    Platforms
+                  </div>
+                </th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">
+                  <div class="flex items-center justify-center gap-1">
+                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Joined
+                  </div>
+                </th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody" class="divide-y divide-slate-200/50">
+              <!-- Users will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div id="emptyState" class="hidden text-center py-16">
+        <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M7 20H2v-2a3 3 0 015.856-1.487m0 0a6.002 6.002 0 1110.288 0"></path>
+        </svg>
+        <p class="text-slate-600 font-medium text-lg">No users found</p>
+        <p class="text-slate-500 text-sm mt-1">Try adjusting your search criteria</p>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== USER DETAILS MODAL ===== -->
+<div id="userModal" class="modal-overlay" onclick="closeUserModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <!-- MODAL HEADER -->
+    <div class="bg-gradient-to-r from-orange-50 to-pink-50 px-6 py-6 border-b border-orange-200/30 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900">User Details</h2>
+        <p class="text-sm text-slate-600 mt-1">View and manage user information</p>
+      </div>
+      <button onclick="closeUserModal()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+    </div>
+
+    <!-- MODAL BODY -->
+    <div class="modal-body p-6 space-y-5">
+
+      <!-- USER AVATAR & STATUS -->
+      <div class="card-glass rounded-2xl p-8 bg-gradient-to-br from-orange-50/50 to-pink-50/50">
+        <div class="flex flex-col items-center text-center">
+          <div class="relative mb-4">
+            <div id="modalUserAvatar" class="avatar avatar-1 text-4xl">U</div>
+            <div id="modalStatusBadge" class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-green-400 border-2 border-white flex items-center justify-center text-lg">🟢</div>
+          </div>
+          <h3 id="modalUserName" class="text-2xl font-bold text-slate-900 mb-1"></h3>
+          <p id="modalUserEmail" class="text-sm text-slate-600 mb-4"></p>
+          <div id="modalUserStatus" class="status-badge status-active">🟢 Active</div>
+        </div>
+      </div>
+
+      <!-- USER INFORMATION -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest px-1">Profile Information</h3>
+        <div class="card-glass rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200/50">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span class="text-slate-600 text-sm">Username:</span>
+            </div>
+            <span id="modalUsername" class="font-semibold text-slate-900 text-sm">@user</span>
+          </div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200/50">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-slate-600 text-sm">Email:</span>
+            </div>
+            <span id="modalEmailDisplay" class="font-semibold text-blue-600 text-sm">user@email.com</span>
+          </div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200/50">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              <span class="text-slate-600 text-sm">Role:</span>
+            </div>
+            <span id="modalUserRole" class="font-semibold text-slate-900 px-3 py-1 rounded-full bg-blue-100/60 text-blue-700 text-xs">USER</span>
+          </div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200/50">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-slate-600 text-sm">Joined On:</span>
+            </div>
+            <span id="modalJoinedDate" class="font-semibold text-slate-900 text-sm">Jan 15, 2024</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-slate-600 text-sm">Last Active:</span>
+            </div>
+            <span id="modalLastActive" class="font-semibold text-slate-900 text-sm">Today</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOUNT ACTIVITY -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest px-1">Activity Metrics</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card-glass rounded-xl p-4 text-center">
+            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 mx-auto mb-2">
+              <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z"/>
+              </svg>
+            </div>
+            <p class="text-xs text-slate-600 mb-1">Posts</p>
+            <p id="modalPostsCount" class="text-2xl font-bold text-orange-600">0</p>
+          </div>
+          <div class="card-glass rounded-xl p-4 text-center">
+            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 mx-auto mb-2">
+              <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+              </svg>
+            </div>
+            <p class="text-xs text-slate-600 mb-1">Platforms</p>
+            <p id="modalPlatformsCount" class="text-2xl font-bold text-blue-600">0</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODAL FOOTER -->
+    <div class="bg-slate-50 px-6 py-4 border-t border-slate-200/50 flex gap-3 justify-end flex-shrink-0 rounded-b-2xl">
+      <button onclick="closeUserModal()" class="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition">
+        Close
+      </button>
+      <button onclick="showDeleteConfirmation()" class="px-6 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:shadow-lg transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        Delete User
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE CONFIRMATION MODAL ===== -->
+<div id="deleteModal" class="modal-overlay" onclick="closeDeleteModal(event)">
+  <div class="modal-content delete-modal" onclick="event.stopPropagation()">
+    <!-- MODAL HEADER -->
+    <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-6 border-b border-red-200/30 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900">Delete User</h2>
+        <p class="text-sm text-slate-600 mt-1">This action cannot be undone</p>
+      </div>
+      <button onclick="closeDeleteModal()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+    </div>
+
+    <!-- MODAL BODY -->
+    <div class="p-8 text-center space-y-4">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto">
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 0a9 9 0 110-18 9 9 0 010 18z"></path>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Are you sure?</h3>
+        <p class="text-slate-600 text-sm">
+          You're about to permanently delete <span id="deleteConfirmName" class="font-bold text-slate-900"></span>'s account and all associated data.
+        </p>
+      </div>
+      <div class="bg-red-50 border border-red-200/50 rounded-lg p-4 mt-6">
+        <p class="text-red-700 text-sm font-medium">
+          💡 Tip: This action will delete all user data including posts, connections, and activity history. Consider deactivating the account instead if you want to preserve data.
+        </p>
+      </div>
+    </div>
+
+    <!-- MODAL FOOTER -->
+    <div class="bg-slate-50 px-6 py-4 border-t border-slate-200/50 flex gap-3 justify-end">
+      <button onclick="closeDeleteModal()" class="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition">
+        Cancel
+      </button>
+      <button onclick="confirmDeleteUser()" id="confirmDeleteBtn" class="px-6 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:shadow-lg transition flex items-center gap-2">
+        <span id="deleteBtnText">Delete Permanently</span>
+        <span id="deleteSpinner" class="hidden">
+          <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== DATA & STATE =====
+  let users = [];
+  let currentUserModal = null;
+  const avatarClasses = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4', 'avatar-5', 'avatar-6'];
+
+  // ===== DUMMY DATA =====
+  function getDummyUsers() {
+    return [
+      {
+        id: '1',
+        name: 'Sarah Johnson',
+        email: 'sarah.johnson@email.com',
+        username: 'sarahjohnson',
+        role: 'USER',
+        createdAt: '2024-01-15',
+        lastLogin: '2024-02-04',
+        isActive: true,
+        postsCount: 42,
+        platformsCount: 4,
+        avatarClass: avatarClasses[0],
+        avatarInitial: 'S'
+      },
+      {
+        id: '2',
+        name: 'Michael Chen',
+        email: 'michael.chen@email.com',
+        username: 'mikechen92',
+        role: 'USER',
+        createdAt: '2023-11-20',
+        lastLogin: '2024-02-03',
+        isActive: true,
+        postsCount: 28,
+        platformsCount: 3,
+        avatarClass: avatarClasses[1],
+        avatarInitial: 'M'
+      },
+      {
+        id: '3',
+        name: 'Emily Rodriguez',
+        email: 'emily.rodriguez@email.com',
+        username: 'emilyrodriguez',
+        role: 'USER',
+        createdAt: '2024-02-01',
+        lastLogin: '2024-02-04',
+        isActive: true,
+        postsCount: 15,
+        platformsCount: 5,
+        avatarClass: avatarClasses[2],
+        avatarInitial: 'E'
+      },
+      {
+        id: '4',
+        name: 'David Thompson',
+        email: 'david.thompson@email.com',
+        username: 'davethompson',
+        role: 'USER',
+        createdAt: '2023-10-10',
+        lastLogin: '2024-01-28',
+        isActive: false,
+        postsCount: 35,
+        platformsCount: 4,
+        avatarClass: avatarClasses[3],
+        avatarInitial: 'D'
+      },
+      {
+        id: '5',
+        name: 'Jessica Lee',
+        email: 'jessica.lee@email.com',
+        username: 'jessicalee21',
+        role: 'USER',
+        createdAt: '2024-01-02',
+        lastLogin: '2024-02-04',
+        isActive: true,
+        postsCount: 56,
+        platformsCount: 4,
+        avatarClass: avatarClasses[4],
+        avatarInitial: 'J'
+      },
+      {
+        id: '6',
+        name: 'James Wilson',
+        email: 'james.wilson@email.com',
+        username: 'jameswilson88',
+        role: 'USER',
+        createdAt: '2023-12-12',
+        lastLogin: '2024-02-02',
+        isActive: true,
+        postsCount: 22,
+        platformsCount: 3,
+        avatarClass: avatarClasses[5],
+        avatarInitial: 'J'
+      },
+      {
+        id: '7',
+        name: 'Amanda Martinez',
+        email: 'amanda.martinez@email.com',
+        username: 'amandamartinez',
+        role: 'USER',
+        createdAt: '2024-01-18',
+        lastLogin: '2024-02-04',
+        isActive: true,
+        postsCount: 33,
+        platformsCount: 4,
+        avatarClass: avatarClasses[0],
+        avatarInitial: 'A'
+      },
+      {
+        id: '8',
+        name: 'Robert Garcia',
+        email: 'robert.garcia@email.com',
+        username: 'robertgarcia',
+        role: 'USER',
+        createdAt: '2023-09-05',
+        lastLogin: '2024-01-20',
+        isActive: false,
+        postsCount: 48,
+        platformsCount: 5,
+        avatarClass: avatarClasses[1],
+        avatarInitial: 'R'
+      },
+      {
+        id: '9',
+        name: 'Lisa Anderson',
+        email: 'lisa.anderson@email.com',
+        username: 'lisaanderson',
+        role: 'USER',
+        createdAt: '2024-01-25',
+        lastLogin: '2024-02-04',
+        isActive: true,
+        postsCount: 19,
+        platformsCount: 2,
+        avatarClass: avatarClasses[2],
+        avatarInitial: 'L'
+      },
+      {
+        id: '10',
+        name: 'Christopher Kumar',
+        email: 'chris.kumar@email.com',
+        username: 'chriskumar',
+        role: 'USER',
+        createdAt: '2023-11-30',
+        lastLogin: '2024-02-03',
+        isActive: true,
+        postsCount: 41,
+        platformsCount: 4,
+        avatarClass: avatarClasses[3],
+        avatarInitial: 'C'
+      }
+    ];
+  }
+
+  // ===== FETCH USERS FROM DATABASE =====
+  async function fetchUsersFromDatabase() {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch('http://localhost:8082/api/users/all', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Transform backend data to match frontend structure
+        users = data.map((user, index) => ({
+          id: user.id,
+          name: user.name || user.userName || 'Unknown',
+          email: user.email,
+          username: user.userName || 'User',
+          role: user.role || 'USER',
+          createdAt: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : 'N/A',
+          lastLogin: user.lastLogin ? new Date(user.lastLogin).toISOString().split('T')[0] : 'Never',
+          isActive: user.isActive !== false,
+          postsCount: Math.floor(Math.random() * 50) + 1,
+          platformsCount: Math.floor(Math.random() * 5) + 1,
+          avatarClass: avatarClasses[index % avatarClasses.length],
+          avatarInitial: (user.name || user.userName || 'U').charAt(0).toUpperCase()
+        }));
+        renderUsers();
+        updateStats();
+      } else {
+        console.error('Failed to fetch users:', response.status);
+        loadDummyUsers();
+      }
+    } catch (error) {
+      console.error('Error fetching users from database:', error);
+      loadDummyUsers();
+    }
+  }
+
+  // ===== LOAD DUMMY USERS AS FALLBACK =====
+  function loadDummyUsers() {
+    users = getDummyUsers();
+    renderUsers();
+    updateStats();
+  }
+
+  // ===== AUTHENTICATION CHECK =====
+  window.addEventListener('load', () => {
+    const authToken = localStorage.getItem('authToken');
+    const userRole = localStorage.getItem('userRole');
+    
+    if (!authToken) {
+      window.location.href = 'home.html';
+      return;
+    }
+    
+    if (userRole !== 'ADMIN') {
+      alert('Access Denied: Admin privileges required');
+      window.location.href = 'main.html';
+      return;
+    }
+
+    const userEmail = localStorage.getItem('userEmail') || 'admin@graphura.com';
+    const userName = localStorage.getItem('userName') || 'Admin';
+    
+    document.getElementById('sidebarUserName').textContent = userName;
+    document.getElementById('sidebarUserEmail').textContent = userEmail;
+    document.getElementById('mobileSidebarUserName').textContent = userName;
+    document.getElementById('mobileSidebarUserEmail').textContent = userEmail;
+
+    initializeProfileDropdown();
+    fetchUsersFromDatabase();
+  });
+
+  // ===== RENDER USERS =====
+  function renderUsers() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    const filtered = users.filter(u => {
+      return u.name.toLowerCase().includes(searchTerm) ||
+             u.email.toLowerCase().includes(searchTerm) ||
+             u.username.toLowerCase().includes(searchTerm);
+    });
+
+    const usersTableBody = document.getElementById('usersTableBody');
+    const emptyState = document.getElementById('emptyState');
+
+    if (filtered.length === 0) {
+      usersTableBody.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+    usersTableBody.innerHTML = filtered.map(u => `
+      <tr class="hover:bg-orange-50/40 transition-colors cursor-pointer group" onclick="openUserModal('${u.id}')">
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="avatar ${u.avatarClass} text-xs relative flex-shrink-0">
+              ${u.avatarInitial}
+              <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full ${u.isActive ? 'bg-green-400' : 'bg-amber-400'} border-2 border-white flex items-center justify-center text-xs"></span>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-900 group-hover:text-orange-600 transition">${u.name}</p>
+              <p class="text-xs text-slate-500">@${u.username}</p>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-sm text-blue-600 font-medium hover:underline">${u.email}</p>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full font-semibold text-xs ${u.isActive ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+            <span class="w-2 h-2 rounded-full ${u.isActive ? 'bg-green-500' : 'bg-amber-500'}"></span>
+            ${u.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-orange-100 text-orange-600 font-bold text-sm">
+            ${u.postsCount}
+          </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 text-blue-600 font-bold text-sm">
+            ${u.platformsCount}
+          </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <div class="flex items-center justify-center gap-1 text-sm text-slate-600">
+            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            ${new Date(u.createdAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: '2-digit'})}
+          </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <button onclick="event.stopPropagation(); openUserModal('${u.id}')" class="px-4 py-2 rounded-lg bg-gradient-to-r from-orange-400 to-pink-400 text-white text-xs font-bold hover:shadow-lg hover:from-orange-500 hover:to-pink-500 transition-all transform hover:scale-105">
+            View
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ===== OPEN USER MODAL =====
+  function openUserModal(userId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    currentUserModal = user;
+    
+    document.getElementById('modalUserAvatar').className = `avatar ${user.avatarClass} text-3xl`;
+    document.getElementById('modalUserAvatar').textContent = user.avatarInitial;
+    document.getElementById('modalUserName').textContent = user.name;
+    document.getElementById('modalUserEmail').textContent = user.email;
+    document.getElementById('modalUsername').textContent = user.username;
+    document.getElementById('modalEmailDisplay').textContent = user.email;
+    document.getElementById('modalUserRole').textContent = user.role;
+    document.getElementById('modalJoinedDate').textContent = new Date(user.createdAt).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
+    document.getElementById('modalLastActive').textContent = user.lastLogin;
+    document.getElementById('modalPostsCount').textContent = user.postsCount;
+    document.getElementById('modalPlatformsCount').textContent = user.platformsCount;
+
+    const statusElement = document.getElementById('modalUserStatus');
+    if (user.isActive) {
+      statusElement.className = 'status-badge status-active';
+      statusElement.textContent = '🟢 Active';
+      document.getElementById('modalStatusBadge').textContent = '🟢';
+    } else {
+      statusElement.className = 'status-badge status-inactive';
+      statusElement.textContent = '🔴 Inactive';
+      document.getElementById('modalStatusBadge').textContent = '🔴';
+    }
+
+    document.getElementById('userModal').classList.add('show');
+  }
+
+  // ===== CLOSE USER MODAL =====
+  function closeUserModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('userModal').classList.remove('show');
+    currentUserModal = null;
+  }
+
+  // ===== SHOW DELETE CONFIRMATION =====
+  function showDeleteConfirmation() {
+    if (!currentUserModal) return;
+    document.getElementById('deleteConfirmName').textContent = currentUserModal.name;
+    document.getElementById('deleteModal').classList.add('show');
+  }
+
+  // ===== CLOSE DELETE MODAL =====
+  function closeDeleteModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('deleteModal').classList.remove('show');
+  }
+
+  // ===== CONFIRM DELETE USER =====
+  async function confirmDeleteUser() {
+    if (!currentUserModal) return;
+
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const deleteBtnText = document.getElementById('deleteBtnText');
+    const deleteSpinner = document.getElementById('deleteSpinner');
+
+    confirmBtn.disabled = true;
+    deleteBtnText.textContent = 'Deleting';
+    deleteSpinner.classList.remove('hidden');
+
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`http://localhost:8082/api/users/${currentUserModal.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+
+      if (response.ok) {
+        alert('User deleted successfully!');
+        closeDeleteModal();
+        closeUserModal();
+        fetchUsersFromDatabase();
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + (errorData.message || 'Failed to delete user'));
+        confirmBtn.disabled = false;
+        deleteBtnText.textContent = 'Delete Permanently';
+        deleteSpinner.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Network error. Please try again.');
+      confirmBtn.disabled = false;
+      deleteBtnText.textContent = 'Delete Permanently';
+      deleteSpinner.classList.add('hidden');
+    }
+  }
+
+  // ===== UPDATE STATS =====
+  function updateStats() {
+    const total = users.length;
+    const active = users.filter(u => u.isActive).length;
+    const inactive = total - active;
+
+    document.getElementById('totalUsers').textContent = total;
+    document.getElementById('activeUsers').textContent = active;
+    document.getElementById('inactiveUsers').textContent = inactive;
+  }
+
+  // ===== SEARCH =====
+  document.getElementById('searchInput').addEventListener('input', renderUsers);
+
+  // ===== PROFILE DROPDOWN =====
+  function initializeProfileDropdown() {
+    const sidebarProfileBtn = document.getElementById('sidebarProfileBtn');
+    const sidebarProfileMenu = document.getElementById('sidebarProfileMenu');
+
+    if (sidebarProfileBtn && sidebarProfileMenu) {
+      let isOpen = false;
+      const toggleDropdown = (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        sidebarProfileMenu.classList.toggle('hidden', !isOpen);
+      };
+      const closeDropdown = () => {
+        isOpen = false;
+        sidebarProfileMenu.classList.add('hidden');
+      };
+      sidebarProfileBtn.addEventListener('click', toggleDropdown);
+      document.addEventListener('click', closeDropdown);
+    }
+
+    const mobileSidebarProfileBtn = document.getElementById('mobileSidebarProfileBtn');
+    const mobileSidebarProfileMenu = document.getElementById('mobileSidebarProfileMenu');
+
+    if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
+      let isOpen = false;
+      const toggleDropdown = (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        mobileSidebarProfileMenu.classList.toggle('hidden', !isOpen);
+      };
+      const closeDropdown = () => {
+        isOpen = false;
+        mobileSidebarProfileMenu.classList.add('hidden');
+      };
+      mobileSidebarProfileBtn.addEventListener('click', toggleDropdown);
+      document.addEventListener('click', closeDropdown);
+    }
+  }
+
+  // ===== MOBILE SIDEBAR =====
+  function openMobileSidebar() {
+    document.getElementById('mobileSidebar').classList.add('open');
+    document.getElementById('mobileSidebarOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileSidebar() {
+    document.getElementById('mobileSidebar').classList.remove('open');
+    document.getElementById('mobileSidebarOverlay').classList.remove('open');
+    document.body.style.overflow = 'auto';
+  }
+
+  // ===== LOGOUT =====
+  async function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      window.location.href = 'home.html';
+    }
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeUserModal();
+      closeDeleteModal();
+    }
+  });
+</script>
+
+</body>
+</html>
