@@ -505,8 +505,10 @@
                     <label class="form-label">Enter Secret Key</label>
                     <input id="suSecret" type="password" placeholder="Secret key"
                       class="form-input w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                    <p id="suSecretError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                   </div>
                 </div>
+                <p id="suFormError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                 <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right"></i>
@@ -560,8 +562,10 @@
                     <label class="form-label">Enter Secret Key</label>
                     <input id="liSecret" type="password" placeholder="Secret key"
                       class="form-input w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                    <p id="liSecretError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                   </div>
                 </div>
+                <p id="liFormError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                 
                 <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
@@ -626,6 +630,72 @@
         toggleForm(); // Show signup form
       }
     });
+
+    function clearInlineErrors(ids) {
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+    }
+
+    function showInlineError(id, message) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = message;
+      el.classList.remove('hidden');
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function parseResponse(res) {
+      const text = await res.text();
+      let data = null;
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          data = null;
+        }
+      }
+      let message = '';
+      if (typeof data === 'string') {
+        message = data;
+      } else if (data && typeof data === 'object') {
+        message = data.message || data.error || data.msg || data.details || '';
+      }
+      if (!message) message = text || res.statusText || `Request failed (${res.status})`;
+      return { ok: res.ok, status: res.status, data: data || {}, message };
+    }
+
+    function routeLoginError(message, mode) {
+      const msg = String(message || 'Login failed');
+      const lower = msg.toLowerCase();
+      if (lower.includes('role mismatch')) {
+        const friendly = mode === 'ADMIN'
+          ? 'This account is not an admin account. Uncheck Admin to continue.'
+          : 'This account is an admin account. Check Admin to continue.';
+        return { id: 'liFormError', msg: friendly };
+      }
+      if (lower.includes('email or password')) return { id: 'liFormError', msg: 'Invalid email or password' };
+      if ((lower.includes('secret') || lower.includes('otp') || lower.includes('key')) && !lower.includes('credential')) {
+        return { id: 'liSecretError', msg };
+      }
+      if (lower.includes('password')) return { id: 'liPasswordError', msg };
+      if (lower.includes('email')) return { id: 'liEmailError', msg };
+      return { id: 'liFormError', msg };
+    }
+
+    function routeSignupError(message) {
+      const msg = String(message || 'Signup failed');
+      const lower = msg.toLowerCase();
+      if (lower.includes('secret') || lower.includes('key')) return { id: 'suSecretError', msg };
+      if (lower.includes('username') || lower.includes('user name')) return { id: 'suNameError', msg };
+      if (lower.includes('email')) return { id: 'suEmailError', msg };
+      if (lower.includes('password')) return { id: 'suPasswordError', msg };
+      return { id: 'suFormError', msg };
+    }
     
     // LOGIN (enhanced)
     let isLoginSubmitting = false;
@@ -640,19 +710,21 @@
       const loaderOverlay = document.getElementById('loaderOverlay');
 
       // Clear errors
-      document.getElementById('liEmailError').classList.add('hidden');
-      document.getElementById('liPasswordError').classList.add('hidden');
+      clearInlineErrors(['liEmailError', 'liPasswordError', 'liSecretError', 'liFormError']);
 
       // Validate
       if (!email) {
-        document.getElementById('liEmailError').textContent = 'Email is required';
-        document.getElementById('liEmailError').classList.remove('hidden');
+        showInlineError('liEmailError', 'Email is required');
+        isLoginSubmitting = false;
+        return;
+      }
+      if (!isValidEmail(email)) {
+        showInlineError('liEmailError', 'Enter a valid email address');
         isLoginSubmitting = false;
         return;
       }
       if (!password) {
-        document.getElementById('liPasswordError').textContent = 'Password is required';
-        document.getElementById('liPasswordError').classList.remove('hidden');
+        showInlineError('liPasswordError', 'Password is required');
         isLoginSubmitting = false;
         return;
       }
@@ -661,8 +733,7 @@
       if (isAdmin) {
         const secret = document.getElementById('liSecret') ? document.getElementById('liSecret').value.trim() : '';
         if (!secret) {
-          document.getElementById('liEmailError').textContent = 'Secret key is required for admin login';
-          document.getElementById('liEmailError').classList.remove('hidden');
+          showInlineError('liSecretError', 'Secret key is required for admin login');
           isLoginSubmitting = false;
           return;
         }
@@ -673,24 +744,24 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, role: 'ADMIN', secretKey: secret })
           });
-          const result = await res.json();
+          const result = await parseResponse(res);
           loaderOverlay.classList.remove('active');
-          if (res.ok && result.token) {
-            localStorage.setItem('authToken', result.token);
+          if (result.ok && result.data && result.data.token) {
+            localStorage.setItem('authToken', result.data.token);
             localStorage.setItem('userEmail', email);
-            localStorage.setItem('userName', result.username || 'User');
+            localStorage.setItem('userName', result.data.username || 'User');
             localStorage.setItem('userRole', 'ADMIN');
             // Admin users go to admin dashboard
             window.location.href = 'admin-dashboard.html';
           } else {
-            document.getElementById('liEmailError').textContent = result.message || 'Invalid credentials or secret key';
-            document.getElementById('liEmailError').classList.remove('hidden');
+            const routed = routeLoginError(result.message || 'Invalid email, password, or secret key', 'ADMIN');
+            showInlineError(routed.id, routed.msg);
           }
         } catch (err) {
           loaderOverlay.classList.remove('active');
-          document.getElementById('liEmailError').textContent = 'Backend not reachable';
-          document.getElementById('liEmailError').classList.remove('hidden');
+          showInlineError('liFormError', 'Backend not reachable');
         }
+        isLoginSubmitting = false;
         return;
       }
 
@@ -702,19 +773,18 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, role: 'USER' })
         });
-        const result = await res.json();
+        const result = await parseResponse(res);
         loaderOverlay.classList.remove('active');
-        if (res.ok) {
+        if (result.ok) {
           showNotification('success', 'Secret key sent to your email');
           showOtpOverlay();
         } else {
-          document.getElementById('liEmailError').textContent = result.message || 'Invalid credentials';
-          document.getElementById('liEmailError').classList.remove('hidden');
+          const routed = routeLoginError(result.message || 'Invalid email or password', 'USER');
+          showInlineError(routed.id, routed.msg);
         }
       } catch (err) {
         loaderOverlay.classList.remove('active');
-        document.getElementById('liEmailError').textContent = 'Backend not reachable';
-        document.getElementById('liEmailError').classList.remove('hidden');
+        showInlineError('liFormError', 'Backend not reachable');
       }
       isLoginSubmitting = false;
     });
@@ -793,15 +863,15 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, secretKey: otp })
         });
-        const result = await res.json();
+        const result = await parseResponse(res);
         loaderOverlay.classList.remove('active');
-        if (res.ok && (result.success || result.valid || result.token)) {
+        if (result.ok && (result.data.success || result.data.valid || result.data.token)) {
           // If backend returned a token, use it. Otherwise attempt to obtain token via login endpoint.
-          if (result.token) {
+          if (result.data.token) {
             hideOtpOverlay();
-            localStorage.setItem('authToken', result.token);
+            localStorage.setItem('authToken', result.data.token);
             localStorage.setItem('userEmail', email);
-            localStorage.setItem('userName', result.username || 'User');
+            localStorage.setItem('userName', result.data.username || 'User');
             localStorage.setItem('userRole', 'USER');
             window.location.href = 'main.html';
             return;
@@ -814,12 +884,12 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, role: 'USER' })
           });
-          const loginResult = await loginRes.json();
-          if (loginRes.ok && loginResult.token) {
+          const loginResult = await parseResponse(loginRes);
+          if (loginResult.ok && loginResult.data && loginResult.data.token) {
             hideOtpOverlay();
-            localStorage.setItem('authToken', loginResult.token);
+            localStorage.setItem('authToken', loginResult.data.token);
             localStorage.setItem('userEmail', email);
-            localStorage.setItem('userName', loginResult.username || 'User');
+            localStorage.setItem('userName', loginResult.data.username || 'User');
             localStorage.setItem('userRole', 'USER');
             window.location.href = 'main.html';
             return;
@@ -835,7 +905,7 @@
           const otpInputs = overlay.querySelectorAll('.otp-input');
           otpInputs.forEach(i => i.value = '');
           overlay.classList.remove('active');
-          showNotification('error', 'You entered the wrong secret key');
+          showNotification('error', result.message || 'You entered the wrong secret key');
         }
       } catch (err) {
         loaderOverlay.classList.remove('active');
@@ -853,35 +923,41 @@
       const username = document.getElementById('suName').value.trim();
       const email = document.getElementById('suEmail').value.trim();
       const password = document.getElementById('suPassword').value.trim();
+      const isAdmin = document.getElementById('suIsAdmin') && document.getElementById('suIsAdmin').checked;
+      const secret = document.getElementById('suSecret') ? document.getElementById('suSecret').value.trim() : '';
       const loaderOverlay = document.getElementById('loaderOverlay');
       
       // Clear errors
-      document.getElementById('suNameError').classList.add('hidden');
-      document.getElementById('suEmailError').classList.add('hidden');
-      document.getElementById('suPasswordError').classList.add('hidden');
+      clearInlineErrors(['suNameError', 'suEmailError', 'suPasswordError', 'suSecretError', 'suFormError']);
       
       // Validate
       if (!username) {
-        document.getElementById('suNameError').textContent = 'Username is required';
-        document.getElementById('suNameError').classList.remove('hidden');
+        showInlineError('suNameError', 'Username is required');
         isSignupSubmitting = false;
         return;
       }
       if (username.length < 3) {
-        document.getElementById('suNameError').textContent = 'Username must be at least 3 characters';
-        document.getElementById('suNameError').classList.remove('hidden');
+        showInlineError('suNameError', 'Username must be at least 3 characters');
         isSignupSubmitting = false;
         return;
       }
       if (!email) {
-        document.getElementById('suEmailError').textContent = 'Email is required';
-        document.getElementById('suEmailError').classList.remove('hidden');
+        showInlineError('suEmailError', 'Email is required');
+        isSignupSubmitting = false;
+        return;
+      }
+      if (!isValidEmail(email)) {
+        showInlineError('suEmailError', 'Enter a valid email address');
         isSignupSubmitting = false;
         return;
       }
       if (!password || password.length < 8) {
-        document.getElementById('suPasswordError').textContent = 'Password must be at least 8 characters';
-        document.getElementById('suPasswordError').classList.remove('hidden');
+        showInlineError('suPasswordError', 'Password must be at least 8 characters');
+        isSignupSubmitting = false;
+        return;
+      }
+      if (isAdmin && !secret) {
+        showInlineError('suSecretError', 'Secret key is required to register as admin');
         isSignupSubmitting = false;
         return;
       }
@@ -890,11 +966,9 @@
         // Show loader
         loaderOverlay.classList.add('active');
         
-        const isAdmin = document.getElementById('suIsAdmin') && document.getElementById('suIsAdmin').checked;
         const role = isAdmin ? 'ADMIN' : 'USER';
         const payload = { email, password, role, username };
         if (isAdmin) {
-          const secret = document.getElementById('suSecret') ? document.getElementById('suSecret').value : '';
           if (secret) payload.secretKey = secret;
         }
 
@@ -904,12 +978,12 @@
           body: JSON.stringify(payload)
         });
         
-        const result = await res.json();
+        const result = await parseResponse(res);
         
         // Hide loader
         loaderOverlay.classList.remove('active');
         
-        if (res.ok && result.success) {
+        if (result.ok && (result.data.success === undefined || result.data.success)) {
           showNotification('success', 'Account created! Please sign in.');
           // Clear signup form
           document.getElementById('suName').value = '';
@@ -919,35 +993,23 @@
           document.getElementById('suSecret').value = '';
           document.getElementById('suSecretDiv').classList.add('hidden');
           // Clear errors
-          document.getElementById('suNameError').classList.add('hidden');
-          document.getElementById('suEmailError').classList.add('hidden');
-          document.getElementById('suPasswordError').classList.add('hidden');
+          clearInlineErrors(['suNameError', 'suEmailError', 'suPasswordError', 'suSecretError', 'suFormError']);
           toggleForm();
         } else {
           // If backend indicates secret/secret-key mismatch, show specific message
-          const backendMsg = (result && result.message) ? String(result.message) : '';
-          const backendError = result && result.error ? String(result.error) : '';
+          const backendMsg = result.message ? String(result.message) : '';
+          const backendError = result.data && result.data.error ? String(result.data.error) : '';
           let displayMsg = backendMsg || 'Signup failed';
           if (backendMsg.toLowerCase().includes('secret') || backendError === 'SECRET_MISMATCH' || backendMsg.toLowerCase().includes('secrete')) {
             displayMsg = 'Secret key did not match';
           }
-          // Show error in appropriate field
-          if (displayMsg.toLowerCase().includes('email')) {
-            document.getElementById('suEmailError').textContent = displayMsg;
-            document.getElementById('suEmailError').classList.remove('hidden');
-          } else if (displayMsg.toLowerCase().includes('password')) {
-            document.getElementById('suPasswordError').textContent = displayMsg;
-            document.getElementById('suPasswordError').classList.remove('hidden');
-          } else {
-            document.getElementById('suEmailError').textContent = displayMsg;
-            document.getElementById('suEmailError').classList.remove('hidden');
-          }
+          const routed = routeSignupError(displayMsg || backendError || 'Signup failed');
+          showInlineError(routed.id, routed.msg);
         }
       } catch (err) {
         // Hide loader on error
         loaderOverlay.classList.remove('active');
-        document.getElementById('suEmailError').textContent = 'Backend not reachable';
-        document.getElementById('suEmailError').classList.remove('hidden');
+        showInlineError('suFormError', 'Backend not reachable');
       }
       isSignupSubmitting = false;
     });

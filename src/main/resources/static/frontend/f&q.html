@@ -694,6 +694,7 @@
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
     const formMessage = document.getElementById('formMessage');
+    clearFormMessage();
     
     const name = document.getElementById('contactName').value.trim();
     const email = document.getElementById('contactEmail').value.trim();
@@ -746,11 +747,17 @@
         setTimeout(() => {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
-          formMessage.classList.add('hidden');
+          clearFormMessage();
         }, 3000);
       } else {
-        const errorData = await response.json();
-        showFormMessage(errorData.message || 'Error submitting question. Please try again.', 'error');
+        let errorMessage = 'Error submitting question. Please try again.';
+        try {
+          const errorData = await response.json();
+          if (errorData && errorData.message) errorMessage = errorData.message;
+        } catch (err) {
+          // Keep default message for non-JSON responses
+        }
+        showFormMessage(errorMessage, 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       }
@@ -774,10 +781,23 @@
     }
   }
 
+  function clearFormMessage() {
+    const formMessage = document.getElementById('formMessage');
+    if (!formMessage) return;
+    formMessage.textContent = '';
+    formMessage.classList.add('hidden');
+    formMessage.classList.remove('bg-green-50', 'text-green-800', 'bg-red-50', 'text-red-800');
+  }
+
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
+
+  ['contactName', 'contactEmail', 'contactMessage'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', clearFormMessage);
+  });
 
   // ===== LOGOUT FUNCTION =====
   async function logout() {

@@ -338,7 +338,7 @@
 
           <!-- Bar Graph: Connected Accounts -->
           <div class="graph-container">
-            <h3 class="text-xl font-bold text-slate-900 mb-4">Connected Accounts (YouTube)</h3>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Connected Accounts</h3>
             <canvas id="barChart" height="150"></canvas>
           </div>
 
@@ -671,7 +671,7 @@
         labels: platformData.platforms,
         datasets: [
           {
-            label: 'YouTube Connections',
+            label: 'Connections',
             data: platformData.counts,
             backgroundColor: barColors.background,
             borderColor: barColors.border,
@@ -701,6 +701,9 @@
             ticks: {
               font: { size: 11 },
               color: '#64748b',
+              precision: 0,
+              stepSize: 1,
+              callback: (value) => Number.isFinite(value) ? Math.round(value) : value,
             }
           },
           x: {
@@ -777,9 +780,11 @@
   function calculatePlatformUsage(users) {
     // Only YouTube accounts are available in user DTO today
     const totalConnectedAccounts = users.reduce((sum, user) => sum + (user.connectedAccountsCount || 0), 0);
+    const platforms = ['YouTube', 'Facebook', 'Twitter', 'Pinterest', 'LinkedIn'];
+    const counts = [totalConnectedAccounts, 0, 0, 0, 0];
     return {
-      platforms: ['YouTube'],
-      counts: [totalConnectedAccounts]
+      platforms,
+      counts
     };
   }
 
