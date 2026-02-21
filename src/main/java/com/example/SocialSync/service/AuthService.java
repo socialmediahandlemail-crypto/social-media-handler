@@ -176,7 +176,7 @@ public class AuthService implements UserDetailsService {
         user.setResetToken(token);
         user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
-        String resetLink = "http://localhost:3000/reset-password?token=" + token;
+        String resetLink = "http://127.0.0.1:5500/src/main/resources/static/frontend/reset-password.html?token=" + token;
         emailService.sendEmail(user.getEmail(), "🔐 Reset Your Password",
                 PasswordEmailTemplateUtil.resetPassword(user.getUsername(), resetLink));
     }
