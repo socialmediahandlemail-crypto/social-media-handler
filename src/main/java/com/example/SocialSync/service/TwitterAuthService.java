@@ -8,9 +8,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.SocialSync.model.TwitterAccount;
-import com.example.SocialSync.model.User;
-import com.example.SocialSync.repository.TwitterAccountRepository;
 import com.example.SocialSync.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
@@ -34,7 +30,7 @@ public class TwitterAuthService {
     @Value("${twitter.redirect-uri}")
     private String redirectUri;
 
-    private final TwitterAccountRepository accountRepository;
+    private final SocialConnectionService socialConnectionService;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -60,20 +56,11 @@ public class TwitterAuthService {
         // 1. Exchange Code for Token
         String accessToken = exchangeCodeForToken(code);
 
-        // 2. Find User
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // 2. Fetch Twitter Username (Optional, but good for UI)
+        String username = "Twitter User"; // In a real app, make a quick GET to Twitter's /users/me endpoint here
 
-        // 3. Save/Update Twitter Account
-        TwitterAccount account = accountRepository.findByUser(user)
-                .orElse(new TwitterAccount());
-        
-        account.setAccessToken(accessToken);
-        account.setUser(user);
-        account.setConnectedAt(LocalDateTime.now());
-        // Note: You should also fetch the Twitter User ID here using the token if needed
-        
-        accountRepository.save(account);
+        // 3. ✅ Save to the UNIFIED SocialConnection table!
+        socialConnectionService.connectPlatform(userId, "TWITTER", accessToken, username);
     }
 
     private String exchangeCodeForToken(String code) {

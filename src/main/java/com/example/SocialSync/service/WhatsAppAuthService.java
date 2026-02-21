@@ -6,14 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.SocialSync.model.User;
-import com.example.SocialSync.model.WhatsAppAccount;
 import com.example.SocialSync.repository.UserRepository;
-import com.example.SocialSync.repository.WhatsAppAccountRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +24,7 @@ public class WhatsAppAuthService {
     @Value("${facebook.redirect-uri}")
     private String redirectUri;
 
-    private final WhatsAppAccountRepository accountRepository;
+    private final SocialConnectionService socialConnectionService;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -47,22 +42,11 @@ public class WhatsAppAuthService {
         // 1. Exchange Code for Token
         String accessToken = exchangeCodeForToken(code);
 
-        // 2. Find User
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // 2. Fetch Twitter Username (Optional, but good for UI)
+        String username = "WhatsApp User"; // In a real app, make a quick GET to Twitter's /users/me endpoint here
 
-        // 3. Save/Update WhatsApp Account
-        WhatsAppAccount account = accountRepository.findByUser(user)
-                .orElse(new WhatsAppAccount());
-        
-        account.setAccessToken(accessToken);
-        account.setUser(user);
-        account.setConnectedAt(LocalDateTime.now());
-        
-        // TODO: ideally here you fetch the WABA ID and Phone ID from Meta API
-        // For now, we save the token so the connection is "Green"
-        
-        accountRepository.save(account);
+        // 3. ✅ Save to the UNIFIED SocialConnection table!
+        socialConnectionService.connectPlatform(userId, "WHATSAPP", accessToken, username);
     }
 
     private String exchangeCodeForToken(String code) {
