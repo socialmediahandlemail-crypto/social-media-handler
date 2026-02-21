@@ -67,24 +67,28 @@ public class MediaController {
                 return ResponseEntity.badRequest().body("No file provided");
             }
 
-            // 1. ✅ USE THE HELPER METHOD TO GET CORRECT EMAIL
+            // 1. Get Logged-in User
             String email = getLoggedUserEmail();
-
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
 
-            // 2. Upload to Cloudinary
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            // 2. ✅ FIX: Tell Cloudinary to automatically detect Image vs Video
+            Map<String, Object> uploadParams = ObjectUtils.asMap("resource_type", "auto");
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
             
             String mediaUrl = (String) uploadResult.get("secure_url");
             String publicId = (String) uploadResult.get("public_id");
+            
+            // 🔥 Grab the type (will return "image" or "video")
+            String mediaType = (String) uploadResult.get("resource_type"); 
 
-            // 3. Save to DB linked to User
+            // 3. Save to DB
             MediaAsset asset = MediaAsset.builder()
                     .userId(user.getId())
                     .publicId(publicId)
                     .url(mediaUrl)
                     .platform(platform)
+                    .mediaType(mediaType.toUpperCase()) // Save as "IMAGE" or "VIDEO"
                     .createdAt(LocalDateTime.now())
                     .build();
             
@@ -94,6 +98,7 @@ public class MediaController {
             Map<String, String> response = new HashMap<>();
             response.put("mediaId", publicId);
             response.put("url", mediaUrl);
+            response.put("mediaType", mediaType.toUpperCase());
 
             return ResponseEntity.ok(response);
 
@@ -102,7 +107,6 @@ public class MediaController {
             return ResponseEntity.internalServerError().body("Upload failed: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            // This catches the RuntimeException and returns 500 instead of crashing silently
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
         }
     }

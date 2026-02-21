@@ -19,6 +19,9 @@ public class MediaAsset {
     private String publicId;
     private String url;
     private String platform;
+
+    private String mediaType;
+    
     private LocalDateTime createdAt;
 
 }
