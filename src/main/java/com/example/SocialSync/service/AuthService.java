@@ -187,7 +187,7 @@ public class AuthService implements UserDetailsService {
 
         userRepository.save(user);
 
-        String resetLink = "http://localhost:5500/reset-password?token=" + token;
+        String resetLink = "http://localhost:5500/src/main/resources/static/frontend/reset-password.html?token=" + token;
 
         emailService.sendEmail(
                 user.getEmail(),
