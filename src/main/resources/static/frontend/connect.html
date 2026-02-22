@@ -527,7 +527,7 @@
 </div>
 
 <!-- Notification root for toast-style messages -->
-<div id="notification-root" style="position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:none"></div>
+<div id="notification-root" style="position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:auto"></div>
 
 <script src="component/sidebar.js"></script>
 <script src="main.js"></script>
@@ -806,7 +806,7 @@
   function _injectNotificationStyles() {
     if (document.getElementById('notif-styles')) return;
     const css = `
-    #notification-root { display:flex; flex-direction:column; gap:10px; pointer-events:none }
+    #notification-root { display:flex; flex-direction:column; gap:10px; pointer-events:auto }
     .notif-card{min-width:280px;max-width:360px;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08);display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(2,6,23,0.04);font-family:Inter,system-ui,Arial}
     .notif-card strong{display:block;font-weight:700;color:#0f172a}
     .notif-success{background:linear-gradient(180deg,#ecfdf5,#f0fdf4);border-color:rgba(16,185,129,0.08);}
@@ -815,7 +815,8 @@
     .notif-success .notif-icon{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
     .notif-error .notif-icon{background:linear-gradient(90deg,#fb7185,#f97316);color:#fff}
     .notif-body{flex:1;color:#0f172a;font-size:14px}
-    .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px}
+    .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px;transition:background .15s ease,color .15s ease,transform .15s ease}
+    .notif-close:hover{background:rgba(15,23,42,0.08);color:rgba(15,23,42,0.9);transform:translateY(-1px)}
     .notif-enter{animation:notifIn .28s cubic-bezier(.2,.9,.2,1)}
     .notif-leave{animation:notifOut .28s ease forwards}
     @keyframes notifIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}

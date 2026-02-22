@@ -696,9 +696,9 @@
       <!-- Right: Content & Details -->
       <div class="md:col-span-2 flex flex-col gap-4">
         <div>
-          <h4 class="text-sm font-bold text-slate-800 mb-2">Message Content</h4>
+          <h4 class="text-sm font-bold text-slate-800 mb-2">Description</h4>
           <div class="bg-white rounded-lg p-4 border border-slate-100 shadow-sm">
-            <p id="detailContent" class="text-slate-700 leading-relaxed text-sm">Message content will appear here</p>
+            <p id="detailContent" class="text-slate-700 leading-relaxed text-sm">Description will appear here</p>
           </div>
         </div>
 
@@ -711,12 +711,6 @@
             </div>
           </div>
 
-          <div>
-            <h4 class="text-xs font-semibold text-slate-600 uppercase mb-2">Recipient</h4>
-            <div class="bg-white rounded-lg p-3 border border-slate-100 shadow-sm">
-              <p id="detailRecipient" class="text-sm font-bold text-slate-800 truncate">--</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -754,12 +748,8 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-1">📞 Recipient Number</label>
-                <input type="text" id="recipient" placeholder="e.g. 919876543210" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition font-medium text-slate-700 placeholder-slate-400 text-sm">
-            </div>
-            <div>
                 <label class="block text-xs font-semibold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-1">
-  💬 Message Content
+  💬 Description
 </label>
 
 <textarea id="content" rows="5"
@@ -768,7 +758,7 @@
          focus:border-orange-400 focus:ring-2 focus:ring-orange-100
          transition font-medium text-slate-700
          placeholder-slate-400 resize-none text-sm"
-  placeholder="Type your message here..." required>
+  placeholder="Type your description here..." required>
 </textarea>
 
             </div>
@@ -835,6 +825,305 @@ function getComputedStatus(post) {
   return "PENDING";
 }
 
+// ===== PLATFORM POSTING CONFIG =====
+const PLATFORM_UPLOAD_CONFIG = {
+  YOUTUBE: {
+    endpoint: `${API_BASE_URL}/api/youtube/upload`,
+    authScheme: "Bearer",
+    enabled: true
+  },
+  FACEBOOK: {
+    endpoint: `${API_BASE_URL}/api/facebook/upload`,
+    authScheme: "OAuth",
+    enabled: false
+  },
+  LINKEDIN: {
+    endpoint: `${API_BASE_URL}/api/linkedin/upload`,
+    authScheme: "OAuth",
+    enabled: false
+  },
+  TWITTER: {
+    endpoint: `${API_BASE_URL}/api/twitter/upload`,
+    authScheme: "OAuth",
+    enabled: false
+  },
+  PINTEREST: {
+    endpoint: `${API_BASE_URL}/api/pinterest/upload`,
+    authScheme: "OAuth",
+    enabled: false
+  },
+  WHATSAPP: {
+    endpoint: `${API_BASE_URL}/api/whatsapp/upload`,
+    authScheme: "OAuth",
+    enabled: false
+  }
+};
+
+const POST_META_STORAGE_KEY = "scheduledPostMeta";
+const POST_DISPATCH_STATE_KEY = "scheduledPostDispatchState";
+const CONNECTION_CACHE_TTL_MS = 30000;
+const USE_BACKEND_SCHEDULER = true;
+
+let connectionCache = { fetchedAt: 0, data: null };
+const scheduledPostTimers = {};
+
+function prettyPlatformName(platform) {
+  if (!platform) return "Platform";
+  const upper = platform.toUpperCase();
+  const map = {
+    YOUTUBE: "YouTube",
+    FACEBOOK: "Facebook",
+    LINKEDIN: "LinkedIn",
+    TWITTER: "Twitter / X",
+    PINTEREST: "Pinterest",
+    WHATSAPP: "WhatsApp"
+  };
+  return map[upper] || upper;
+}
+
+function getStoredJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function setStoredJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+function getPostMetaMap() {
+  return getStoredJson(POST_META_STORAGE_KEY, {});
+}
+
+function savePostMeta(postId, meta) {
+  if (!postId) return;
+  const map = getPostMetaMap();
+  map[postId] = { ...(map[postId] || {}), ...(meta || {}) };
+  setStoredJson(POST_META_STORAGE_KEY, map);
+}
+
+function removePostMeta(postId) {
+  if (!postId) return;
+  const map = getPostMetaMap();
+  if (map[postId]) {
+    delete map[postId];
+    setStoredJson(POST_META_STORAGE_KEY, map);
+  }
+}
+
+function getDispatchState() {
+  return getStoredJson(POST_DISPATCH_STATE_KEY, {});
+}
+
+function markDispatched(postId, status, details) {
+  if (!postId) return;
+  const state = getDispatchState();
+  state[postId] = {
+    status,
+    at: new Date().toISOString(),
+    ...(details || {})
+  };
+  setStoredJson(POST_DISPATCH_STATE_KEY, state);
+}
+
+function clearDispatchState(postId) {
+  if (!postId) return;
+  const state = getDispatchState();
+  if (state[postId]) {
+    delete state[postId];
+    setStoredJson(POST_DISPATCH_STATE_KEY, state);
+  }
+}
+
+function isDispatched(postId) {
+  const state = getDispatchState();
+  return !!state[postId];
+}
+
+async function fetchConnectionStatus(force = false) {
+  const now = Date.now();
+  if (!force && connectionCache.data && now - connectionCache.fetchedAt < CONNECTION_CACHE_TTL_MS) {
+    return connectionCache.data;
+  }
+
+  const token = localStorage.getItem("authToken");
+  if (!token) return null;
+
+  try {
+    const response = await fetch(API_ENDPOINTS.SOCIAL.STATUS, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    connectionCache = { fetchedAt: now, data };
+    return data;
+  } catch (error) {
+    console.error("Failed to load connection status:", error);
+    return null;
+  }
+}
+
+async function ensurePlatformConnected(platform, showToast = true) {
+  const data = await fetchConnectionStatus();
+  const connections = data && data.connections ? data.connections : null;
+  const upper = (platform || "").toUpperCase();
+  const isConnected = connections ? !!connections[upper] : false;
+
+  if (!isConnected && showToast) {
+    showNotification("error", `❌ You are not connected to ${prettyPlatformName(upper)}`);
+  }
+  return isConnected;
+}
+
+function deriveYouTubeTitle(content) {
+  if (!content) return "Scheduled Post";
+  const trimmed = content.trim().replace(/\s+/g, " ");
+  if (!trimmed) return "Scheduled Post";
+  return trimmed.length > 80 ? trimmed.substring(0, 80) : trimmed;
+}
+
+function buildUploadPayload(platform, post) {
+  const upper = (platform || "").toUpperCase();
+  if (upper === "YOUTUBE") {
+    return {
+      title: post.title || deriveYouTubeTitle(post.content),
+      description: post.description || post.content || "",
+      privacy: post.privacy || "public",
+      mediaUrl: post.mediaUrl,
+      mediaType: post.mediaType
+    };
+  }
+
+  // Generic fallback (adjust per platform when backend APIs are available)
+  return {
+    platform: upper,
+    content: post.content || "",
+    mediaUrl: post.mediaUrl || null,
+    mediaType: post.mediaType || null
+  };
+}
+
+async function triggerPlatformPost(post) {
+  if (!post || !post.id || isDispatched(post.id)) return;
+
+  const platform = (post.platform || "").toUpperCase();
+  const config = PLATFORM_UPLOAD_CONFIG[platform];
+
+  if (!config) {
+    markDispatched(post.id, "UNSUPPORTED", { platform });
+    return;
+  }
+
+  if (!config.enabled) {
+    showNotification("error", `❌ Posting API not available for ${prettyPlatformName(platform)} yet.`);
+    markDispatched(post.id, "UNAVAILABLE", { platform });
+    return;
+  }
+
+  const isConnected = await ensurePlatformConnected(platform, true);
+  if (!isConnected) {
+    markDispatched(post.id, "NOT_CONNECTED", { platform });
+    return;
+  }
+
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    showNotification("error", "❌ Please login again to publish scheduled posts.");
+    markDispatched(post.id, "NO_AUTH", { platform });
+    return;
+  }
+
+  const payload = buildUploadPayload(platform, post);
+
+  if (platform === "YOUTUBE") {
+    if (!payload.mediaUrl) {
+      showNotification("error", "❌ YouTube posting requires a video upload.");
+      markDispatched(post.id, "NO_MEDIA", { platform });
+      return;
+    }
+    if (payload.mediaType && payload.mediaType.toUpperCase() === "IMAGE") {
+      showNotification("error", "❌ YouTube does not allow image-only uploads.");
+      markDispatched(post.id, "INVALID_MEDIA", { platform });
+      return;
+    }
+  }
+
+  try {
+    const response = await fetch(config.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${config.authScheme} ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      showNotification("success", `✅ ${prettyPlatformName(platform)} post published.`);
+      markDispatched(post.id, "SUCCESS", { platform });
+    } else {
+      let errorMessage = response.statusText;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        // ignore JSON parse
+      }
+      showNotification("error", `❌ ${prettyPlatformName(platform)} posting failed: ${errorMessage}`);
+      markDispatched(post.id, "FAILED", { platform });
+    }
+  } catch (error) {
+    console.error("Posting failed:", error);
+    showNotification("error", `❌ ${prettyPlatformName(platform)} posting failed. Please try again.`);
+    markDispatched(post.id, "FAILED", { platform });
+  }
+}
+
+function schedulePostDispatches(posts) {
+  if (USE_BACKEND_SCHEDULER) {
+    return;
+  }
+  if (!Array.isArray(posts)) return;
+  posts.forEach((post) => {
+    if (!post || !post.id) return;
+    const status = (post.status || "").toUpperCase();
+    if (status === "FAILED" || status === "SENT" || status === "POSTED") return;
+    if (!post.scheduledTime) return;
+
+    const scheduledDate = new Date(post.scheduledTime);
+    if (Number.isNaN(scheduledDate.getTime())) return;
+
+    if (isDispatched(post.id)) return;
+
+    const delay = scheduledDate.getTime() - Date.now();
+    if (delay <= 0) {
+      triggerPlatformPost(post);
+      return;
+    }
+
+    if (scheduledPostTimers[post.id]) return;
+    scheduledPostTimers[post.id] = setTimeout(() => {
+      triggerPlatformPost(post);
+    }, delay);
+  });
+}
+
 
   // Sidebar profile dropdown
   const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
@@ -886,6 +1175,8 @@ function openModal() {
 function closeModal() {
     document.getElementById('postModal').classList.add('hidden');
     document.getElementById('scheduleForm').reset();
+    window.uploadedMediaUrl = null;
+    window.uploadedMediaType = null;
 }
 
 // Attach openModal to your "New Post" button
@@ -898,7 +1189,19 @@ document.querySelectorAll('button').forEach(btn => {
 document.getElementById('scheduleForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const platform = document.getElementById('platform').value;
     const mediaFile = document.getElementById('mediaFile').files[0];
+
+    const isConnected = await ensurePlatformConnected(platform, true);
+    if (!isConnected) {
+        closeModal();
+        return;
+    }
+
+    if (platform === "YOUTUBE" && !mediaFile) {
+        showNotification('error', '❌ YouTube post requires a video upload.');
+        return;
+    }
     
     // ===== BACKEND MEDIA UPLOAD CONNECTION POINT =====
     // TODO: Implement media upload to backend
@@ -912,6 +1215,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
         try {
             const formData = new FormData();
             formData.append('file', mediaFile);
+            formData.append('platform', platform);
             
             // ===== UPLOAD MEDIA TO BACKEND =====
             const mediaResponse = await fetch(API_ENDPOINTS.MEDIA.UPLOAD, {
@@ -928,6 +1232,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
                 mediaId = mediaData.mediaId || mediaData.id || mediaData.url; // Get media ID
                 // Also store mediaUrl if backend returns it
                 window.uploadedMediaUrl = mediaData.url || mediaData.mediaUrl || mediaData.path || null;
+                window.uploadedMediaType = mediaData.mediaType || null;
                 console.log("Media uploaded successfully:", mediaId);
                 console.log("Media URL:", window.uploadedMediaUrl);
             } else {
@@ -938,15 +1243,29 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
             console.warn("Proceeding with post without media");
         }
     }
+
+    if (platform === "YOUTUBE") {
+        if (!window.uploadedMediaUrl) {
+            showNotification('error', '❌ Media upload failed. Please try again.');
+            return;
+        }
+        if (window.uploadedMediaType && window.uploadedMediaType.toUpperCase() === "IMAGE") {
+            showNotification('error', '❌ YouTube requires a video file, not an image.');
+            return;
+        }
+    }
     
+    const content = document.getElementById('content').value;
+    const scheduledTime = document.getElementById('scheduledTime').value;
+
     const postData = {
-        platform: document.getElementById('platform').value,
-        recipient: document.getElementById('recipient').value,
-        content: document.getElementById('content').value,
-        scheduledTime: document.getElementById('scheduledTime').value,
+        platform: platform,
+        content: content,
+        scheduledTime: scheduledTime,
         status: "PENDING",
         mediaId: mediaId, // Include uploaded media ID if available
-        mediaUrl: window.uploadedMediaUrl || null // Include media URL if available
+        mediaUrl: window.uploadedMediaUrl || null, // Include media URL if available
+        mediaType: window.uploadedMediaType || null
     };
 
     try {
@@ -960,10 +1279,24 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
         });
 
         if (response.ok) {
+          const savedPost = await response.json();
+          if (savedPost && savedPost.id) {
+            savePostMeta(savedPost.id, {
+              platform: platform,
+              content: content,
+              scheduledTime: scheduledTime,
+              mediaUrl: window.uploadedMediaUrl || null,
+              mediaType: window.uploadedMediaType || null,
+              title: deriveYouTubeTitle(content),
+              description: content,
+              privacy: "public"
+            });
+          }
           showNotification('success', '✅ Post scheduled successfully!');
           closeModal();
           // Clear the temporary media URL
           window.uploadedMediaUrl = null;
+          window.uploadedMediaType = null;
           loadPosts(); // UI refresh karne ke liye
         } else {
           const errorData = await response.json();
@@ -1066,6 +1399,18 @@ async function loadPosts() {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         });
         allPosts = await response.json();
+
+        // Hydrate posts with locally stored media/meta (needed for YouTube uploads)
+        const metaMap = getPostMetaMap();
+        if (Array.isArray(allPosts)) {
+            allPosts = allPosts.map(post => {
+                const meta = post && post.id ? metaMap[post.id] : null;
+                return meta ? { ...post, ...meta } : post;
+            });
+        }
+
+        // Schedule publishing for pending posts
+        schedulePostDispatches(allPosts);
 
         if (allPosts.length === 0) {
             document.getElementById('upcomingViewContent').innerHTML = `
@@ -1321,21 +1666,6 @@ function renderPostCards(posts, container) {
             </div>
           </div>
 
-          <!-- Recipient -->
-          <div class="flex items-center gap-3 text-sm group/detail hover:bg-orange-50/50 p-2 rounded-lg transition-all duration-200">
-            <svg class="w-5 h-5 text-orange-600 flex-shrink-0 group-hover/detail:text-pink-600 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            <div class="flex-grow">
-              <p class="text-slate-600 text-xs uppercase tracking-wide font-semibold">
-                Recipient Number
-              </p>
-              <p class="text-slate-800 font-bold text-sm truncate">
-                ${post.recipient}
-              </p>
-            </div>
-          </div>
-
         </div>
 
         <!-- Action Button - Enhanced -->
@@ -1448,9 +1778,6 @@ function openPostDetailsModal(post) {
     document.getElementById('detailScheduledTime').textContent =
         scheduledDate.toLocaleTimeString();
 
-    document.getElementById('detailRecipient').textContent =
-        post.recipient || 'Not specified';
-
     document.getElementById('detailPostId').textContent =
         post.id || 'N/A';
 
@@ -1491,6 +1818,8 @@ async function deletePost(postId) {
 
         if (response.ok) {
           showNotification('success', '✅ Post deleted successfully!');
+          removePostMeta(postId);
+          clearDispatchState(postId);
           loadPosts(); // Refresh the list
         } else {
           const errorData = await response.json();
@@ -1520,6 +1849,10 @@ async function deletePostFromModal() {
 
         if (response.ok) {
           showNotification('success', '✅ Post deleted successfully!');
+          if (currentPost && currentPost.id) {
+            removePostMeta(currentPost.id);
+            clearDispatchState(currentPost.id);
+          }
           closePostDetailsModal();
           loadPosts(); // Refresh the list
         } else {
@@ -1586,7 +1919,8 @@ function _injectNotificationStyles() {
   .notif-success .notif-icon{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
   .notif-error .notif-icon{background:linear-gradient(90deg,#fb7185,#f97316);color:#fff}
   .notif-body{flex:1;color:#0f172a;font-size:14px}
-  .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px}
+  .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px;transition:background .15s ease,color .15s ease,transform .15s ease}
+  .notif-close:hover{background:rgba(15,23,42,0.08);color:rgba(15,23,42,0.9);transform:translateY(-1px)}
   .notif-enter{animation:notifIn .28s cubic-bezier(.2,.9,.2,1)}
   .notif-leave{animation:notifOut .28s ease forwards}
   @keyframes notifIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}

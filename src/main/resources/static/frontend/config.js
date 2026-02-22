@@ -14,6 +14,7 @@ const API_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/auth/login`,
     SIGNUP: `${API_BASE_URL}/auth/signup`,
     VERIFY_KEY: `${API_BASE_URL}/auth/verify-key`,
+    RESEND_KEY: `${API_BASE_URL}/auth/resend-key`,
     FORGOT_PASSWORD: `${API_BASE_URL}/auth/forgot-password`,
     RESET_PASSWORD: `${API_BASE_URL}/auth/reset-password`
   },

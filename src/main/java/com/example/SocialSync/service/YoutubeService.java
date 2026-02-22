@@ -25,20 +25,33 @@ public class YoutubeService {
     private final SocialConnectionRepository socialConnectionRepository;
 
     public String uploadVideo(String title, String description, String privacyStatus, String mediaUrl, String mediaType) throws Exception {
-        
+        // 1. Get Logged-in User
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return uploadVideoForUser(user.getId(), title, description, privacyStatus, mediaUrl, mediaType);
+    }
+
+    public String uploadVideoForUser(String userId, String title, String description, String privacyStatus, String mediaUrl, String mediaType) throws Exception {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new RuntimeException("User not available for YouTube upload.");
+        }
+
+        SocialConnection connection = socialConnectionRepository.findByUserIdAndPlatform(userId, "YOUTUBE")
+                .orElseThrow(() -> new RuntimeException("YouTube account not connected!"));
+
+        String accessToken = connection.getAccessToken();
+        return uploadVideoWithAccessToken(accessToken, title, description, privacyStatus, mediaUrl, mediaType);
+    }
+
+    private String uploadVideoWithAccessToken(String accessToken, String title, String description, String privacyStatus, String mediaUrl, String mediaType) throws Exception {
         // 🚨 SAFETY CHECK: YouTube strictly forbids image uploads
         if ("IMAGE".equalsIgnoreCase(mediaType)) {
             throw new RuntimeException("YouTube API strictly requires a video file. Static images cannot be uploaded.");
         }
 
-        // 1. Get Logged-in User
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        // 2. Fetch YouTube Access Token from DB
-        SocialConnection connection = socialConnectionRepository.findByUserIdAndPlatform(user.getId(), "YOUTUBE")
-                .orElseThrow(() -> new RuntimeException("YouTube account not connected!"));
-
-        String accessToken = connection.getAccessToken();
+        if (mediaUrl == null || mediaUrl.trim().isEmpty()) {
+            throw new RuntimeException("Media URL is required for YouTube upload.");
+        }
 
         // 3. Create YouTube Client
         YouTube youtube = YouTubeClientUtil.createClient(accessToken);
