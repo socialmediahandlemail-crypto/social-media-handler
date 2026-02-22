@@ -1,5 +1,7 @@
 package com.example.SocialSync.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +58,27 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/resend-key")
+    public ResponseEntity<?> resendKey(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email is required"));
+            }
+
+            // Calls the exact same service method you already built!
+            authService.generateAndSendSecretKey(email);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "New Secret Key sent to email.", 
+                "expiresIn", "2 minutes"
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
