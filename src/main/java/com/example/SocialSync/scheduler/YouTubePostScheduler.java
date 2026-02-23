@@ -45,7 +45,7 @@ public class YouTubePostScheduler {
 
                 account = accountRepository.findAll().get(0);
 
-                uploadService.uploadVideo(
+                String videoUrl = uploadService.uploadVideo(
                         account.getAccessToken(),
                         new File(post.getMediaPath()),
                         post.getTitle(),
@@ -55,6 +55,7 @@ public class YouTubePostScheduler {
 
                 post.setStatus(PostStatus.POSTED);
                 post.setPostedAt(LocalDateTime.now());
+                post.setPlatformPostUrl(videoUrl);
                 postRepository.save(post);
 
                 // ✅ EMAIL ON SUCCESS

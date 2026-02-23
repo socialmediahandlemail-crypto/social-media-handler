@@ -899,6 +899,20 @@ function setStoredJson(key, value) {
   }
 }
 
+function extractUrlFromResponseText(text) {
+  if (!text) return null;
+  try {
+    const data = JSON.parse(text);
+    const candidate = data.url || data.videoUrl || data.platformPostUrl || data.link;
+    if (candidate) return candidate;
+  } catch (e) {
+    // ignore non-JSON responses
+  }
+  const match = text.match(/https?:\/\/[^\s"'<>]+/);
+  if (!match) return null;
+  return match[0].replace(/[).,]+$/, "");
+}
+
 function getPostMetaMap() {
   return getStoredJson(POST_META_STORAGE_KEY, {});
 }
@@ -1075,6 +1089,23 @@ async function triggerPlatformPost(post) {
     });
 
     if (response.ok) {
+      let platformPostUrl = null;
+      try {
+        const responseText = await response.text();
+        platformPostUrl = extractUrlFromResponseText(responseText);
+      } catch (e) {
+        // ignore response parsing
+      }
+
+      if (platform === "YOUTUBE" && platformPostUrl) {
+        savePostMeta(post.id, { platformPostUrl });
+        if (Array.isArray(allPosts)) {
+          allPosts = allPosts.map(item =>
+            item && item.id === post.id ? { ...item, platformPostUrl } : item
+          );
+        }
+        refreshCurrentPostView();
+      }
       showNotification("success", `✅ ${prettyPlatformName(platform)} post published.`);
       markDispatched(post.id, "SUCCESS", { platform });
     } else {
@@ -1555,6 +1586,14 @@ shadow-sm"
     renderPostCards(pastPosts, pastView);
 }
 
+function refreshCurrentPostView() {
+    if (currentPostView === 'past') {
+        renderPastPosts();
+    } else {
+        renderUpcomingPosts();
+    }
+}
+
 // Common function to render post cards
 function renderPostCards(posts, container) {
     let cardsHtml = `
@@ -1583,6 +1622,14 @@ function renderPostCards(posts, container) {
             post.platform === "PINTEREST" ? "rose" : "orange";
 
         const computedStatus = getComputedStatus(post);
+        const platformPostUrl =
+          post.platform === "YOUTUBE"
+            ? (post.platformPostUrl || post.youtubeUrl || post.videoUrl || post.postUrl || post.url)
+            : (post.platformPostUrl || post.postUrl || post.url);
+        const showYoutubeUrl =
+          post.platform === "YOUTUBE" &&
+          platformPostUrl &&
+          (computedStatus === "COMPLETED" || computedStatus === "SENT");
 
          const statusStyle =
          computedStatus === "COMPLETED"
@@ -1665,6 +1712,23 @@ function renderPostCards(posts, container) {
               </p>
             </div>
           </div>
+
+          ${showYoutubeUrl ? `
+          <div class="flex items-center gap-3 text-sm group/detail hover:bg-red-50/50 p-2 rounded-lg transition-all duration-200">
+            <svg class="w-5 h-5 text-red-600 flex-shrink-0 group-hover/detail:text-red-700 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 8l6 4-6 4V8z"></path>
+              <path d="M21 6.5a2.5 2.5 0 0 0-1.8-1.8C17.4 4.2 12 4.2 12 4.2s-5.4 0-7.2.5A2.5 2.5 0 0 0 3 6.5 26.2 26.2 0 0 0 2.5 12a26.2 26.2 0 0 0 .5 5.5 2.5 2.5 0 0 0 1.8 1.8c1.8.5 7.2.5 7.2.5s5.4 0 7.2-.5a2.5 2.5 0 0 0 1.8-1.8c.3-1.8.5-5.5.5-5.5s-.2-3.7-.5-5.5z"></path>
+            </svg>
+            <div class="flex-grow min-w-0">
+              <p class="text-slate-600 text-xs uppercase tracking-wide font-semibold">
+                YouTube URL
+              </p>
+              <a href="${platformPostUrl}" target="_blank" rel="noopener" class="text-red-600 font-bold text-sm truncate hover:underline block">
+                ${platformPostUrl}
+              </a>
+            </div>
+          </div>
+          ` : ''}
 
         </div>
 

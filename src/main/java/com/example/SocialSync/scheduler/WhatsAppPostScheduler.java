@@ -41,7 +41,7 @@ public class WhatsAppPostScheduler {
                     } else {
                         String title = deriveYouTubeTitle(post.getContent());
                         String description = post.getContent() != null ? post.getContent() : "";
-                        youtubeService.uploadVideoForUser(
+                        String videoUrl = youtubeService.uploadVideoForUser(
                                 post.getUserId(),
                                 title,
                                 description,
@@ -49,6 +49,7 @@ public class WhatsAppPostScheduler {
                                 post.getMediaUrl(),
                                 post.getMediaType()
                         );
+                        post.setPlatformPostUrl(videoUrl);
                         post.setStatus("SENT");
                     }
                 } else {

@@ -24,6 +24,7 @@ private PostStatus status;
 private String failureReason;
 private LocalDateTime createdAt;
 private LocalDateTime postedAt;
+private String platformPostUrl;
 @jakarta.persistence.PrePersist
 public void onCreate() {
 createdAt = LocalDateTime.now();

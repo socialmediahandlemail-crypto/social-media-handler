@@ -51,7 +51,7 @@ public class YouTubeUploadService {
         );
 
         Video response = request.execute();
-        return response.getId();
+        return "https://www.youtube.com/watch?v=" + response.getId();
     }
 
 }

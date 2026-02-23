@@ -17,6 +17,7 @@ public class WhatsAppScheduledPost {
     private String status; // "PENDING", "SENT", "FAILED"
     private String mediaUrl;
     private String mediaType; // "IMAGE" or "VIDEO"
+    private String platformPostUrl;
 
     public String getId() {
         return id;
@@ -88,6 +89,14 @@ public class WhatsAppScheduledPost {
 
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
+    }
+
+    public String getPlatformPostUrl() {
+        return platformPostUrl;
+    }
+
+    public void setPlatformPostUrl(String platformPostUrl) {
+        this.platformPostUrl = platformPostUrl;
     }
 
     @jakarta.persistence.PrePersist
