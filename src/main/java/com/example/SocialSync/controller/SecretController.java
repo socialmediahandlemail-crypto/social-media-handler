@@ -16,7 +16,7 @@ public class SecretController {
     @Autowired
     private AuthService authService;
 
-    // 🔥 Maps to http://localhost:8082/api/secret/generate
+    // 🔥 Maps to https://social-media-handler-backend.onrender.com/api/secret/generate
     @PostMapping("/generate")
     public ResponseEntity<?> generateSecret(@RequestBody Map<String, String> request) {
         try {
