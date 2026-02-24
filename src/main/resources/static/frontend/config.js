@@ -5,7 +5,7 @@
  */
 
 // API Base URL - Change this for production deployment
-const API_BASE_URL = "http://localhost:8082";
+const API_BASE_URL = "https://social-media-handler-backend.onrender.com";
 
 // API Endpoints
 const API_ENDPOINTS = {
