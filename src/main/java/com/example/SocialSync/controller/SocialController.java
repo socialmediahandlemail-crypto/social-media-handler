@@ -105,11 +105,11 @@ public class SocialController {
             socialAuthService.handleCallback(platform, code, userId);
             
             // Redirect back to your Frontend Dashboard
-            return new RedirectView("http://127.0.0.1:5500/src/main/resources/static/frontend/connect.html?status=success");
+            return new RedirectView("https://social-media-handler-frontend.onrender.com/src/main/resources/static/frontend/connect.html?status=success");
             
         } catch (Exception e) {
             e.printStackTrace();
-            return new RedirectView("http://127.0.0.1:5500/dashboard.html?status=error");
+            return new RedirectView("https://social-media-handler-frontend.onrender.com/dashboard.html?status=error");
         }
     }
 

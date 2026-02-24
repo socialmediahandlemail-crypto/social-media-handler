@@ -10,7 +10,7 @@ import com.example.SocialSync.service.TwitterService;
 
 @RestController
 @RequestMapping("/api/twitter")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://social-media-handler-frontend.onrender.com")
 public class TwitterController {
 
     @Autowired

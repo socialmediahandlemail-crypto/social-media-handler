@@ -18,7 +18,7 @@ import com.example.SocialSync.service.AuthService;
 
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://social-media-handler-frontend.onrender.com")
 @RequestMapping("/auth")
 public class AuthController {
 

@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/schedule")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://social-media-handler-frontend.onrender.com")
 public class SocialScheduleController {
 
     private final UserRepository userRepository;

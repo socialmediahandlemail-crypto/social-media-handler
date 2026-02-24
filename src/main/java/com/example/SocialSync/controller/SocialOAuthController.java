@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/oauth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://social-media-handler-frontend.onrender.com")
 public class SocialOAuthController {
 
     private final SocialAuthService socialAuthService;
@@ -60,11 +60,11 @@ public class SocialOAuthController {
             socialAuthService.handleCallback(platform.toUpperCase(), code, state);
             
             // Redirect back to your Frontend Dashboard on success
-            return new RedirectView("http://127.0.0.1:5500/src/main/resources/static/frontend/main.html?status=" + platform + "_connected");
+            return new RedirectView("https://social-media-handler-frontend.onrender.com/src/main/resources/static/frontend/main.html?status=" + platform + "_connected");
             
         } catch (Exception e) {
             e.printStackTrace();
-            return new RedirectView("http://127.0.0.1:5500/src/main/resources/static/frontend/main.html?status=error");
+            return new RedirectView("https://social-media-handler-frontend.onrender.com/src/main/resources/static/frontend/main.html?status=error");
         }
     }
 }
