@@ -50,7 +50,7 @@ public class ContactController {
         String adminBody = buildAdminEmail(request);
         
         // Replace with your actual support email
-        emailService.sendEmail("ayushdby902@gmail.com", adminSubject, adminBody); 
+        emailService.sendEmail("socialmediahandlemail@gmail.com", adminSubject, adminBody); 
 
         // 2. Send Auto-Reply to User
         String userSubject = "We received your question - Graphura Support";

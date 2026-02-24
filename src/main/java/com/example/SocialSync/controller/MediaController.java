@@ -24,6 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/media")
+@CrossOrigin(origins = "https://social-media-handler-frontend.onrender.com")
 @RequiredArgsConstructor
 public class MediaController {
 

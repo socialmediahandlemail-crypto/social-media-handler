@@ -2,6 +2,7 @@ package com.example.SocialSync.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import com.example.SocialSync.service.LinkedInAnalyticsService;
 
 @RestController
 @RequestMapping("/linkedin/analytics")
+@CrossOrigin(origins = "https://social-media-handler-frontend.onrender.com")
 @RequiredArgsConstructor
 public class LinkedInAnalyticsController {
 

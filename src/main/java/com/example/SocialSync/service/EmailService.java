@@ -19,7 +19,7 @@ public class EmailService {
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
-            message.setFrom("ayushdby902@gmail.com"); 
+            message.setFrom("socialmediahandlemail@gmail.com"); 
             mailSender.send(message);
         } catch (Exception e) {
             System.err.println("Failed to send email to " + to + ": " + e.getMessage());
