@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/webp" href="assets/Graphura-favicon.webp">
   <title>Graphura | Login & Signup</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -366,6 +367,18 @@
       border-color: rgba(249,115,22,0.4);
       box-shadow: 0 6px 16px rgba(2,6,23,0.08);
     }
+
+    /* Mobile navbar adjustments to match home.html */
+    @media (max-width: 640px) {
+      nav.fixed { top: 0.5rem; }
+      #topNav { padding: 0.65rem 0.9rem; border-radius: 18px; }
+      #topNav > .flex { gap: 0.6rem; }
+      #topNav img[alt="Graphura Logo"] { height: 2.5rem; }
+      #authButtons { gap: 0.4rem; flex-wrap: wrap; }
+      #authButtons a { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+      #loginContent,
+      #signupContent { display: none !important; }
+    }
   </style>
 </head>
 
@@ -415,7 +428,7 @@
 
   <!-- NAVBAR -->
   <nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl">
-    <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-full px-8 py-4 shadow-lg hover:shadow-xl transition-shadow">
+    <div id="topNav" class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-full px-8 py-4 shadow-lg hover:shadow-xl transition-shadow">
       <div class="flex items-center justify-between">
         
         <!-- LOGO -->
@@ -431,7 +444,7 @@
         </ul>
 
         <!-- AUTH AREA -->
-        <div class="flex items-center gap-3">
+        <div id="authButtons" class="flex items-center gap-3">
           <a href="home.html"
              class="px-6 py-2 rounded-full text-sm font-semibold text-white
                     bg-gradient-to-br from-orange-400 to-pink-500 

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/webp" href="assets/Graphura-favicon.webp">
   <title>Graphura – FAQ Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -94,6 +95,22 @@
 
     .mobile-sidebar.open {
       transform: translateX(0);
+    }
+
+    .mobile-sidebar-header {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+
+    .mobile-sidebar-header img {
+      grid-column: 2;
+      justify-self: center;
+    }
+
+    .mobile-sidebar-close {
+      grid-column: 3;
+      justify-self: end;
     }
 
     /* CARD STYLES */
@@ -270,9 +287,9 @@
 <!-- MOBILE SIDEBAR -->
 <aside id="mobileSidebar" class="mobile-sidebar">
   <!-- LOGO -->
-  <div class="px-4 py-4 border-b flex items-center justify-between">
+  <div class="px-4 py-4 border-b mobile-sidebar-header">
     <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
-    <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
+    <button class="text-gray-500 hover:text-gray-700 text-xl mobile-sidebar-close" onclick="closeMobileSidebar()">✕</button>
   </div>
 
   <!-- NAV -->

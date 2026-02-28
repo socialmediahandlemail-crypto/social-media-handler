@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/webp" href="assets/Graphura-favicon.webp">
   <title>Graphura – Social Media Workspace</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -224,7 +224,60 @@
     .top-nav-wrap.solid { background: rgba(255,255,255,0.88); box-shadow: 0 10px 30px rgba(2,6,23,0.06); border: 1px solid rgba(255,255,255,0.6); }
     .top-nav-wrap.transparent { background: transparent; box-shadow: none; border-color: transparent; }
     .user-badge { background: rgba(255,247,237,0.9); color: #92400e; padding: 6px 10px; border-radius: 9999px; font-weight:600; }
-  </style>
+    .footer-links-group { display: contents; }
+
+    /* Mobile adjustments for nav + footer (keep original layout, tighten spacing) */
+    @media (max-width: 640px) {
+      nav.fixed { top: 0.5rem; }
+      #topNav { padding: 0.65rem 0.9rem; }
+      #topNav > .flex { gap: 0.6rem; }
+      #topNav img[alt="Graphura Logo"] { height: 2.5rem; }
+      #authButtons { gap: 0.4rem; flex-wrap: wrap; }
+      #authButtons a,
+      #authButtons button { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+      #userNameDisplay {
+        max-width: 7.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      footer .max-w-7xl { padding-top: 2rem; padding-bottom: 2rem; }
+      footer .grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+      }
+      footer .grid > div { min-width: 0; }
+      footer .footer-links-group {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+      }
+      footer .footer-links-group > div { width: 100%; }
+      footer .footer-links-group h4,
+      footer .footer-links-group ul,
+      footer .footer-links-group li,
+      footer .footer-links-group a {
+        text-align: center;
+        word-break: normal;
+        overflow-wrap: normal;
+      }
+      footer .footer-links-group ul { line-height: 1.3; }
+      footer .footer-links-group li { line-height: 1.25; }
+      footer .footer-links-group a { white-space: normal; }
+      footer .footer-links-group a[href^="tel:"],
+      footer .footer-links-group a[href^="mailto:"] {
+        white-space: nowrap;
+        font-size: 0.7rem;
+      }
+      footer img[alt="Graphura Logo"] { height: 3rem; }
+      footer p,
+      footer ul { font-size: 0.7rem; }
+      footer p { font-size: 0.78rem; }
+      footer p { max-width: 22rem; margin-left: auto; margin-right: auto; }
+      footer .grid h4 { margin-bottom: 0.5rem; }
+    }
+</style>
 </head>
 
 <body class="gradient-primary text-slate-800 min-h-screen flex flex-col m-0 p-0">
@@ -292,9 +345,11 @@
     <!-- LEFT CONTENT -->
     <div>
 
-      <span class="inline-flex items-center px-4 py-2 mb-6
+      <span class="inline-flex items-center gap-2 px-4 py-2 mb-6
                    rounded-full text-sm font-semibold
-                   text-orange-600 bg-orange-100">
+                   text-orange-700 bg-orange-50 border border-orange-200/70
+                   shadow-sm shadow-orange-200/40">
+        <span class="h-2 w-2 rounded-full bg-gradient-to-r from-orange-400 to-pink-500"></span>
         Social Media Management
       </span>
 
@@ -640,39 +695,40 @@
         </p>
       </div>
 
-      <!-- Quick Links -->
-      <div>
-        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 text-center">
-          Quick Links
-        </h4>
-        <ul class="space-y-3 text-center">
-          <li><a href="#hero" class="footer-link">Home</a></li>
-          <li><a href="#features" class="footer-link">Features</a></li>
-          <li><a href="#analytics" class="footer-link">Dashboard</a></li>
-          <li><a href="login-signup.html" class="footer-link">Get Started</a></li>
-        </ul>
-      </div>
+      <div class="footer-links-group">
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 text-center">
+            Quick Links
+          </h4>
+          <ul class="space-y-3 text-center">
+            <li><a href="#hero" class="footer-link">Home</a></li>
+            <li><a href="#features" class="footer-link">Features</a></li>
+            <li><a href="#analytics" class="footer-link">Dashboard</a></li>
+            <li><a href="login-signup.html" class="footer-link">Get Started</a></li>
+          </ul>
+        </div>
 
-      <!-- Product -->
-      <div>
-        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 text-center">
-          Product
-        </h4>
-        <ul class="space-y-3 text-center">
-          <li>
-            <a href="https://www.graphura.in/services/smm.html" class="footer-link">Social Media Marketing</a>
-          </li>
-          <li>
-            <a href="https://www.graphura.in/services/smo.html" class="footer-link">Social Media Optimization</a>
-          </li>
-          <li>
-            <a href="https://www.graphura.in/services/seo.html" class="footer-link">SEO & Search Visibility</a>
-          </li>
-          <li>
-            <a href="https://www.graphura.in/services/web-development.html" class="footer-link">Web Development</a>
-          </li>
-        </ul>
-      </div>
+        <!-- Product -->
+        <div>
+          <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 text-center">
+            Product
+          </h4>
+          <ul class="space-y-3 text-center">
+            <li>
+              <a href="https://www.graphura.in/services/smm.html" class="footer-link">Social Media Marketing</a>
+            </li>
+            <li>
+              <a href="https://www.graphura.in/services/smo.html" class="footer-link">Social Media Optimization</a>
+            </li>
+            <li>
+              <a href="https://www.graphura.in/services/seo.html" class="footer-link">SEO & Search Visibility</a>
+            </li>
+            <li>
+              <a href="https://www.graphura.in/services/web-development.html" class="footer-link">Web Development</a>
+            </li>
+          </ul>
+        </div>
 
       <!-- Contact Us -->
       <div>
@@ -684,20 +740,39 @@
             <strong>Graphura India</strong><br>
             <span class="text-slate-500 text-xs">
               Near RSF, Pataudi, Gurugram,<br>
-              Haryana 122503
-            </span>
-          </li>
-          <li>
-            <a href="tel:+917378021327" class="footer-link">
-              +91 73780 21327
-            </a>
-          </li>
+               Haryana 122503
+              </span>
+            </li>
+            <li>
+              <a href="tel:+917378021327" class="footer-link">
+                +91 73780 21327
+              </a>
+            </li>
           <li>
             <a href="mailto:support@graphura.in" class="footer-link">
               support@graphura.in
             </a>
           </li>
         </ul>
+        <div class="mt-4 flex items-center justify-center gap-3">
+          <a href="https://www.facebook.com/@Graphura.in/?hr=1&wtsid=rdr_04UeHoTsByAjQXXqI" aria-label="Facebook" class="w-9 h-9 rounded-full bg-white border border-slate-200/70 flex items-center justify-center hover:shadow-md hover:border-orange-200 transition text-slate-600 hover:text-orange-500">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true">
+              <path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5 3.66 9.14 8.44 9.93v-7.02H7.9v-2.91h2.4V9.84c0-2.38 1.42-3.69 3.59-3.69 1.04 0 2.12.19 2.12.19v2.33h-1.19c-1.17 0-1.54.73-1.54 1.48v1.78h2.62l-.42 2.91h-2.2v7.02c4.78-.79 8.44-4.93 8.44-9.93z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/graphura.in?igsh=cnpoeHQwaWhqNzkw" aria-label="Instagram" class="w-9 h-9 rounded-full bg-white border border-slate-200/70 flex items-center justify-center hover:shadow-md hover:border-orange-200 transition text-slate-600 hover:text-orange-500">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+              <circle cx="12" cy="12" r="4"></circle>
+              <circle cx="17" cy="7" r="1"></circle>
+            </svg>
+          </a>
+          <a href="https://www.linkedin.com/company/graphura-india-private-limited/" aria-label="LinkedIn" class="w-9 h-9 rounded-full bg-white border border-slate-200/70 flex items-center justify-center hover:shadow-md hover:border-orange-200 transition text-slate-600 hover:text-orange-500">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true">
+              <path d="M4.98 3.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5zM3.5 9h3v12h-3V9zm6 0h2.9v1.64h.04c.4-.76 1.38-1.56 2.84-1.56C18.4 9.08 20 10.4 20 13.14V21h-3v-7.18c0-1.7-.03-3.88-2.36-3.88-2.36 0-2.72 1.84-2.72 3.76V21h-3V9z"/>
+            </svg>
+          </a>
+        </div>
       </div>
 
     </div>
@@ -714,6 +789,8 @@
 
 <!-- include global confirm helper -->
 <script src="confirm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
   // Set current year in footer
   document.getElementById('current-year').textContent = new Date().getFullYear();
@@ -854,6 +931,216 @@
   }
 
   window.addEventListener("DOMContentLoaded", initCounters);
+  
+  function initScrollAnimations() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.defaults({ duration: 0.6, ease: "power2.out" });
+    gsap.config({ force3D: true });
+    ScrollTrigger.defaults({ once: true, invalidateOnRefresh: true });
+
+    gsap.from("nav", {
+      y: -20,
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.out",
+      immediateRender: false
+    });
+
+    const baseFrom = {
+      autoAlpha: 0,
+      y: 16,
+      scale: 0.992
+    };
+    const baseTo = {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      duration: 1.05,
+      ease: "power2.out",
+      clearProps: "will-change"
+    };
+    const fadeFrom = { autoAlpha: 0 };
+    const fadeTo = {
+      autoAlpha: 1,
+      duration: 0.95,
+      ease: "power2.out",
+      clearProps: "will-change"
+    };
+
+    function reveal(targets, options = {}) {
+      const trigger = options.trigger || targets;
+      const start = options.start || "top 82%";
+      const stagger = options.stagger || 0;
+      const fromVars = { ...baseFrom, ...(options.from || {}) };
+      const toVars = { ...baseTo, ...(options.to || {}) };
+
+      gsap.set(targets, { ...fromVars, willChange: "transform, opacity" });
+      gsap.to(targets, {
+        ...toVars,
+        stagger,
+        immediateRender: false,
+        scrollTrigger: { trigger, start }
+      });
+    }
+
+    function revealFade(targets, options = {}) {
+      const trigger = options.trigger || targets;
+      const start = options.start || "top 82%";
+      const stagger = options.stagger || 0;
+      const fromVars = { ...fadeFrom, ...(options.from || {}) };
+      const toVars = { ...fadeTo, ...(options.to || {}) };
+
+      gsap.set(targets, { ...fromVars, willChange: "opacity" });
+      gsap.to(targets, {
+        ...toVars,
+        stagger,
+        immediateRender: false,
+        scrollTrigger: { trigger, start }
+      });
+    }
+
+    // HERO: stagger the left content, then reveal orbit and icons
+    reveal("#hero .grid > div:first-child > *", {
+      trigger: "#hero",
+      stagger: 0.1,
+      start: "top 80%"
+    });
+    revealFade("#hero .grid > div:last-child", {
+      trigger: "#hero",
+      start: "top 80%",
+      from: { autoAlpha: 0 },
+      to: { duration: 1.0 }
+    });
+    reveal("#hero .social-orbit .social-icon", {
+      trigger: "#hero",
+      start: "top 78%",
+      stagger: 0.06,
+      from: { y: 12, scale: 0.98 },
+      to: { duration: 0.9 }
+    });
+
+    // STATS: header, card fade, then inner text
+    reveal("#stats .text-center > *", {
+      trigger: "#stats",
+      stagger: 0.1,
+      start: "top 78%"
+    });
+    revealFade("#stats .stat-card", {
+      trigger: "#stats",
+      stagger: 0.1,
+      start: "top 75%"
+    });
+    reveal("#stats .stat-card > *", {
+      trigger: "#stats",
+      stagger: 0.06,
+      start: "top 72%",
+      from: { y: 12, scale: 0.995 },
+      to: { duration: 0.9 }
+    });
+
+    // FEATURES: header, card fade, then card contents
+    reveal("#features .text-center > *", {
+      trigger: "#features",
+      stagger: 0.1,
+      start: "top 78%"
+    });
+    revealFade("#features .feature-card", {
+      trigger: "#features",
+      stagger: 0.1,
+      start: "top 75%"
+    });
+    reveal("#features .feature-card > *", {
+      trigger: "#features",
+      stagger: 0.06,
+      start: "top 72%",
+      from: { y: 12, scale: 0.995 },
+      to: { duration: 0.9 }
+    });
+
+    // ANALYTICS: header, dashboard fade, stats column fade, then inner elements
+    reveal("#analytics .text-center > *", {
+      trigger: "#analytics",
+      stagger: 0.1,
+      start: "top 78%"
+    });
+    revealFade("#analytics .lg\\:col-span-2", {
+      trigger: "#analytics",
+      start: "top 75%",
+      from: { autoAlpha: 0 },
+      to: { duration: 1.0 }
+    });
+    reveal("#analytics .lg\\:col-span-2 > *", {
+      trigger: "#analytics",
+      stagger: 0.06,
+      start: "top 73%",
+      from: { y: 12, scale: 0.995 },
+      to: { duration: 0.9 }
+    });
+    revealFade("#analytics .flex.flex-col.gap-4 > div", {
+      trigger: "#analytics",
+      stagger: 0.1,
+      start: "top 75%"
+    });
+    reveal("#analytics .flex.flex-col.gap-4 > div > *", {
+      trigger: "#analytics",
+      stagger: 0.06,
+      start: "top 72%",
+      from: { y: 10, scale: 0.995 },
+      to: { duration: 0.85 }
+    });
+
+    // CTA: container fade + inner elements
+    revealFade("#cta .rounded-3xl", {
+      trigger: "#cta",
+      start: "top 78%",
+      from: { autoAlpha: 0 },
+      to: { duration: 1.0 }
+    });
+    reveal("#cta .rounded-3xl > *", {
+      trigger: "#cta",
+      stagger: 0.1,
+      start: "top 78%"
+    });
+    reveal("#cta .rounded-3xl a", {
+      trigger: "#cta",
+      start: "top 76%",
+      from: { y: 8, scale: 0.995 },
+      to: { duration: 0.85 }
+    });
+
+    // FOOTER: container fade, then columns and items
+    revealFade("footer .max-w-7xl", {
+      trigger: "footer",
+      start: "top 85%",
+      to: { duration: 0.9 }
+    });
+    reveal("footer .grid > *", {
+      trigger: "footer",
+      start: "top 83%",
+      stagger: 0.08,
+      from: { y: 12, scale: 0.995 },
+      to: { duration: 0.85 }
+    });
+    reveal("footer .grid > * *", {
+      trigger: "footer",
+      start: "top 82%",
+      stagger: 0.03,
+      from: { y: 8, scale: 0.998 },
+      to: { duration: 0.75 }
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", initScrollAnimations);
+  window.addEventListener("load", () => {
+    if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.refresh();
+    }
+  });
 </script>
 
 </body>
